@@ -1,13 +1,14 @@
 import { categoriasOrdenadas, rotulosCategoria } from './categorias'
 
 describe('categorias', () => {
-  it('mantém ordem fixa massas → molhos → recheios', () => {
-    expect(categoriasOrdenadas).toEqual(['massas', 'molhos', 'recheios'])
+  it('mantém ordem fixa pizzas → esfihas → sobremesas → bebidas', () => {
+    expect(categoriasOrdenadas).toEqual(['pizzas', 'esfihas', 'sobremesas', 'bebidas'])
   })
 
   it('expõe rótulos em português', () => {
-    expect(rotulosCategoria.massas).toBe('Massas')
-    expect(rotulosCategoria.molhos).toBe('Molhos')
-    expect(rotulosCategoria.recheios).toBe('Recheios')
+    expect(rotulosCategoria.pizzas).toBe('Pizzas')
+    expect(rotulosCategoria.esfihas).toBe('Esfihas')
+    expect(rotulosCategoria.sobremesas).toBe('Sobremesas')
+    expect(rotulosCategoria.bebidas).toBe('Bebidas')
   })
 })

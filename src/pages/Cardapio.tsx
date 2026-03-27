@@ -14,7 +14,7 @@ const SWIPE_VERTICAL_RATIO = 0.65
 export function Cardapio() {
   const navigate = useNavigate()
   const { categoria } = useParams<{ categoria: string }>()
-  const cat = (categoria?.toLowerCase() as Categoria) || 'massas'
+  const cat = (categoria?.toLowerCase() as Categoria) || 'pizzas'
   const touchStart = useRef<{ x: number; y: number } | null>(null)
   const navCooldown = useRef(false)
 
@@ -40,7 +40,7 @@ export function Cardapio() {
       if (idx < 0) return
 
       if (dx > 0) {
-        // Dedo desliza para a direita → próxima categoria (ex.: Massas → Molhos)
+        // Dedo desliza para a direita → próxima categoria (ex.: Pizzas → Esfihas)
         const next = validas[(idx + 1) % validas.length]
         navigate(`/cardapio/${next}`)
       } else {
@@ -58,7 +58,7 @@ export function Cardapio() {
   )
 
   if (!categoria || !validas.includes(cat)) {
-    return <Navigate to="/cardapio/massas" replace />
+    return <Navigate to="/cardapio/pizzas" replace />
   }
 
   const lista = produtos.filter((p) => p.categoria === cat)
@@ -85,17 +85,23 @@ export function Cardapio() {
 
           <h2 className="visually-hidden">{rotulosCategoria[cat]}</h2>
           <div className="menu-panel">
-            <div className="pgrid">
-              {lista.map((p) => (
-                <Link key={p.id} to={`/produto/${p.id}`} className="pcard">
-                  <img className="pcard__img" src={p.imagem} alt="" width={72} height={72} loading="lazy" />
-                  <div className="pcard__body">
-                    <h3 className="pcard__nome">{p.nome}</h3>
-                    <p className="pcard__meta">{p.descricao.slice(0, 90)}…</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            {lista.length === 0 ? (
+              <p className="cardapio-vazio" style={{ color: 'var(--text-muted)', margin: '1rem 0 0' }}>
+                Itens desta categoria em breve.
+              </p>
+            ) : (
+              <div className="pgrid">
+                {lista.map((p) => (
+                  <Link key={p.id} to={`/produto/${p.id}`} className="pcard">
+                    <img className="pcard__img" src={p.imagem} alt="" width={72} height={72} loading="lazy" />
+                    <div className="pcard__body">
+                      <h3 className="pcard__nome">{p.nome}</h3>
+                      <p className="pcard__meta">{p.descricao.slice(0, 90)}…</p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

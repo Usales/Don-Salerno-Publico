@@ -38,7 +38,7 @@ export function Produto() {
     return (
       <div className="container" style={{ padding: '2rem' }}>
         <p>Produto não encontrado.</p>
-        <Link to="/cardapio/massas">Voltar às receitas</Link>
+        <Link to="/cardapio/pizzas">Voltar ao cardápio</Link>
       </div>
     )
   }

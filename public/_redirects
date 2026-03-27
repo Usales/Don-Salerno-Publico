@@ -1,2 +1,7 @@
+# URLs antigas do cardápio → novas categorias
+/cardapio/massas    /cardapio/pizzas     301
+/cardapio/molhos    /cardapio/pizzas     301
+/cardapio/recheios  /cardapio/pizzas     301
+
 # SPA (React Router): todas as rotas entregam index.html
 /*    /index.html   200

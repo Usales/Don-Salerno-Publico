@@ -24,7 +24,7 @@ export function Header() {
             Início
           </NavLink>
           <NavLink
-            to="/cardapio/massas"
+            to="/cardapio/pizzas"
             className={() =>
               loc.pathname.startsWith('/cardapio') || loc.pathname.startsWith('/produto') ? 'is-active' : ''
             }

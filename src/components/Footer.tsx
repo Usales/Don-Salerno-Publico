@@ -7,7 +7,7 @@ export function Footer() {
       <div className="container site-footer__grid">
         <div>
           <strong className="site-footer__brand">Don Salerno</strong>
-          <p className="site-footer__txt">Massas, molhos e recheios artesanais. Tradição italiana no prato.</p>
+          <p className="site-footer__txt">Pizzas, esfihas e cardápio completo. Tradição italiana no prato.</p>
         </div>
         <div>
           <h2 className="site-footer__h">Links</h2>

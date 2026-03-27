@@ -3,9 +3,10 @@ import type { Categoria } from '@/types'
 import { IngredientIcon, type IconeIngrediente } from './IngredientIcon'
 
 const mapCategoria: Record<Categoria, keyof typeof processoFabricacao> = {
-  massas: 'massas',
-  molhos: 'molhos',
-  recheios: 'recheios',
+  pizzas: 'pizzas',
+  esfihas: 'esfihas',
+  sobremesas: 'sobremesas',
+  bebidas: 'bebidas',
 }
 
 export function ProcessSteps({ categoria }: { categoria: Categoria }) {

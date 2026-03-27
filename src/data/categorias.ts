@@ -1,9 +1,10 @@
 import type { Categoria } from '@/types'
 
 export const rotulosCategoria: Record<Categoria, string> = {
-  massas: 'Massas',
-  molhos: 'Molhos',
-  recheios: 'Recheios',
+  pizzas: 'Pizzas',
+  esfihas: 'Esfihas',
+  sobremesas: 'Sobremesas',
+  bebidas: 'Bebidas',
 }
 
-export const categoriasOrdenadas: Categoria[] = ['massas', 'molhos', 'recheios']
+export const categoriasOrdenadas: Categoria[] = ['pizzas', 'esfihas', 'sobremesas', 'bebidas']

@@ -11,7 +11,7 @@ export function JsonLdRestaurant() {
       '@context': 'https://schema.org',
       '@type': 'Restaurant',
       name: 'Don Salerno',
-      servesCuisine: ['Massas', 'Molhos', 'Recheios'],
+      servesCuisine: ['Pizza', 'Esfiha', 'Sobremesas', 'Bebidas'],
       priceRange: '$$',
       url: typeof window !== 'undefined' ? window.location.origin : '',
     })

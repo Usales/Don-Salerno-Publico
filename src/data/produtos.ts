@@ -17,13 +17,14 @@ const adicionaisPadrao: Produto['adicionais'] = [
 
 function massaDoFicha(
   indice: number,
+  categoria: Produto['categoria'],
   extra: Pick<Produto, 'id' | 'slug' | 'imagem' | 'precos' | 'tempoPreparoMin'>,
 ): Produto {
   const f = fichasMassas[indice]
   return {
     ...extra,
     nome: f.nome,
-    categoria: 'massas',
+    categoria,
     descricao: `${f.hidratacao} hidratação · ${f.farinha.tipo} (${f.farinha.proteina_percentual} proteína). Escala: 1 kg de farinha.`,
     receita: receitaMassaPorIndice(indice),
     ingredientes: ['Medidas na tabela da receita (1 kg de farinha).'],
@@ -34,7 +35,7 @@ function massaDoFicha(
 }
 
 export const produtos: Produto[] = [
-  massaDoFicha(0, {
+  massaDoFicha(0, 'pizzas', {
     id: 'p1',
     slug: 'massa-napoletana',
     tempoPreparoMin: 25,
@@ -42,7 +43,7 @@ export const produtos: Produto[] = [
       'https://images.unsplash.com/photo-1513844316321-dd2466411c4c?w=1200&q=80&auto=format&fit=max',
     precos: { P: 42, M: 58, G: 72 },
   }),
-  massaDoFicha(1, {
+  massaDoFicha(1, 'pizzas', {
     id: 'p2',
     slug: 'massa-romana-al-teglia',
     tempoPreparoMin: 20,
@@ -50,7 +51,7 @@ export const produtos: Produto[] = [
       'https://images.unsplash.com/photo-1716237388463-14fdbfc0ca5e?w=1200&q=80&auto=format&fit=max',
     precos: { P: 45, M: 62, G: 78 },
   }),
-  massaDoFicha(2, {
+  massaDoFicha(2, 'pizzas', {
     id: 'p3',
     slug: 'massa-new-york',
     tempoPreparoMin: 24,
@@ -58,7 +59,7 @@ export const produtos: Produto[] = [
       'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1280&h=640&fit=crop&auto=format&q=80',
     precos: { P: 40, M: 56, G: 70 },
   }),
-  massaDoFicha(3, {
+  massaDoFicha(3, 'pizzas', {
     id: 'p4',
     slug: 'massa-chicago-deep-dish',
     tempoPreparoMin: 25,
@@ -66,7 +67,7 @@ export const produtos: Produto[] = [
       'https://images.unsplash.com/photo-1689778560408-78595f912b97?w=1200&q=80&auto=format&fit=max',
     precos: { P: 44, M: 60, G: 74 },
   }),
-  massaDoFicha(4, {
+  massaDoFicha(4, 'pizzas', {
     id: 'p5',
     slug: 'massa-detroit',
     tempoPreparoMin: 20,
@@ -74,7 +75,7 @@ export const produtos: Produto[] = [
       'https://images.unsplash.com/photo-1650039215510-a086786c3da5?w=1200&q=80&auto=format&fit=max',
     precos: { P: 43, M: 59, G: 73 },
   }),
-  massaDoFicha(5, {
+  massaDoFicha(5, 'pizzas', {
     id: 'p6',
     slug: 'massa-siciliana',
     tempoPreparoMin: 21,
@@ -82,7 +83,7 @@ export const produtos: Produto[] = [
       'https://images.unsplash.com/photo-1772981277505-c855d2c9314f?w=1200&q=80&auto=format&fit=max',
     precos: { P: 41, M: 57, G: 71 },
   }),
-  massaDoFicha(6, {
+  massaDoFicha(6, 'esfihas', {
     id: 'p7',
     slug: 'massa-esfiha',
     tempoPreparoMin: 50,
@@ -94,7 +95,7 @@ export const produtos: Produto[] = [
     id: 'e1',
     nome: 'Molho de Tomate Tradicional para Pizza',
     slug: 'molho-caseiro',
-    categoria: 'molhos',
+    categoria: 'pizzas',
     descricao:
       'Molho cru ou minimamente processado, com tomate pelado de qualidade — base tradicional para pizza.',
     ingredientes: ['Tomate pelado', 'sal', 'azeite (opcional)', 'manjericão (opcional)'],
@@ -114,7 +115,7 @@ export const produtos: Produto[] = [
     id: 'c1',
     nome: 'Calzone presunto & mussarela',
     slug: 'calzone-presunto',
-    categoria: 'recheios',
+    categoria: 'pizzas',
     descricao: 'Meia-lua assada, recheio clássico e selagem firme.',
     ingredientes: ['Farinha de trigo', 'presunto', 'mussarela', 'molho de tomate', 'orégano'],
     alergenos: ['CONTÉM TRIGO E DERIVADOS DO LEITE.'],
@@ -128,7 +129,7 @@ export const produtos: Produto[] = [
     id: 'c2',
     nome: 'Calzone de calabresa',
     slug: 'calzone-calabresa',
-    categoria: 'recheios',
+    categoria: 'pizzas',
     descricao: 'Calabresa, cebola e mussarela.',
     ingredientes: ['Farinha de trigo', 'calabresa', 'cebola', 'mussarela', 'molho'],
     alergenos: ['CONTÉM TRIGO E DERIVADOS DO LEITE.'],
