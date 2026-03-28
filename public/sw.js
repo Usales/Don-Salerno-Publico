@@ -1,10 +1,10 @@
-/* Cache mínimo — incremente CACHE em cada deploy relevante para evitar index.html antigo (tela branca). */
-const CACHE = 'don-salerno-v3'
-const ASSETS = ['/', '/index.html', '/manifest.json', '/logo.svg']
+/* Estratégia segura contra tela branca por cache antigo. */
+const CACHE = 'don-salerno-v4'
+const APP_SHELL = ['/', '/index.html', '/manifest.json', '/logo.svg']
 
 self.addEventListener('install', (e) => {
   self.skipWaiting()
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)))
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(APP_SHELL)))
 })
 
 self.addEventListener('activate', (e) => {
@@ -17,7 +17,43 @@ self.addEventListener('activate', (e) => {
 })
 
 self.addEventListener('fetch', (e) => {
-  e.respondWith(
-    caches.match(e.request).then((r) => r || fetch(e.request).catch(() => caches.match('/index.html'))),
-  )
+  if (e.request.method !== 'GET') return
+
+  const url = new URL(e.request.url)
+  const isSameOrigin = url.origin === self.location.origin
+
+  // Navegação SPA: sempre tenta rede primeiro para evitar index/chunks desatualizados.
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request)
+        .then((response) => {
+          const copy = response.clone()
+          caches.open(CACHE).then((cache) => cache.put('/index.html', copy))
+          return response
+        })
+        .catch(async () => {
+          const cached = await caches.match('/index.html')
+          return cached || Response.error()
+        }),
+    )
+    return
+  }
+
+  // Assets locais: cache-first com fallback de rede.
+  if (isSameOrigin) {
+    e.respondWith(
+      caches.match(e.request).then((cached) => {
+        if (cached) return cached
+        return fetch(e.request).then((response) => {
+          const copy = response.clone()
+          caches.open(CACHE).then((cache) => cache.put(e.request, copy))
+          return response
+        })
+      }),
+    )
+    return
+  }
+
+  // Requisições externas: apenas rede.
+  e.respondWith(fetch(e.request))
 })

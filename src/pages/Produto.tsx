@@ -38,6 +38,31 @@ export function Produto() {
   const [tamanho, setTamanho] = useState<TamanhoCodigo>('P')
   const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
   const adicionarAoCarrinho = useCart((s) => s.adicionar)
+  const categoriaProduto = p?.categoria
+  const fluxoProximaCategoria: Record<Categoria, Categoria | 'carrinho'> = {
+    pizzas: 'esfihas',
+    esfihas: 'calzones',
+    calzones: 'sobremesas',
+    sobremesas: 'bebidas',
+    bebidas: 'carrinho',
+  }
+  const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
+    () => (categoriaProduto === 'esfihas' ? ['P'] : ['P', 'M', 'G']),
+    [categoriaProduto],
+  )
+  const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
+    () =>
+      categoriaProduto === 'sobremesas'
+        ? { P: '1', M: '5', G: '10' }
+        : { P: 'P', M: 'M', G: 'G' },
+    [categoriaProduto],
+  )
+
+  useEffect(() => {
+    if (!tamanhosDisponiveis.includes(tamanho)) {
+      setTamanho(tamanhosDisponiveis[0])
+    }
+  }, [tamanho, tamanhosDisponiveis])
 
   if (!p) {
     return (
@@ -49,30 +74,6 @@ export function Produto() {
   }
 
   const produto = p
-  const fluxoProximaCategoria: Record<Categoria, Categoria | 'carrinho'> = {
-    pizzas: 'esfihas',
-    esfihas: 'calzones',
-    calzones: 'sobremesas',
-    sobremesas: 'bebidas',
-    bebidas: 'carrinho',
-  }
-  const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
-    () => (produto.categoria === 'esfihas' ? ['P'] : ['P', 'M', 'G']),
-    [produto.categoria],
-  )
-  const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
-    () =>
-      produto.categoria === 'sobremesas'
-        ? { P: '1', M: '5', G: '10' }
-        : { P: 'P', M: 'M', G: 'G' },
-    [produto.categoria],
-  )
-
-  useEffect(() => {
-    if (!tamanhosDisponiveis.includes(tamanho)) {
-      setTamanho(tamanhosDisponiveis[0])
-    }
-  }, [tamanho, tamanhosDisponiveis])
 
   function enviarReview(e: FormEvent) {
     e.preventDefault()
@@ -220,7 +221,7 @@ export function Produto() {
               value={tamanho}
               onChange={(e) => setTamanho(e.target.value as TamanhoCodigo)}
               disabled={tamanhosDisponiveis.length === 1}
-              style={{ minWidth: 200, padding: '0.5rem 0.65rem', fontSize: '1rem' }}
+              style={{ width: '100%', minWidth: 180, padding: '0.5rem 0.65rem', fontSize: '1rem' }}
             >
               {tamanhosDisponiveis.map((t) => (
                 <option key={t} value={t}>
