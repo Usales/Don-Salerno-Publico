@@ -4,7 +4,7 @@
   background: var(--bg);
   border-bottom: 1px solid var(--border);
   position: sticky;
-  top: 0;
+  top: 8px;
   z-index: 100;
 }
 
@@ -186,6 +186,7 @@
   flex: 1;
   outline: none;
   background: var(--bg-soft);
+  padding-top: 8px;
 }
 
 /* Rodapé corporativo (fundo escuro, colunas, dados cadastrais) */
@@ -404,12 +405,12 @@
 
 /* Altura estimada do header (uma linha / duas em mobile) — hero full-view abaixo dele */
 :root {
-  --layout-header-offset: 72px;
+  --layout-header-offset: 80px;
 }
 
 @media (max-width: 767px) {
   :root {
-    --layout-header-offset: 118px;
+    --layout-header-offset: 126px;
   }
 }
 
