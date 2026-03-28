@@ -114,7 +114,7 @@ export const produtos: Produto[] = [
     descricao:
       'Pepperoni levemente picante, mussarela abundante e toque de orégano. Estilo americano, bordas douradas e sabor intenso do primeiro ao último pedaço.',
     tempoPreparoMin: 22,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-pepperoni.png',
     precos: { P: 48, M: 64, G: 78 },
     ingredientes: ['Pepperoni levemente apimentado', 'mussarela', 'orégano'],
   }),
@@ -125,7 +125,7 @@ export const produtos: Produto[] = [
     descricao:
       'Mussarela, provolone, gorgonzola e parmesão em camadas de cremosidade e aroma. Para quem ama queijo de verdade e final persistente no paladar.',
     tempoPreparoMin: 23,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-quatro-queijos.png',
     precos: { P: 47, M: 63, G: 77 },
     ingredientes: ['Mussarela', 'provolone', 'gorgonzola', 'parmesão'],
   }),
@@ -136,7 +136,7 @@ export const produtos: Produto[] = [
     descricao:
       'Frango desfiado bem temperado, catupiry original cremoso e toque de milho verde. Conforto em forma de pizza, com sabor caseiro e textura perfeita.',
     tempoPreparoMin: 24,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-frango-catupiry.png',
     precos: { P: 45, M: 61, G: 75 },
     ingredientes: ['Frango desfiado temperado', 'catupiry original', 'milho verde'],
   }),
@@ -147,7 +147,7 @@ export const produtos: Produto[] = [
     descricao:
       'Anchovas, alcaparras, tomate-cereja e mussarela em uma receita de perfil mediterrâneo. Salinidade elegante e acidez fresca na medida certa.',
     tempoPreparoMin: 23,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-napolitana.png',
     precos: { P: 49, M: 65, G: 79 },
     ingredientes: ['Anchovas', 'alcaparras', 'tomate cereja', 'mussarela'],
   }),
@@ -158,7 +158,7 @@ export const produtos: Produto[] = [
     descricao:
       'Pimentões coloridos, champignon, palmito, cebola roxa e mussarela. Leve, aromática e muito saborosa para quem prefere uma opção sem carnes.',
     tempoPreparoMin: 23,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-vegetariana.png',
     precos: { P: 45, M: 61, G: 75 },
     ingredientes: ['Pimentões', 'champignon', 'palmito', 'cebola roxa', 'mussarela'],
   }),
@@ -169,7 +169,7 @@ export const produtos: Produto[] = [
     descricao:
       'Carne seca desfiada, cream cheese cremoso, cebola roxa e mussarela. Um contraste perfeito entre intensidade, cremosidade e toque regional.',
     tempoPreparoMin: 25,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-carne-seca-cream-cheese.png',
     precos: { P: 52, M: 68, G: 82 },
     ingredientes: ['Carne seca desfiada', 'cream cheese', 'cebola roxa', 'mussarela'],
   }),
@@ -180,7 +180,7 @@ export const produtos: Produto[] = [
     descricao:
       'Calabresa moída, pimenta, cebola, azeitona e mussarela para quem gosta de sabor com atitude. Picância equilibrada e final marcante.',
     tempoPreparoMin: 23,
-    imagem: '/hero-pizza-calabresa.png',
+    imagem: '/hero-pizza-baiana.png',
     precos: { P: 46, M: 62, G: 76 },
     ingredientes: ['Calabresa moída', 'pimenta', 'cebola', 'azeitona', 'mussarela'],
   }),
