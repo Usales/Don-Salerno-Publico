@@ -185,6 +185,7 @@
   padding: calc(4.5px + 0.3cm);
   background: #fff;
   box-shadow: none;
+  animation: none !important;
 }
 
 /* Borda tracejada estática; a foto gira dentro do círculo */
@@ -200,14 +201,29 @@
 }
 
 @keyframes home-pop-pizza-spin {
+  from {
+    transform: rotate(0deg);
+  }
   to {
     transform: rotate(360deg);
   }
 }
 
 .home-fold2 .home-pop-card__img {
-  animation: home-pop-pizza-spin 22s linear infinite;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
   transform-origin: center center;
+  will-change: transform;
+  animation-name: home-pop-pizza-spin !important;
+  animation-duration: 22s !important;
+  animation-timing-function: linear !important;
+  animation-iteration-count: infinite !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
