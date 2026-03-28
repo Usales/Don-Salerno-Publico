@@ -9,6 +9,7 @@ import { Sobre } from '@/pages/Sobre'
 import { Contato } from '@/pages/Contato'
 import { Privacidade } from '@/pages/Privacidade'
 import { NotFound } from '@/pages/NotFound'
+import { Carrinho } from '@/pages/Carrinho'
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="cardapio" element={<Navigate to="/cardapio/pizzas" replace />} />
             <Route path="cardapio/:categoria" element={<Cardapio />} />
             <Route path="produto/:id" element={<Produto />} />
+            <Route path="carrinho" element={<Carrinho />} />
             <Route path="conta" element={<Conta />} />
             <Route path="sobre" element={<Sobre />} />
             <Route path="contato" element={<Contato />} />

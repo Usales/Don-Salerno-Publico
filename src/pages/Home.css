@@ -1,46 +1,168 @@
 /* Landing — referência visual: destaques + banners promocionais */
 
-.home-popular {
-  position: relative;
-  padding: 2.5rem 0 2rem;
+/* Segunda dobra: populares + promoções preenchem uma viewport (abaixo da hero) */
+.home-fold2 {
   background-color: #faf7f2;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23c4c4c4' stroke-width='0.8' opacity='0.35'%3E%3Cpath d='M20 55 Q35 40 50 55 T80 55'/%3E%3Ccircle cx='95' cy='28' r='10'/%3E%3Cpath d='M15 95h25l5-12h-18z'/%3E%3Cpath d='M88 88 L102 95 L95 102 Z'/%3E%3C/g%3E%3C/svg%3E");
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
+  /* vh → dvh → lvh: evitar 100svh como teto (svh é a viewport “pequena” e deixa a dobra curta) */
+  min-height: calc(100vh - var(--layout-header-offset));
+  min-height: calc(100dvh - var(--layout-header-offset));
+  min-height: calc(100lvh - var(--layout-header-offset));
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-block: clamp(1rem, 3vh, 2rem);
+}
+
+.home-fold2__inner {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: clamp(1rem, 4vh, 2.5rem);
+  min-height: 0;
+}
+
+.home-popular {
+  position: relative;
+  padding: 0;
+  margin: 0;
 }
 
 .home-popular__title {
   text-align: center;
-  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-size: clamp(2.025rem, 4.5vw, 2.625rem);
   font-weight: 800;
   color: #1a1f36;
   margin: 0 0 2rem;
   letter-spacing: -0.02em;
 }
 
-.home-popular__grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem 1rem;
-  max-width: 1000px;
-  margin: 0 auto;
+/*
+ * Desloca só o desenho do título: margin negativa colapsa com o fluxo e puxa a grade.
+ * translateY não altera o box no layout — os cards ficam onde estavam.
+ */
+.home-fold2 .home-popular__title {
+  position: relative;
+  z-index: 1;
+  transform: translateY(calc(-1cm + 3.5px + 2cm - 0.5cm));
 }
 
-@media (min-width: 768px) {
-  .home-popular__grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem 1.25rem;
+@media (prefers-reduced-motion: reduce) {
+  .home-fold2 .home-popular__title {
+    transform: none;
   }
 }
 
+/* Faixa contínua estilo carrossel (direita → esquerda), sem controles */
+.home-popular__marquee {
+  overflow: hidden;
+  padding-top: calc(0.42 * 144px + 1.25rem);
+  padding-bottom: 0.75rem;
+  width: 100%;
+  max-width: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.home-popular__marquee:active {
+  cursor: grabbing;
+}
+
+.home-popular__marquee:hover .home-popular__marquee-track:not(.home-popular__marquee-track--js),
+.home-popular__marquee:focus-within .home-popular__marquee-track:not(.home-popular__marquee-track--js) {
+  animation-play-state: paused;
+}
+
+.home-popular__marquee-track {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  width: max-content;
+  animation: home-popular-marquee 55s linear infinite;
+}
+
+.home-popular__marquee-track--js {
+  animation: none !important;
+  will-change: transform;
+}
+
+.home-popular__marquee-set {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  gap: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .home-popular__marquee-set {
+    gap: 1.875rem;
+    padding-right: 1.875rem;
+  }
+}
+
+.home-popular__marquee-set .home-pop-card {
+  flex: 0 0 auto;
+  width: clamp(220px, 78vw, 340px);
+}
+
+@media (min-width: 768px) {
+  .home-popular__marquee-set .home-pop-card {
+    width: clamp(240px, 22vw, 360px);
+  }
+}
+
+@keyframes home-popular-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-popular__marquee {
+    cursor: default;
+    touch-action: auto;
+  }
+
+  .home-popular__marquee-track {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1500px;
+    margin-inline: auto;
+  }
+
+  .home-popular__marquee-set[aria-hidden='true'] {
+    display: none;
+  }
+
+  .home-popular__marquee-set {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-right: 0;
+    gap: 1.875rem 1.5rem;
+  }
+}
+
+/* Cards populares — alinhado ao template .single-food-items (gradiente, raio, sombra) */
 .home-pop-card {
   display: block;
   text-decoration: none;
   color: inherit;
-  background: #fff;
-  border-radius: 16px;
-  padding: 3.25rem 1rem 1.25rem;
-  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
   text-align: center;
+  margin-top: 0;
+  padding: clamp(5.5rem, 10vw, 8.75rem) 25px 30px;
+  border-radius: 16px;
+  background: linear-gradient(rgba(255, 255, 255, 0.3) 0%, rgb(255, 255, 255) 63.33%);
+  border: 1px solid rgba(210, 210, 209, 0.45);
+  box-shadow: 0 6px 30px 0 rgba(52, 55, 170, 0.12);
   position: relative;
   transition:
     transform 0.2s ease,
@@ -48,8 +170,8 @@
 }
 
 .home-pop-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 36px 0 rgba(52, 55, 170, 0.18);
 }
 
 .home-pop-card__img-wrap {
@@ -57,16 +179,46 @@
   top: 0;
   left: 50%;
   transform: translate(-50%, -42%);
-  width: 96px;
-  height: 96px;
+  width: 144px;
+  height: 144px;
   border-radius: 50%;
-  border: 2px dashed var(--brand);
-  padding: 3px;
+  padding: calc(4.5px + 0.3cm);
   background: #fff;
-  box-shadow: 0 4px 14px rgba(234, 29, 44, 0.12);
+  box-shadow: none;
+}
+
+/* Borda tracejada estática; a foto gira dentro do círculo */
+.home-pop-card__img-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px dashed var(--brand);
+  box-sizing: border-box;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes home-pop-pizza-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.home-fold2 .home-pop-card__img {
+  animation: home-pop-pizza-spin 22s linear infinite;
+  transform-origin: center center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-fold2 .home-pop-card__img {
+    animation: none;
+  }
 }
 
 .home-pop-card__img {
+  position: relative;
+  z-index: 2;
   width: 100%;
   height: 100%;
   border-radius: 50%;
@@ -75,22 +227,26 @@
 }
 
 .home-pop-card__nome {
-  font-size: 0.9375rem;
+  font-size: 1.40625rem;
   font-weight: 700;
   color: #1a1f36;
-  margin: 0 0 0.35rem;
+  margin: 0 0 0.525rem;
   line-height: 1.3;
 }
 
+.home-fold2 .home-pop-card__nome {
+  margin-top: 0.35rem;
+}
+
 .home-pop-card__desc {
-  font-size: 0.75rem;
+  font-size: 1.125rem;
   color: var(--text-muted);
-  margin: 0 0 0.65rem;
+  margin: 0 0 0.975rem;
   line-height: 1.35;
 }
 
 .home-pop-card__preco {
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--brand);
   margin: 0;
@@ -98,8 +254,8 @@
 
 /* Banners promocionais */
 .home-banners {
-  padding: 2rem 0 3.5rem;
-  background: #faf7f2;
+  padding: 0;
+  margin: 0;
 }
 
 .home-banners__grid {
@@ -239,15 +395,11 @@
   bottom: 0;
   height: 28px;
   z-index: 1;
-  background: repeating-linear-gradient(
-    92deg,
-    #4a3428 0px,
-    #5c4033 6px,
-    #3d2a20 6px,
-    #5c4033 12px,
-    #6b4e3d 12px,
-    #4a3428 18px
-  );
+  background-color: #5c4033;
+  background-image: url('/home-banner-floor-wood.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.25);
 }
 

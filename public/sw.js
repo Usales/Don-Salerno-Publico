@@ -1,5 +1,5 @@
 /* Cache mínimo — incremente CACHE em cada deploy relevante para evitar index.html antigo (tela branca). */
-const CACHE = 'don-salerno-v2'
+const CACHE = 'don-salerno-v3'
 const ASSETS = ['/', '/index.html', '/manifest.json', '/logo.svg']
 
 self.addEventListener('install', (e) => {

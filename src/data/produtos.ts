@@ -1,5 +1,4 @@
 import type { Produto } from '@/types'
-import { receitaMolhoTomateTradicional } from './receitaMolhoTomateTradicional'
 import { fichasMassas, receitaMassaPorIndice } from './receitasMassasFicha'
 
 const massasPadrao: Produto['massas'] = [
@@ -14,6 +13,26 @@ const adicionaisPadrao: Produto['adicionais'] = [
   { id: 'rucula', nome: 'Rúcula fresca', preco: 5 },
   { id: 'azeitona', nome: 'Azeitona preta', preco: 4 },
 ]
+
+const alergenoPizzaPadrao =
+  'Contém glúten e lactose. Pode conter ovos e outros; informe restrições no pedido.'
+
+function pizzaSabor(
+  o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
+    ingredientes?: string[]
+    alergenos?: string[]
+    imagemDestaque?: string
+  },
+): Produto {
+  return {
+    ...o,
+    categoria: 'pizzas',
+    ingredientes: o.ingredientes ?? [o.descricao],
+    alergenos: o.alergenos ?? [alergenoPizzaPadrao],
+    massas: massasPadrao,
+    adicionais: adicionaisPadrao,
+  }
+}
 
 function massaDoFicha(
   indice: number,
@@ -35,92 +54,152 @@ function massaDoFicha(
 }
 
 export const produtos: Produto[] = [
-  massaDoFicha(0, 'pizzas', {
+  pizzaSabor({
     id: 'p1',
-    slug: 'massa-napoletana',
-    tempoPreparoMin: 25,
-    imagem:
-      'https://images.unsplash.com/photo-1513844316321-dd2466411c4c?w=1200&q=80&auto=format&fit=max',
+    slug: 'margherita',
+    nome: 'Margherita',
+    descricao:
+      'A clássica italiana feita como deve ser: molho de tomate feito a partir de tomates italianos encorpados, mussarela de búfala cremosa, manjericão fresco e finalizada com azeite extravirgem. Leve, aromática e irresistível.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza-margherita.png',
+    imagemDestaque: '/hero-pizza-margherita-destaque.png',
     precos: { P: 42, M: 58, G: 72 },
+    ingredientes: [
+      'Molho de tomate (tomates italianos encorpados)',
+      'mussarela de búfala cremosa',
+      'manjericão fresco',
+      'azeite extravirgem',
+    ],
   }),
-  massaDoFicha(1, 'pizzas', {
+  pizzaSabor({
     id: 'p2',
-    slug: 'massa-romana-al-teglia',
-    tempoPreparoMin: 20,
-    imagem:
-      'https://images.unsplash.com/photo-1716237388463-14fdbfc0ca5e?w=1200&q=80&auto=format&fit=max',
-    precos: { P: 45, M: 62, G: 78 },
-  }),
-  massaDoFicha(2, 'pizzas', {
-    id: 'p3',
-    slug: 'massa-new-york',
-    tempoPreparoMin: 24,
-    imagem:
-      'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=1280&h=640&fit=crop&auto=format&q=80',
-    precos: { P: 40, M: 56, G: 70 },
-  }),
-  massaDoFicha(3, 'pizzas', {
-    id: 'p4',
-    slug: 'massa-chicago-deep-dish',
-    tempoPreparoMin: 25,
-    imagem:
-      'https://images.unsplash.com/photo-1689778560408-78595f912b97?w=1200&q=80&auto=format&fit=max',
+    slug: 'calabresa',
+    nome: 'Calabresa',
+    descricao:
+      'Calabresa fatiada no ponto certo, coberta com cebola em rodelas e mussarela derretida. Um clássico de boteco elevado ao nível de pizza artesanal — simples, intenso e impossível de errar.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza-calabresa.png',
     precos: { P: 44, M: 60, G: 74 },
+    ingredientes: ['Calabresa fatiada', 'Cebola fresca em rodelas', 'Mussarela derretida'],
   }),
-  massaDoFicha(4, 'pizzas', {
+  pizzaSabor({
+    id: 'p3',
+    slug: 'portuguesa',
+    nome: 'Portuguesa',
+    descricao: 'Presunto, ovos, cebola, palmito, ervilha e mussarela na medida certa.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-portuguesa.png',
+    precos: { P: 46, M: 62, G: 76 },
+    ingredientes: ['Presunto', 'ovos', 'cebola', 'palmito', 'ervilha', 'mussarela'],
+  }),
+  pizzaSabor({
+    id: 'p4',
+    slug: 'pepperoni',
+    nome: 'Pepperoni',
+    descricao: 'Pepperoni levemente apimentado, mussarela e orégano — estilo americano.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza.png',
+    precos: { P: 48, M: 64, G: 78 },
+    ingredientes: ['Pepperoni levemente apimentado', 'mussarela', 'orégano'],
+  }),
+  pizzaSabor({
     id: 'p5',
-    slug: 'massa-detroit',
-    tempoPreparoMin: 20,
-    imagem:
-      'https://images.unsplash.com/photo-1650039215510-a086786c3da5?w=1200&q=80&auto=format&fit=max',
-    precos: { P: 43, M: 59, G: 73 },
+    slug: 'quatro-queijos',
+    nome: 'Quatro queijos',
+    descricao: 'Mussarela, provolone, gorgonzola e parmesão — cremosa e intensa.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza.png',
+    precos: { P: 47, M: 63, G: 77 },
+    ingredientes: ['Mussarela', 'provolone', 'gorgonzola', 'parmesão'],
   }),
-  massaDoFicha(5, 'pizzas', {
+  pizzaSabor({
     id: 'p6',
-    slug: 'massa-siciliana',
-    tempoPreparoMin: 21,
-    imagem:
-      'https://images.unsplash.com/photo-1772981277505-c855d2c9314f?w=1200&q=80&auto=format&fit=max',
-    precos: { P: 41, M: 57, G: 71 },
+    slug: 'frango-catupiry',
+    nome: 'Frango com catupiry',
+    descricao: 'Frango desfiado temperado, catupiry original e um toque de milho verde.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza.png',
+    precos: { P: 45, M: 61, G: 75 },
+    ingredientes: ['Frango desfiado temperado', 'catupiry original', 'milho verde'],
+  }),
+  pizzaSabor({
+    id: 'p8',
+    slug: 'napolitana',
+    nome: 'Napolitana',
+    descricao: 'Anchovas, alcaparras, tomate cereja e mussarela — sabor marcante do mar.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza.png',
+    precos: { P: 49, M: 65, G: 79 },
+    ingredientes: ['Anchovas', 'alcaparras', 'tomate cereja', 'mussarela'],
+  }),
+  pizzaSabor({
+    id: 'p9',
+    slug: 'vegetariana',
+    nome: 'Vegetariana',
+    descricao: 'Pimentões, champignon, palmito, cebola roxa e mussarela.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza.png',
+    precos: { P: 45, M: 61, G: 75 },
+    ingredientes: ['Pimentões', 'champignon', 'palmito', 'cebola roxa', 'mussarela'],
+  }),
+  pizzaSabor({
+    id: 'p10',
+    slug: 'carne-seca-cream-cheese',
+    nome: 'Carne seca com cream cheese',
+    descricao: 'Carne seca desfiada, cream cheese, cebola roxa e mussarela.',
+    tempoPreparoMin: 25,
+    imagem: '/hero-pizza.png',
+    precos: { P: 52, M: 68, G: 82 },
+    ingredientes: ['Carne seca desfiada', 'cream cheese', 'cebola roxa', 'mussarela'],
+  }),
+  pizzaSabor({
+    id: 'p11',
+    slug: 'baiana',
+    nome: 'Baiana',
+    descricao: 'Calabresa moída, pimenta, cebola, azeitona e mussarela — com pegada.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-calabresa.png',
+    precos: { P: 46, M: 62, G: 76 },
+    ingredientes: ['Calabresa moída', 'pimenta', 'cebola', 'azeitona', 'mussarela'],
+  }),
+  pizzaSabor({
+    id: 'p12',
+    slug: 'moda-da-casa',
+    nome: 'Moda da casa',
+    descricao: 'Combinação do dia: frango, bacon, milho, mussarela e catupiry — pergunte no balcão.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza.png',
+    precos: { P: 50, M: 66, G: 80 },
+    ingredientes: ['Frango', 'bacon', 'milho', 'mussarela', 'catupiry'],
+  }),
+  pizzaSabor({
+    id: 'p13',
+    slug: 'm-m',
+    nome: 'M&M',
+    descricao:
+      'Morango fresco e chocolate na medida certa — doce intenso, contraste levemente ácido e aquela fatia que some antes do café.',
+    tempoPreparoMin: 18,
+    imagem: '/hero-pizza-duo-chocolate-morango.png',
+    precos: { P: 38, M: 52, G: 64 },
+    ingredientes: ['Morango fresco', 'Chocolate', 'Base doce da casa'],
   }),
   massaDoFicha(6, 'esfihas', {
     id: 'p7',
     slug: 'massa-esfiha',
     tempoPreparoMin: 50,
-    imagem:
-      'https://images.unsplash.com/photo-1612884610549-ce221d92514a?w=1200&q=80&auto=format&fit=max',
+    imagem: 'https://images.unsplash.com/photo-1612884610549-ce221d92514a?w=900&q=80&auto=format&fit=max',
     precos: { P: 39, M: 55, G: 69 },
   }),
-  {
-    id: 'e1',
-    nome: 'Molho de Tomate Tradicional para Pizza',
-    slug: 'molho-caseiro',
-    categoria: 'pizzas',
-    descricao:
-      'Molho cru ou minimamente processado, com tomate pelado de qualidade — base tradicional para pizza.',
-    ingredientes: ['Tomate pelado', 'sal', 'azeite (opcional)', 'manjericão (opcional)'],
-    alergenos: ['Contém tomate. Confirme outras restrições no atendimento.'],
-    tempoPreparoMin: 10,
-    imagem:
-      'https://images.unsplash.com/photo-1472476443507-c7a5948772fc?w=1200&q=80&auto=format&fit=crop',
-    precos: { P: 8, M: 10, G: 12 },
-    massas: massasPadrao,
-    receita: receitaMolhoTomateTradicional,
-    adicionais: [
-      { id: 'oregano', nome: 'Orégano extra', preco: 1 },
-      { id: 'pimenta', nome: 'Pimenta-calabresa', preco: 2 },
-    ],
-  },
   {
     id: 'c1',
     nome: 'Calzone presunto & mussarela',
     slug: 'calzone-presunto',
-    categoria: 'pizzas',
+    categoria: 'calzones',
     descricao: 'Meia-lua assada, recheio clássico e selagem firme.',
     ingredientes: ['Farinha de trigo', 'presunto', 'mussarela', 'molho de tomate', 'orégano'],
     alergenos: ['CONTÉM TRIGO E DERIVADOS DO LEITE.'],
     tempoPreparoMin: 22,
-    imagem: 'https://images.unsplash.com/photo-1513104890138-7c749fdcb608?w=800&q=75',
+    imagem: '/hero-calzone-presunto-queijo.png',
     precos: { P: 32, M: 38, G: 44 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
@@ -129,26 +208,34 @@ export const produtos: Produto[] = [
     id: 'c2',
     nome: 'Calzone de calabresa',
     slug: 'calzone-calabresa',
-    categoria: 'pizzas',
+    categoria: 'calzones',
     descricao: 'Calabresa, cebola e mussarela.',
     ingredientes: ['Farinha de trigo', 'calabresa', 'cebola', 'mussarela', 'molho'],
     alergenos: ['CONTÉM TRIGO E DERIVADOS DO LEITE.'],
     tempoPreparoMin: 22,
-    imagem: 'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=800&q=75',
+    imagem: '/hero-calzone-pepperoni.png',
     precos: { P: 34, M: 40, G: 46 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
 ]
 
-/** Slugs antigos (ex.: margherita) → id do produto atual. */
+/** Slugs antigos (receitas de massa / molho) → id de produto atual. */
 const slugLegadoParaId: Record<string, string> = {
   margherita: 'p1',
   calabresa: 'p2',
-  'esfiha-carne': 'e1',
+  'esfiha-carne': 'p7',
+  'massa-napoletana': 'p1',
+  'massa-romana-al-teglia': 'p1',
+  'massa-new-york': 'p4',
+  'massa-chicago-deep-dish': 'p5',
+  'massa-detroit': 'p6',
+  'massa-siciliana': 'p12',
+  'molho-caseiro': 'p1',
+  'romeu-e-julieta': 'p13',
 }
 
-/** Aceita id (ex.: p1) ou slug (ex.: massa-napoletana) ou slug legado. */
+/** Aceita id (ex.: p1) ou slug (ex.: margherita) ou slug legado. */
 export function getProdutoPorId(idOuSlug: string): Produto | undefined {
   const porLegado = slugLegadoParaId[idOuSlug]
   if (porLegado) return produtos.find((p) => p.id === porLegado)

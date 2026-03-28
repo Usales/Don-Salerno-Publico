@@ -3,10 +3,11 @@ import { Link, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { rotulosCategoria } from '@/data/categorias'
 import { getProdutoPorId } from '@/data/produtos'
+import { brl } from '@/lib/format'
 import { useAuth } from '@/stores/useAuth'
+import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
-import { ProcessSteps } from '@/components/ProcessSteps'
-
+import type { TamanhoCodigo } from '@/types'
 function PassoTextoReceita({ texto }: { texto: string }) {
   const linhas = texto.split('\n')
   return (
@@ -33,6 +34,9 @@ export function Produto() {
 
   const [nota, setNota] = useState(5)
   const [comentario, setComentario] = useState('')
+  const [tamanho, setTamanho] = useState<TamanhoCodigo>('M')
+  const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
+  const adicionarAoCarrinho = useCart((s) => s.adicionar)
 
   if (!p) {
     return (
@@ -78,7 +82,7 @@ export function Produto() {
           </ul>
         )}
         <p style={{ marginTop: '1rem' }}>
-          <strong>Tempo ativo (referência):</strong> ~{produto.tempoPreparoMin} minutos
+          Sai do forno em cerca de {produto.tempoPreparoMin} minutos.
         </p>
       </header>
 
@@ -153,38 +157,69 @@ export function Produto() {
           ))}
         </section>
       ) : (
-        <p>
-          <strong>Ingredientes:</strong> {produto.ingredientes.join(', ')}.
-        </p>
+        <section className="produto-ingredientes" aria-labelledby="ing-produto-titulo">
+          <h2 id="ing-produto-titulo" className="receita-como__titulo">
+            Ingredientes selecionados
+          </h2>
+          <ul className="produto-ingredientes__lista">
+            {produto.ingredientes.map((ing, i) => (
+              <li key={`${ing}-${i}`}>{ing}</li>
+            ))}
+          </ul>
+        </section>
       )}
 
-      <div
-        style={{
-          margin: '1.5rem auto',
-          width: '100%',
-          maxWidth: 640,
-          aspectRatio: '2 / 1',
-          borderRadius: 12,
-          overflow: 'hidden',
-          background: 'var(--bg-soft)',
-        }}
-      >
+      <div className="produto-foto-wrap">
         <img
+          className="produto-foto"
           src={produto.imagem}
           alt={produto.nome}
-          width={640}
-          height={320}
           decoding="async"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center',
-            display: 'block',
-          }}
           loading="lazy"
         />
       </div>
+
+      <section className="produto-comprar" aria-labelledby="produto-comprar-titulo" style={{ marginTop: '1.75rem' }}>
+        <h2 id="produto-comprar-titulo" className="receita-como__titulo">
+          Montar pedido
+        </h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
+          <div>
+            <label htmlFor="produto-tamanho" style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>
+              Tamanho
+            </label>
+            <select
+              id="produto-tamanho"
+              value={tamanho}
+              onChange={(e) => setTamanho(e.target.value as TamanhoCodigo)}
+              style={{ minWidth: 200, padding: '0.5rem 0.65rem', fontSize: '1rem' }}
+            >
+              <option value="P">P — {brl(produto.precos.P)}</option>
+              <option value="M">M — {brl(produto.precos.M)}</option>
+              <option value="G">G — {brl(produto.precos.G)}</option>
+            </select>
+          </div>
+          <button
+            type="button"
+            className="btn btn--primario"
+            onClick={() => {
+              adicionarAoCarrinho(produto, tamanho)
+              setFeedbackCarrinho(true)
+              window.setTimeout(() => setFeedbackCarrinho(false), 2200)
+            }}
+          >
+            Adicionar ao carrinho
+          </button>
+          <Link to="/carrinho" className="btn btn--secundario" style={{ textDecoration: 'none' }}>
+            Ver carrinho
+          </Link>
+        </div>
+        {feedbackCarrinho ? (
+          <p style={{ margin: '0.75rem 0 0', color: 'var(--brand)', fontWeight: 600 }} role="status">
+            Adicionado ao carrinho.
+          </p>
+        ) : null}
+      </section>
 
       {produto.receita ? (
         <section className="receita-como" aria-labelledby="como-receita-titulo">
@@ -200,9 +235,7 @@ export function Produto() {
             ))}
           </ol>
         </section>
-      ) : (
-        <ProcessSteps categoria={produto.categoria} />
-      )}
+      ) : null}
 
       <section style={{ marginTop: '2rem' }} aria-labelledby="reviews-titulo">
         <h2 id="reviews-titulo" className="processo__titulo">

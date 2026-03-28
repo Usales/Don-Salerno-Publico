@@ -1,13 +1,11 @@
-/** Endereço postal completo. */
-const ENDERECO_COMPLETO =
-  'Av. Hilário Sebastião de Figueiredo - Santo Hilario, Goiânia - GO, 74780-250'
+import { empresa } from '@/data/empresa'
 
 /** Ponto de referência visível no Google Maps (mercado ao lado do qual ficamos). */
 const PONTO_REFERENCIA_MAPA = 'Armazém Sales, Goiânia, GO, Brasil'
 
 const MAPA_EMBED_URL = `https://maps.google.com/maps?q=${encodeURIComponent(PONTO_REFERENCIA_MAPA)}&hl=pt&z=17&output=embed`
 const MAPA_ABRIR_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(PONTO_REFERENCIA_MAPA)}`
-const MAPA_ENDERECO_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ENDERECO_COMPLETO)}`
+const MAPA_ENDERECO_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(empresa.endereco)}`
 
 export function Contato() {
   return (
@@ -15,13 +13,14 @@ export function Contato() {
       <div className="container" style={{ paddingBottom: '2rem' }}>
         <h1>Contato</h1>
         <p>
-          <strong>Endereço:</strong> {ENDERECO_COMPLETO}
+          <strong>Endereço:</strong> {empresa.endereco}
         </p>
         <p>
           <strong>Referência:</strong> ficamos <strong>ao lado do Armazém Sales</strong> — mercado em Goiânia (GO). É o ponto mais fácil de achar no mapa.
         </p>
         <p>
-          <strong>Telefone / WhatsApp:</strong> <a href="tel:+5500000000000">(00) 00000-0000</a>
+          <strong>Telefone / WhatsApp:</strong>{' '}
+          <a href={empresa.telefoneHref}>{empresa.telefoneLabel}</a>
         </p>
         <p>
           <strong>Horário:</strong> segunda a domingo, 17h às 23h

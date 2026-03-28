@@ -13,6 +13,12 @@ export function Privacidade() {
         <li>Revogação do consentimento</li>
         <li>Solicitação de exclusão da conta (entre em contato)</li>
       </ul>
+      <h2 id="termos">Termos de uso do site</h2>
+      <p>
+        O uso deste site implica aceite das práticas descritas nesta página e no cardápio vigente. O Don Salerno
+        pode alterar funcionalidades, preços e disponibilidade de produtos; em caso de divergência, prevalece a
+        informação no estabelecimento ou no canal oficial de atendimento.
+      </p>
       <h2>Cookies</h2>
       <p>
         Utilizamos cookies essenciais para sessão e preferências; cookies analíticos apenas após aceite no banner.

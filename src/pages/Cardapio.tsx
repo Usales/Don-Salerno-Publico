@@ -1,6 +1,7 @@
 import { useCallback, useRef } from 'react'
-import { Link, NavLink, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { NavLink, Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { Categoria } from '@/types'
+import { CardapioProductCard } from '@/components/CardapioProductCard'
 import { categoriasOrdenadas, rotulosCategoria } from '@/data/categorias'
 import { produtos } from '@/data/produtos'
 
@@ -66,7 +67,7 @@ export function Cardapio() {
   return (
     <section className="page-section">
       <div className="container">
-        <h1 className="page-title">Receitas</h1>
+        <h1 className="page-title">Cardápio</h1>
 
         <div
           className="cardapio-swipe"
@@ -74,7 +75,7 @@ export function Cardapio() {
           onTouchEnd={onTouchEnd}
         >
           <div className="tabs-wrap">
-            <div className="tabs" role="tablist" aria-label="Categorias de receitas">
+            <div className="tabs" role="tablist" aria-label="Categorias do cardápio">
               {validas.map((c) => (
                 <NavLink key={c} to={`/cardapio/${c}`} role="tab" className={({ isActive }) => (isActive ? 'is-active' : '')}>
                   {rotulosCategoria[c]}
@@ -84,7 +85,7 @@ export function Cardapio() {
           </div>
 
           <h2 className="visually-hidden">{rotulosCategoria[cat]}</h2>
-          <div className="menu-panel">
+          <div className="menu-panel menu-panel--cards">
             {lista.length === 0 ? (
               <p className="cardapio-vazio" style={{ color: 'var(--text-muted)', margin: '1rem 0 0' }}>
                 Itens desta categoria em breve.
@@ -92,13 +93,7 @@ export function Cardapio() {
             ) : (
               <div className="pgrid">
                 {lista.map((p) => (
-                  <Link key={p.id} to={`/produto/${p.id}`} className="pcard">
-                    <img className="pcard__img" src={p.imagem} alt="" width={72} height={72} loading="lazy" />
-                    <div className="pcard__body">
-                      <h3 className="pcard__nome">{p.nome}</h3>
-                      <p className="pcard__meta">{p.descricao.slice(0, 90)}…</p>
-                    </div>
-                  </Link>
+                  <CardapioProductCard key={p.id} produto={p} />
                 ))}
               </div>
             )}
