@@ -6,9 +6,9 @@ import { brl } from '@/lib/format'
 import { useCart } from '@/stores/useCart'
 import './Carrinho.css'
 
-const AVISO_PEDIDO = `Bom dia, Cliente!
+const AVISO_PEDIDO = `Bom dia, cliente!
 
-Não fazemos entregas, esse canal é destinado a realizar pedidos e enviar para no whatsapp corporativo onde realizaremos o pedido e você busca em nosso endereço, caso queira pedir para ser entregue, recomendamos que peça pelo Ifood.
+Não fazemos entregas. Este canal é destinado apenas ao envio de pedidos para o WhatsApp corporativo, onde finalizaremos seu pedido para retirada em nosso endereço. Caso prefira entrega, recomendamos que faça o pedido pelo iFood.
 
 Atenciosamente.
 
