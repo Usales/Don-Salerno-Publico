@@ -1,4 +1,4 @@
-import { Fragment, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { rotulosCategoria } from '@/data/categorias'
@@ -34,7 +34,7 @@ export function Produto() {
 
   const [nota, setNota] = useState(5)
   const [comentario, setComentario] = useState('')
-  const [tamanho, setTamanho] = useState<TamanhoCodigo>('M')
+  const [tamanho, setTamanho] = useState<TamanhoCodigo>('P')
   const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
   const adicionarAoCarrinho = useCart((s) => s.adicionar)
 
@@ -48,6 +48,16 @@ export function Produto() {
   }
 
   const produto = p
+  const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
+    () => (produto.categoria === 'esfihas' ? ['P'] : ['P', 'M', 'G']),
+    [produto.categoria],
+  )
+
+  useEffect(() => {
+    if (!tamanhosDisponiveis.includes(tamanho)) {
+      setTamanho(tamanhosDisponiveis[0])
+    }
+  }, [tamanho, tamanhosDisponiveis])
 
   function enviarReview(e: FormEvent) {
     e.preventDefault()
@@ -192,11 +202,14 @@ export function Produto() {
               id="produto-tamanho"
               value={tamanho}
               onChange={(e) => setTamanho(e.target.value as TamanhoCodigo)}
+              disabled={tamanhosDisponiveis.length === 1}
               style={{ minWidth: 200, padding: '0.5rem 0.65rem', fontSize: '1rem' }}
             >
-              <option value="P">P — {brl(produto.precos.P)}</option>
-              <option value="M">M — {brl(produto.precos.M)}</option>
-              <option value="G">G — {brl(produto.precos.G)}</option>
+              {tamanhosDisponiveis.map((t) => (
+                <option key={t} value={t}>
+                  {t} — {brl(produto.precos[t])}
+                </option>
+              ))}
             </select>
           </div>
           <button
@@ -241,7 +254,7 @@ export function Produto() {
         <h2 id="reviews-titulo" className="processo__titulo">
           Avaliações
         </h2>
-        {listaReviews.length === 0 && <p>Nenhuma avaliação ainda. Seja o primeiro!</p>}
+        {listaReviews.length === 0 && <p>Nenhuma avaliação ainda. Seja o primeiro a nos avaliar no Ifood!</p>}
         <ul style={{ listStyle: 'none', padding: 0 }}>
           {listaReviews.map((r) => (
             <li key={r.id} style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--border)' }}>
@@ -270,11 +283,7 @@ export function Produto() {
               Publicar
             </button>
           </form>
-        ) : (
-          <p>
-            <Link to="/conta">Entre na conta</Link> para avaliar esta receita.
-          </p>
-        )}
+        ) : null}
       </section>
     </article>
   )
