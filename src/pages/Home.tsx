@@ -203,7 +203,7 @@ export function Home() {
           >
             <img
               key={heroSlide.id}
-              className={`hero__pizza${heroSlide.src.endsWith('.svg') ? ' hero__pizza--logo' : ''}${HERO_CATEGORIAS_VISUAL_ESTATICO.includes(heroCategoria) ? ' hero__pizza--static' : ''}`}
+              className={`hero__pizza${heroSlide.src.endsWith('.svg') ? ' hero__pizza--logo' : ''}${HERO_CATEGORIAS_VISUAL_ESTATICO.includes(heroCategoria) ? ' hero__pizza--static' : ''}${heroCategoria === 'calzones' ? ' hero__pizza--calzone-float' : ''}`}
               src={heroSlide.src}
               alt={`${heroSlide.nome} — Don Salerno`}
               width={480}

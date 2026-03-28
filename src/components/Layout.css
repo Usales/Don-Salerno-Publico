@@ -536,6 +536,31 @@
   animation: none;
 }
 
+@keyframes hero-calzone-float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.hero__pizza--calzone-float {
+  animation: hero-calzone-float 6.8s ease-in-out infinite !important;
+  filter:
+    drop-shadow(0 30px 46px rgba(0, 0, 0, 0.22))
+    drop-shadow(0 12px 20px rgba(0, 0, 0, 0.18));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__pizza--calzone-float {
+    animation: none !important;
+  }
+}
+
 .hero__eyebrow {
   display: inline-block;
   font-size: 0.8125rem;

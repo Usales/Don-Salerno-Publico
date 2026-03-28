@@ -1,5 +1,4 @@
 import type { Produto } from '@/types'
-import { fichasMassas, receitaMassaPorIndice } from './receitasMassasFicha'
 
 const massasPadrao: Produto['massas'] = [
   { id: 'italiana', nome: 'Massa italiana', descricao: 'Tradicional com fermentação lenta.', adicional: 0 },
@@ -34,20 +33,18 @@ function pizzaSabor(
   }
 }
 
-function massaDoFicha(
-  indice: number,
-  categoria: Produto['categoria'],
-  extra: Pick<Produto, 'id' | 'slug' | 'imagem' | 'precos' | 'tempoPreparoMin'>,
+function esfihaSabor(
+  o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
+    ingredientes?: string[]
+    alergenos?: string[]
+    imagemDestaque?: string
+  },
 ): Produto {
-  const f = fichasMassas[indice]
   return {
-    ...extra,
-    nome: f.nome,
-    categoria,
-    descricao: `${f.hidratacao} hidratação · ${f.farinha.tipo} (${f.farinha.proteina_percentual} proteína). Escala: 1 kg de farinha.`,
-    receita: receitaMassaPorIndice(indice),
-    ingredientes: ['Medidas na tabela da receita (1 kg de farinha).'],
-    alergenos: ['CONTÉM TRIGO.'],
+    ...o,
+    categoria: 'esfihas',
+    ingredientes: o.ingredientes ?? [o.descricao],
+    alergenos: o.alergenos ?? [alergenoPizzaPadrao],
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   }
@@ -183,12 +180,61 @@ export const produtos: Produto[] = [
     precos: { P: 38, M: 52, G: 64 },
     ingredientes: ['Morango fresco', 'Chocolate', 'Base doce da casa'],
   }),
-  massaDoFicha(6, 'esfihas', {
+  esfihaSabor({
     id: 'p7',
-    slug: 'massa-esfiha',
-    tempoPreparoMin: 50,
-    imagem: 'https://images.unsplash.com/photo-1612884610549-ce221d92514a?w=900&q=80&auto=format&fit=max',
-    precos: { P: 39, M: 55, G: 69 },
+    slug: 'esfiha-carne',
+    nome: 'Esfiha de Carne com Tomate e Cebola',
+    descricao: 'Carne moída temperada com tomate e cebola em massa macia assada no forno alto.',
+    tempoPreparoMin: 16,
+    imagem: '/hero-esfiha-carne-tomate-cebola.png',
+    imagemDestaque: '/hero-esfiha-carne-tomate-cebola.png',
+    precos: { P: 14, M: 18, G: 24 },
+    ingredientes: ['Carne moída temperada', 'tomate', 'cebola', 'massa artesanal'],
+  }),
+  esfihaSabor({
+    id: 'p14',
+    slug: 'esfiha-calabresa-moida',
+    nome: 'Esfiha de Calabresa Moída',
+    descricao: 'Recheio de calabresa moída ao molho de tomate, sabor intenso e suculento.',
+    tempoPreparoMin: 16,
+    imagem: '/hero-esfiha-calabresa-moida.png',
+    imagemDestaque: '/hero-esfiha-calabresa-moida.png',
+    precos: { P: 15, M: 19, G: 25 },
+    ingredientes: ['Calabresa moída', 'molho de tomate', 'cebola', 'ervas finas'],
+  }),
+  esfihaSabor({
+    id: 'p15',
+    slug: 'esfiha-mussarela',
+    nome: 'Esfiha de Mussarela',
+    descricao: 'Mussarela cremosa e dourada no ponto certo, com massa leve e borda macia.',
+    tempoPreparoMin: 14,
+    imagem: '/hero-esfiha-mussarela.png',
+    imagemDestaque: '/hero-esfiha-mussarela.png',
+    precos: { P: 13, M: 17, G: 23 },
+    ingredientes: ['Mussarela', 'orégano', 'massa artesanal'],
+  }),
+  esfihaSabor({
+    id: 'p16',
+    slug: 'esfiha-frango-catupiry',
+    nome: 'Esfiha de Frango com Catupiry',
+    descricao: 'Frango desfiado bem temperado com catupiry, cremosa e equilibrada.',
+    tempoPreparoMin: 17,
+    imagem: '/hero-esfiha-frango-catupiry.png',
+    imagemDestaque: '/hero-esfiha-frango-catupiry.png',
+    precos: { P: 16, M: 20, G: 26 },
+    ingredientes: ['Frango desfiado', 'catupiry', 'massa artesanal'],
+  }),
+  esfihaSabor({
+    id: 'p17',
+    slug: 'esfiha-doce-chocolate-mms',
+    nome: 'Esfiha Doce de Chocolate com M&Ms',
+    descricao: 'Chocolate cremoso com M&Ms coloridos em uma versão doce e divertida.',
+    tempoPreparoMin: 14,
+    imagem: '/hero-esfiha-doce-chocolate-mms.png',
+    imagemDestaque: '/hero-esfiha-doce-chocolate-mms.png',
+    precos: { P: 15, M: 19, G: 25 },
+    ingredientes: ['Creme de chocolate', 'M&Ms', 'massa doce'],
+    alergenos: ['Contém glúten e lactose. Pode conter amendoim e oleaginosas.'],
   }),
   {
     id: 'c1',
