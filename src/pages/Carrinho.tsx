@@ -1,21 +1,26 @@
-import { useCallback, useState, type FormEvent } from 'react'
+import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
+import { empresa } from '@/data/empresa'
 import { brl } from '@/lib/format'
 import { useCart } from '@/stores/useCart'
 import './Carrinho.css'
 
-export function Carrinho() {
-  const [cupomInput, setCupomInput] = useState('')
-  const [cupomMsg, setCupomMsg] = useState<string | null>(null)
+const AVISO_PEDIDO = `Bom dia, Cliente!
 
+Não fazemos entregas, esse canal é destinado a realizar pedidos e enviar para no whatsapp corporativo onde realizaremos o pedido e você busca em nosso endereço, caso queira pedir para ser entregue, recomendamos que peça pelo Ifood.
+
+Atenciosamente.
+
+Don Salerno`
+
+export function Carrinho() {
+  const [mostrarAvisoPedido, setMostrarAvisoPedido] = useState(false)
+  const [avisoPedidoLido, setAvisoPedidoLido] = useState(false)
   const {
     itens,
-    cupomAplicado,
     definirQuantidade,
     remover,
-    aplicarCupom,
-    limparCupom,
     sincronizarPrecos,
     subtotal,
     descontoValor,
@@ -23,11 +28,8 @@ export function Carrinho() {
   } = useCart(
     useShallow((s) => ({
       itens: s.itens,
-      cupomAplicado: s.cupomAplicado,
       definirQuantidade: s.definirQuantidade,
       remover: s.remover,
-      aplicarCupom: s.aplicarCupom,
-      limparCupom: s.limparCupom,
       sincronizarPrecos: s.sincronizarPrecos,
       subtotal: s.subtotal,
       descontoValor: s.descontoValor,
@@ -35,26 +37,36 @@ export function Carrinho() {
     })),
   )
 
-  const onAplicarCupom = useCallback(
-    (e: FormEvent) => {
-      e.preventDefault()
-      setCupomMsg(null)
-      const r = aplicarCupom(cupomInput)
-      if (!r.ok) setCupomMsg(r.mensagem ?? 'Cupom inválido.')
-      else if (!cupomInput.trim()) {
-        limparCupom()
-        setCupomMsg(null)
-      } else {
-        setCupomMsg('Cupom aplicado.')
-      }
-    },
-    [aplicarCupom, cupomInput, limparCupom],
-  )
-
   const onAtualizar = useCallback(() => {
     sincronizarPrecos()
-    setCupomMsg('Carrinho atualizado com os preços do cardápio.')
   }, [sincronizarPrecos])
+
+  const enviarPedidoWhatsapp = useCallback(() => {
+    const linhas = itens
+      .map(
+        (linha) =>
+          `- ${linha.nome} | Tamanho ${linha.tamanho} | Qtd: ${linha.quantidade} | Total: ${brl(
+            linha.precoUnit * linha.quantidade,
+          )}`,
+      )
+      .join('\n')
+    const mensagemPedido =
+      `Olá, Don Salerno! Segue meu pedido:\n\n${linhas}\n\n` +
+      `Subtotal: ${brl(subtotal())}\n` +
+      `Total: ${brl(total())}\n\n` +
+      'Obrigado!'
+    const waUrl = `https://wa.me/${empresa.whatsappDigits}?text=${encodeURIComponent(mensagemPedido)}`
+
+    window.open(waUrl, '_blank', 'noopener,noreferrer')
+  }, [itens, subtotal, total])
+
+  const onEnviarPedido = useCallback(() => {
+    if (!avisoPedidoLido) {
+      setMostrarAvisoPedido(true)
+      return
+    }
+    enviarPedidoWhatsapp()
+  }, [avisoPedidoLido, enviarPedidoWhatsapp])
 
   return (
     <div className="cart-page container">
@@ -168,30 +180,6 @@ export function Carrinho() {
           </div>
 
           <div className="cart-footer">
-            <form className="cart-cupom" onSubmit={onAplicarCupom}>
-              <label htmlFor="cart-cupom-input" className="visually-hidden">
-                Cupom
-              </label>
-              <input
-                id="cart-cupom-input"
-                type="text"
-                className="cart-cupom__input"
-                placeholder="Código do cupom"
-                value={cupomInput}
-                onChange={(e) => setCupomInput(e.target.value)}
-                autoComplete="off"
-              />
-              <button type="submit" className="btn btn--primario cart-cupom__btn">
-                Aplicar cupom
-              </button>
-            </form>
-            {cupomMsg ? <p className="cart-page__msg">{cupomMsg}</p> : null}
-            {cupomAplicado ? (
-              <p className="cart-page__cupom-ativo">
-                Cupom <strong>{cupomAplicado.codigo}</strong> — {cupomAplicado.percentual}% de desconto
-              </p>
-            ) : null}
-
             <div className="cart-footer__actions">
               <button type="button" className="btn btn--primario" onClick={onAtualizar}>
                 Atualizar carrinho
@@ -217,9 +205,52 @@ export function Carrinho() {
                 <dd>{brl(total())}</dd>
               </div>
             </dl>
+
+            <div className="cart-enviar-wrap">
+              <button type="button" className="cart-enviar-btn" onClick={onEnviarPedido}>
+                <svg className="cart-enviar-btn__icon" viewBox="0 0 24 24" aria-hidden>
+                  <path
+                    fill="currentColor"
+                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.435 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
+                  />
+                </svg>
+                Enviar Pedido
+              </button>
+            </div>
           </div>
         </>
       )}
+
+      {mostrarAvisoPedido ? (
+        <div className="cart-aviso-modal" role="dialog" aria-modal="true" aria-labelledby="cart-aviso-titulo">
+          <div className="cart-aviso-modal__box">
+            <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
+              Aviso importante
+            </h2>
+            <p className="cart-aviso-modal__texto">{AVISO_PEDIDO}</p>
+            <div className="cart-aviso-modal__acoes">
+              <button
+                type="button"
+                className="btn btn--secundario"
+                onClick={() => setMostrarAvisoPedido(false)}
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                className="btn btn--primario cart-aviso-modal__enviar"
+                onClick={() => {
+                  setAvisoPedidoLido(true)
+                  setMostrarAvisoPedido(false)
+                  enviarPedidoWhatsapp()
+                }}
+              >
+                Entendi, enviar pedido
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

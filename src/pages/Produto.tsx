@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { rotulosCategoria } from '@/data/categorias'
 import { getProdutoPorId } from '@/data/produtos'
@@ -7,7 +7,7 @@ import { brl } from '@/lib/format'
 import { useAuth } from '@/stores/useAuth'
 import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
-import type { TamanhoCodigo } from '@/types'
+import type { Categoria, TamanhoCodigo } from '@/types'
 function PassoTextoReceita({ texto }: { texto: string }) {
   const linhas = texto.split('\n')
   return (
@@ -23,6 +23,7 @@ function PassoTextoReceita({ texto }: { texto: string }) {
 }
 
 export function Produto() {
+  const navigate = useNavigate()
   const { id: idParam } = useParams<{ id: string }>()
   const p = idParam ? getProdutoPorId(idParam) : undefined
   const reviewProdutoId = p?.id ?? idParam ?? ''
@@ -48,8 +49,22 @@ export function Produto() {
   }
 
   const produto = p
+  const fluxoProximaCategoria: Record<Categoria, Categoria | 'carrinho'> = {
+    pizzas: 'esfihas',
+    esfihas: 'calzones',
+    calzones: 'sobremesas',
+    sobremesas: 'bebidas',
+    bebidas: 'carrinho',
+  }
   const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
     () => (produto.categoria === 'esfihas' ? ['P'] : ['P', 'M', 'G']),
+    [produto.categoria],
+  )
+  const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
+    () =>
+      produto.categoria === 'sobremesas'
+        ? { P: '1', M: '5', G: '10' }
+        : { P: 'P', M: 'M', G: 'G' },
     [produto.categoria],
   )
 
@@ -92,7 +107,9 @@ export function Produto() {
           </ul>
         )}
         <p style={{ marginTop: '1rem' }}>
-          Sai do forno em cerca de {produto.tempoPreparoMin} minutos.
+          {produto.categoria === 'sobremesas'
+            ? 'Sai da geladeira em 10 minutos.'
+            : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
         </p>
       </header>
 
@@ -207,7 +224,7 @@ export function Produto() {
             >
               {tamanhosDisponiveis.map((t) => (
                 <option key={t} value={t}>
-                  {t} — {brl(produto.precos[t])}
+                  {rotuloTamanho[t]} — {brl(produto.precos[t])}
                 </option>
               ))}
             </select>
@@ -218,7 +235,14 @@ export function Produto() {
             onClick={() => {
               adicionarAoCarrinho(produto, tamanho)
               setFeedbackCarrinho(true)
-              window.setTimeout(() => setFeedbackCarrinho(false), 2200)
+              const next = fluxoProximaCategoria[produto.categoria]
+              window.setTimeout(() => {
+                if (next === 'carrinho') {
+                  navigate('/carrinho')
+                  return
+                }
+                navigate(`/cardapio/${next}`)
+              }, 280)
             }}
           >
             Adicionar ao carrinho
