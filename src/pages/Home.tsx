@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { HomeBannersMarquee } from '@/components/HomeBannersMarquee'
 import { HomeMarqueeStrip } from '@/components/HomeMarqueeStrip'
 import { HomePopularMarquee } from '@/components/HomePopularMarquee'
 import { JsonLdRestaurant } from '@/lib/seo'
@@ -24,11 +25,26 @@ const HERO_CALZONES = [
 ] as const
 
 const HERO_PIZZA_INTERVAL_MS = 4000
+const HERO_SWIPE_MIN_PX = 56
+/** Duração da animação de “arremesso” entre fotos do hero (ms) */
+const HERO_THROW_MS = 540
 
 /** Categorias cujo destaque visual no hero não usa rotação contínua (foto fixa). Pizza gira no forno visual. */
 const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas', 'bebidas']
 
 type HeroSlide = { id: string; src: string; nome: string }
+
+type HeroThrowState =
+  | { phase: 'idle' }
+  | { phase: 'running'; from: HeroSlide; to: HeroSlide; dir: 'next' | 'prev' }
+
+function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
+  let c = 'hero__pizza'
+  if (slide.src.endsWith('.svg')) c += ' hero__pizza--logo'
+  if (HERO_CATEGORIAS_VISUAL_ESTATICO.includes(categoria)) c += ' hero__pizza--static'
+  if (categoria === 'calzones') c += ' hero__pizza--calzone-float'
+  return c
+}
 
 function srcHeroProduto(p: { imagem: string; imagemDestaque?: string }): string {
   return p.imagemDestaque ?? p.imagem
@@ -104,6 +120,11 @@ export function Home() {
   const [heroCategoria, setHeroCategoria] = useState<Categoria>('pizzas')
   const [heroSlideIndex, setHeroSlideIndex] = useState(0)
   const [heroVisualPauseMotion, setHeroVisualPauseMotion] = useState(false)
+  const [heroThrowState, setHeroThrowState] = useState<HeroThrowState>({ phase: 'idle' })
+  const heroSwipeDownRef = useRef<{ x: number; pointerId: number } | null>(null)
+  const prevHeroSlideRef = useRef<HeroSlide | null>(null)
+  const skipHeroThrowRef = useRef(true)
+  const lastHeroNavDirRef = useRef<'next' | 'prev'>('next')
 
   const heroSlides = useMemo(() => heroSlidesParaCategoria(heroCategoria), [heroCategoria])
 
@@ -123,6 +144,8 @@ export function Home() {
   }, [])
 
   useEffect(() => {
+    skipHeroThrowRef.current = true
+    setHeroThrowState({ phase: 'idle' })
     setHeroSlideIndex(0)
   }, [heroCategoria])
 
@@ -137,6 +160,8 @@ export function Home() {
     if (heroVisualPauseMotion || heroSlides.length <= 1) return
     const n = heroSlides.length
     const id = window.setInterval(() => {
+      lastHeroNavDirRef.current = 'next'
+      skipHeroThrowRef.current = false
       setHeroSlideIndex((i) => (i + 1) % n)
     }, HERO_PIZZA_INTERVAL_MS)
     return () => clearInterval(id)
@@ -145,9 +170,97 @@ export function Home() {
   const heroSlide = heroSlides[heroVisualPauseMotion ? 0 : heroSlideIndex] ?? heroSlides[0]
   const heroSlideAtivo = heroVisualPauseMotion ? 0 : heroSlideIndex
 
+  useLayoutEffect(() => {
+    const curr = heroSlides[heroVisualPauseMotion ? 0 : heroSlideIndex] ?? heroSlides[0]
+    if (skipHeroThrowRef.current) {
+      skipHeroThrowRef.current = false
+      prevHeroSlideRef.current = curr
+      setHeroThrowState({ phase: 'idle' })
+      return
+    }
+    if (heroVisualPauseMotion || heroSlides.length <= 1) {
+      prevHeroSlideRef.current = curr
+      setHeroThrowState({ phase: 'idle' })
+      return
+    }
+    const prev = prevHeroSlideRef.current
+    if (!prev) {
+      prevHeroSlideRef.current = curr
+      return
+    }
+    if (prev.id === curr.id) {
+      return
+    }
+    setHeroThrowState({
+      phase: 'running',
+      from: prev,
+      to: curr,
+      dir: lastHeroNavDirRef.current,
+    })
+    const t = window.setTimeout(() => {
+      setHeroThrowState({ phase: 'idle' })
+      prevHeroSlideRef.current = curr
+    }, HERO_THROW_MS)
+    return () => clearTimeout(t)
+  }, [heroSlideIndex, heroSlides, heroVisualPauseMotion])
+
+  const heroThrowing = heroThrowState.phase === 'running'
+  const captionSlide =
+    heroThrowState.phase === 'running' ? heroThrowState.to : heroSlide
+
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
+
+  const onHeroVisualPointerDown = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      if (e.button !== 0 || heroSlides.length <= 1 || heroThrowing) return
+      heroSwipeDownRef.current = { x: e.clientX, pointerId: e.pointerId }
+      e.currentTarget.setPointerCapture(e.pointerId)
+    },
+    [heroSlides.length, heroThrowing],
+  )
+
+  const endHeroSwipe = useCallback(
+    (e: React.PointerEvent<HTMLElement>, applySlide: boolean) => {
+      const d = heroSwipeDownRef.current
+      if (!d || d.pointerId !== e.pointerId) return
+      heroSwipeDownRef.current = null
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      } catch {
+        /* já liberado */
+      }
+      if (!applySlide) return
+      const dx = e.clientX - d.x
+      if (Math.abs(dx) < HERO_SWIPE_MIN_PX) return
+      const n = heroSlides.length
+      if (dx > 0) {
+        lastHeroNavDirRef.current = 'prev'
+        skipHeroThrowRef.current = false
+        setHeroSlideIndex((i) => (i - 1 + n) % n)
+      } else {
+        lastHeroNavDirRef.current = 'next'
+        skipHeroThrowRef.current = false
+        setHeroSlideIndex((i) => (i + 1) % n)
+      }
+    },
+    [heroSlides.length],
+  )
+
+  const onHeroVisualPointerUp = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      endHeroSwipe(e, true)
+    },
+    [endHeroSwipe],
+  )
+
+  const onHeroVisualPointerCancel = useCallback(
+    (e: React.PointerEvent<HTMLElement>) => {
+      endHeroSwipe(e, false)
+    },
+    [endHeroSwipe],
+  )
 
   return (
     <div>
@@ -197,20 +310,62 @@ export function Home() {
             </div>
           </div>
           <figure
-            className="hero__col hero__col--visual"
+            className={`hero__col hero__col--visual${heroSlides.length > 1 ? ' hero__col--visual--swipe' : ''}`}
             aria-live="polite"
-            aria-label={`Destaque: ${rotulosCategoria[heroCategoria]}`}
+            aria-label={
+              heroSlides.length > 1
+                ? `Destaque: ${rotulosCategoria[heroCategoria]}. Deslize para os lados para ver outras fotos.`
+                : `Destaque: ${rotulosCategoria[heroCategoria]}`
+            }
+            onPointerDown={onHeroVisualPointerDown}
+            onPointerUp={onHeroVisualPointerUp}
+            onPointerCancel={onHeroVisualPointerCancel}
           >
-            <img
-              key={heroSlide.id}
-              className={`hero__pizza${heroSlide.src.endsWith('.svg') ? ' hero__pizza--logo' : ''}${HERO_CATEGORIAS_VISUAL_ESTATICO.includes(heroCategoria) ? ' hero__pizza--static' : ''}${heroCategoria === 'calzones' ? ' hero__pizza--calzone-float' : ''}`}
-              src={heroSlide.src}
-              alt={`${heroSlide.nome} — Don Salerno`}
-              width={480}
-              height={480}
-              decoding="async"
-            />
-            <figcaption className="hero__pizza-nome">{heroSlide.nome}</figcaption>
+            <div
+              className={`hero__pizza-stage${heroThrowing ? ' hero__pizza-stage--throwing' : ''}`}
+            >
+              {heroThrowState.phase === 'running' ? (
+                <>
+                  <div
+                    className={`hero__pizza-layer hero__pizza-layer--absolute hero__pizza-layer--out hero__pizza-layer--out-${heroThrowState.dir}`}
+                  >
+                    <img
+                      className={heroPizzaImgClass(heroThrowState.from, heroCategoria)}
+                      src={heroThrowState.from.src}
+                      alt=""
+                      width={480}
+                      height={480}
+                      decoding="async"
+                    />
+                  </div>
+                  <div
+                    className={`hero__pizza-layer hero__pizza-layer--absolute hero__pizza-layer--in hero__pizza-layer--in-${heroThrowState.dir}`}
+                  >
+                    <img
+                      className={heroPizzaImgClass(heroThrowState.to, heroCategoria)}
+                      src={heroThrowState.to.src}
+                      alt={`${heroThrowState.to.nome} — Don Salerno`}
+                      width={480}
+                      height={480}
+                      decoding="async"
+                    />
+                  </div>
+                </>
+              ) : (
+                <div className="hero__pizza-layer">
+                  <img
+                    key={heroSlide.id}
+                    className={heroPizzaImgClass(heroSlide, heroCategoria)}
+                    src={heroSlide.src}
+                    alt={`${heroSlide.nome} — Don Salerno`}
+                    width={480}
+                    height={480}
+                    decoding="async"
+                  />
+                </div>
+              )}
+            </div>
+            <figcaption className="hero__pizza-nome">{captionSlide.nome}</figcaption>
             {heroSlides.length > 1 && (
               <div className="hero__pizza-dots" aria-hidden="true">
                 {heroSlides.map((p, i) => (
@@ -237,54 +392,7 @@ export function Home() {
           </section>
 
           <section className="home-banners" aria-label="Promoções">
-            <div className="home-banners__marquee">
-              <div className="home-banners__track">
-                <div className="home-banners__set">
-                  {banners.map((b) => (
-                    <Link key={b.title} to={b.to} className="home-banner">
-                      <span className="home-banner__badge" aria-hidden>
-                        50%
-                        <br />
-                        OFF
-                      </span>
-                      <div className="home-banner__inner">
-                        <span className="home-banner__tag">{b.tag}</span>
-                        <p className="home-banner__title">{b.title}</p>
-                        <p className="home-banner__sub">{b.sub}</p>
-                        <span className={`home-banner__cta ${b.ctaClass}`}>
-                          Pedir agora
-                          <span aria-hidden> →</span>
-                        </span>
-                      </div>
-                      <img className="home-banner__photo" src={b.img} alt={b.imgAlt} width={200} height={140} loading="lazy" />
-                      <div className="home-banner__floor" aria-hidden />
-                    </Link>
-                  ))}
-                </div>
-                <div className="home-banners__set" aria-hidden="true">
-                  {banners.map((b) => (
-                    <Link key={`${b.title}-dup`} to={b.to} className="home-banner" tabIndex={-1}>
-                      <span className="home-banner__badge" aria-hidden>
-                        50%
-                        <br />
-                        OFF
-                      </span>
-                      <div className="home-banner__inner">
-                        <span className="home-banner__tag">{b.tag}</span>
-                        <p className="home-banner__title">{b.title}</p>
-                        <p className="home-banner__sub">{b.sub}</p>
-                        <span className={`home-banner__cta ${b.ctaClass}`}>
-                          Pedir agora
-                          <span aria-hidden> →</span>
-                        </span>
-                      </div>
-                      <img className="home-banner__photo" src={b.img} alt="" width={200} height={140} loading="lazy" />
-                      <div className="home-banner__floor" aria-hidden />
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <HomeBannersMarquee banners={banners} />
           </section>
         </div>
       </section>

@@ -481,6 +481,17 @@
   animation: hero-visual-slide-in 2s cubic-bezier(0.2, 0.72, 0.2, 1) 120ms both;
 }
 
+/* Várias fotos no destaque: deslize horizontal para trocar (além do autoplay) */
+.hero__col--visual.hero__col--visual--swipe {
+  pointer-events: auto;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.hero__col--visual.hero__col--visual--swipe:active {
+  cursor: grabbing;
+}
+
 .hero__col--texto {
   animation: hero-text-slide-in 2s cubic-bezier(0.2, 0.72, 0.2, 1) 80ms both;
 }
@@ -537,6 +548,127 @@
 .hero__pizza-dot--on {
   background: var(--brand);
   transform: scale(1.2);
+}
+
+/* Troca de foto no hero: “arremesso” lateral (sai de um lado, entra pelo outro) */
+.hero__pizza-stage {
+  position: relative;
+  width: min(78vw, 600px);
+  max-width: 100%;
+  min-height: min(72vw, 460px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 900px) {
+  .hero__pizza-stage {
+    width: min(40vw, 800px);
+    min-height: min(42vw, 540px);
+  }
+}
+
+.hero__pizza-layer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.hero__pizza-layer--absolute {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.hero__pizza-stage .hero__pizza {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+}
+
+.hero__pizza-stage--throwing .hero__pizza-layer .hero__pizza {
+  animation: none !important;
+}
+
+@keyframes hero-pizza-throw-out-next {
+  0% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-122%) rotate(-18deg) scale(0.86);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-pizza-throw-in-next {
+  0% {
+    transform: translateX(108%) rotate(16deg) scale(0.8);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hero-pizza-throw-out-prev {
+  0% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(122%) rotate(18deg) scale(0.86);
+    opacity: 0;
+  }
+}
+
+@keyframes hero-pizza-throw-in-prev {
+  0% {
+    transform: translateX(-108%) rotate(-16deg) scale(0.8);
+    opacity: 0;
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.hero__pizza-layer--out-next {
+  animation: hero-pizza-throw-out-next 0.5s cubic-bezier(0.4, 0, 0.85, 0.35) forwards;
+}
+
+.hero__pizza-layer--in-next {
+  animation: hero-pizza-throw-in-next 0.54s cubic-bezier(0.2, 0.95, 0.25, 1) forwards;
+}
+
+.hero__pizza-layer--out-prev {
+  animation: hero-pizza-throw-out-prev 0.5s cubic-bezier(0.4, 0, 0.85, 0.35) forwards;
+}
+
+.hero__pizza-layer--in-prev {
+  animation: hero-pizza-throw-in-prev 0.54s cubic-bezier(0.2, 0.95, 0.25, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__pizza-layer--out-next,
+  .hero__pizza-layer--in-next,
+  .hero__pizza-layer--out-prev,
+  .hero__pizza-layer--in-prev {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }
 
 @keyframes hero-pizza-spin {

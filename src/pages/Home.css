@@ -287,12 +287,27 @@
   overflow: hidden;
   mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
   -webkit-mask-image: linear-gradient(to right, transparent 0, #000 4%, #000 96%, transparent 100%);
+  cursor: grab;
+  touch-action: none;
+}
+
+.home-banners__marquee:active {
+  cursor: grabbing;
+}
+
+.home-banners__marquee:hover .home-banners__track:not(.home-banners__track--js) {
+  animation-play-state: paused;
 }
 
 .home-banners__track {
   display: flex;
   width: max-content;
   animation: home-banners-marquee-right 44s linear infinite;
+}
+
+.home-banners__track--js {
+  animation: none !important;
+  will-change: transform;
 }
 
 .home-banners__set {
@@ -328,9 +343,28 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .home-banners__marquee {
+    cursor: default;
+    touch-action: auto;
+  }
+
   .home-banners__track {
     animation: none;
     transform: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 1100px;
+    margin-inline: auto;
+  }
+
+  .home-banners__set[aria-hidden='true'] {
+    display: none;
+  }
+
+  .home-banners__set {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
 
