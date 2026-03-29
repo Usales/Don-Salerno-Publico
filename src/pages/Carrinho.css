@@ -397,6 +397,60 @@
   border-color: #15803d;
 }
 
+/* Caixa de observações (acima do rodapé do carrinho) */
+.cart-observacao-box {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  padding: 1.15rem 1.2rem 1.05rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+.cart-observacao-box__titulo {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.cart-observacao__help {
+  margin: 0 0 0.75rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.cart-observacao__textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 8rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  line-height: 1.45;
+  resize: vertical;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.cart-observacao__textarea:focus {
+  outline: 2px solid var(--brand-soft);
+  outline-offset: 2px;
+  border-color: var(--brand);
+}
+
+.cart-observacao__count {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
 @media (max-width: 700px) {
   .cart-footer__actions {
     flex-direction: column;

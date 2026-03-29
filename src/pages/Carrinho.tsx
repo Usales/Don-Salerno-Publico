@@ -19,27 +19,32 @@ export function Carrinho() {
   const [avisoPedidoLido, setAvisoPedidoLido] = useState(false)
   const {
     itens,
+    observacaoPedido,
     definirQuantidade,
     remover,
-    sincronizarPrecos,
+    limparCarrinho,
+    definirObservacaoPedido,
     subtotal,
     descontoValor,
     total,
   } = useCart(
     useShallow((s) => ({
       itens: s.itens,
+      observacaoPedido: s.observacaoPedido ?? '',
       definirQuantidade: s.definirQuantidade,
       remover: s.remover,
-      sincronizarPrecos: s.sincronizarPrecos,
+      limparCarrinho: s.limparCarrinho,
+      definirObservacaoPedido: s.definirObservacaoPedido,
       subtotal: s.subtotal,
       descontoValor: s.descontoValor,
       total: s.total,
     })),
   )
 
-  const onAtualizar = useCallback(() => {
-    sincronizarPrecos()
-  }, [sincronizarPrecos])
+  const onLimparCarrinho = useCallback(() => {
+    if (!window.confirm('Deseja remover todos os itens do carrinho?')) return
+    limparCarrinho()
+  }, [limparCarrinho])
 
   const enviarPedidoWhatsapp = useCallback(() => {
     const linhas = itens
@@ -50,15 +55,19 @@ export function Carrinho() {
           )}`,
       )
       .join('\n')
-    const mensagemPedido =
+    const obs = observacaoPedido.trim()
+    let mensagemPedido =
       `Olá, Don Salerno! Segue meu pedido:\n\n${linhas}\n\n` +
       `Subtotal: ${brl(subtotal())}\n` +
-      `Total: ${brl(total())}\n\n` +
-      'Obrigado!'
+      `Total: ${brl(total())}`
+    if (obs) {
+      mensagemPedido += `\n\nObservações / detalhes do pedido:\n${obs}`
+    }
+    mensagemPedido += '\n\nObrigado!'
     const waUrl = `https://wa.me/${empresa.whatsappDigits}?text=${encodeURIComponent(mensagemPedido)}`
 
     window.open(waUrl, '_blank', 'noopener,noreferrer')
-  }, [itens, subtotal, total])
+  }, [itens, observacaoPedido, subtotal, total])
 
   const onEnviarPedido = useCallback(() => {
     if (!avisoPedidoLido) {
@@ -179,10 +188,42 @@ export function Carrinho() {
             </table>
           </div>
 
+          <section
+            className="cart-observacao-box"
+            aria-labelledby="cart-observacao-titulo"
+          >
+            <h2 id="cart-observacao-titulo" className="cart-observacao-box__titulo">
+              Observações
+            </h2>
+            <p className="cart-observacao__help" id="cart-observacao-desc">
+              Comentários ou detalhes de como prefere o pedido (ex.: ponto da massa, ingredientes a retirar, bem
+              passada, horário de retirada). Será enviado junto no WhatsApp.
+            </p>
+            <textarea
+              id="cart-observacao-textarea"
+              className="cart-observacao__textarea"
+              rows={6}
+              maxLength={2000}
+              value={observacaoPedido}
+              onChange={(e) => definirObservacaoPedido(e.target.value)}
+              placeholder="Descreva como prefere seu pedido."
+              aria-labelledby="cart-observacao-titulo"
+              aria-describedby="cart-observacao-desc"
+            />
+            <p className="cart-observacao__count" aria-live="polite">
+              {observacaoPedido.length}/2000
+            </p>
+          </section>
+
           <div className="cart-footer">
             <div className="cart-footer__actions">
-              <button type="button" className="btn btn--primario" onClick={onAtualizar}>
-                Atualizar carrinho
+              <button
+                type="button"
+                className="btn btn--primario"
+                onClick={onLimparCarrinho}
+                aria-label="Limpar carrinho"
+              >
+                Limpar carrinho
               </button>
               <Link to="/cardapio/pizzas" className="btn btn--primario cart-footer__link-btn">
                 Continuar comprando

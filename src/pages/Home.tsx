@@ -23,7 +23,7 @@ const HERO_CALZONES = [
   },
 ] as const
 
-const HERO_PIZZA_INTERVAL_MS = 8000
+const HERO_PIZZA_INTERVAL_MS = 4000
 
 /** Categorias cujo destaque visual no hero não usa rotação contínua (foto fixa). Pizza gira no forno visual. */
 const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas', 'bebidas']
