@@ -65,3 +65,367 @@
   flex: 1;
   min-width: 0;
 }
+
+/* ——— Página produto: foto compacta ao lado do título e resumo ——— */
+.produto-page {
+  padding: 1.25rem 1rem 2rem;
+  max-width: min(920px, 100%);
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.produto-page__nav a {
+  font-weight: 600;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.produto-hero {
+  display: grid;
+  gap: 1rem 1.5rem;
+  align-items: start;
+  margin-top: 0.65rem;
+}
+
+.produto-hero__texto {
+  min-width: 0;
+}
+
+.produto-hero__titulo {
+  font-size: clamp(1.45rem, 3.8vw, 1.95rem);
+  margin: 0 0 0.45rem;
+  line-height: 1.2;
+}
+
+.produto-hero__descricao {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--text-muted);
+  font-size: clamp(0.9rem, 2.1vw, 1rem);
+}
+
+.produto-hero__tempo {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+}
+
+.produto-hero__media {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+@media (min-width: 720px) {
+  .produto-hero {
+    grid-template-columns: minmax(0, 1fr) minmax(168px, 34%);
+  }
+
+  .produto-hero__media {
+    justify-content: flex-end;
+    padding-top: 0.15rem;
+  }
+}
+
+.produto-hero .produto-foto-wrap {
+  margin: 0;
+  max-width: 220px;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  line-height: 0;
+}
+
+@media (min-width: 720px) {
+  .produto-hero .produto-foto-wrap {
+    max-width: none;
+  }
+}
+
+.produto-hero .produto-foto {
+  max-height: 188px;
+  object-fit: contain;
+}
+
+@media (min-width: 720px) {
+  .produto-hero .produto-foto {
+    max-height: 210px;
+  }
+}
+
+.produto-page .produto-bloco-apos-hero {
+  margin-top: 1rem;
+}
+
+.produto-page .produto-ingredientes {
+  margin-top: 1rem;
+}
+
+.produto-page .receita-ficha-tecnica {
+  margin-top: 1rem;
+}
+
+.produto-page .receita-ingredientes {
+  margin-top: 1rem;
+}
+
+.produto-page .produto-bloco-comprar {
+  margin-top: 1.1rem;
+}
+
+.produto-page .receita-como.produto-bloco-receita {
+  margin-top: 1.25rem;
+}
+
+.produto-page .produto-reviews {
+  margin-top: 1.5rem;
+}
+
+/* ——— Adicionais (abaixo dos ingredientes) ——— */
+.produto-adicionais__lista {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.produto-adicionais__label {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: var(--bg-soft);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.produto-adicionais__label:hover {
+  border-color: #d8d8d8;
+}
+
+.produto-adicionais__check {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--brand);
+  flex-shrink: 0;
+}
+
+.produto-adicionais__nome {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+
+.produto-adicionais__preco {
+  font-weight: 700;
+  font-size: 0.875rem;
+  color: var(--brand);
+}
+
+/* ——— Montar pedido (cartão estilo app) ——— */
+.produto-montar {
+  margin-top: 0.65rem;
+}
+
+.produto-montar__tamanho {
+  margin-bottom: 0.85rem;
+}
+
+.produto-montar__field-label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.35rem;
+}
+
+.produto-montar__select {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.55rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.produto-montar__select--bloco {
+  max-width: none;
+  margin-top: 0.2rem;
+}
+
+.produto-montar__segundo-sabor {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border);
+}
+
+.produto-montar__segundo-sabor .produto-montar__partes-dica {
+  margin-top: 0.5rem;
+}
+
+.produto-montar__card {
+  display: grid;
+  gap: 1.15rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (min-width: 560px) {
+  .produto-montar__card {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.produto-montar__label {
+  display: block;
+  font-weight: 700;
+  font-size: 0.875rem;
+  margin-bottom: 0.4rem;
+  color: var(--text);
+}
+
+.produto-montar__label--partes {
+  margin-bottom: 0.5rem;
+}
+
+.produto-montar__bloco-qtd {
+  margin-bottom: 1rem;
+}
+
+.produto-montar__qtd {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.produto-montar__qtd-btn {
+  width: 2.35rem;
+  height: 2.35rem;
+  border: none;
+  border-radius: 50%;
+  margin: 0.2rem;
+  background: var(--brand);
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.produto-montar__qtd-btn:hover:not(:disabled) {
+  background: var(--brand-hover);
+}
+
+.produto-montar__qtd-btn:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.produto-montar__qtd-val {
+  min-width: 2.5rem;
+  text-align: center;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.produto-montar__valor-num {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.65rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.produto-montar__partes {
+  border: none;
+  margin: 0;
+  padding: 0;
+}
+
+.produto-montar__radio {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  margin-bottom: 0.55rem;
+  color: var(--text);
+}
+
+.produto-montar__radio:last-of-type {
+  margin-bottom: 0;
+}
+
+.produto-montar__radio:focus-within .produto-montar__radio-indic {
+  outline: var(--foco);
+  outline-offset: 2px;
+}
+
+.produto-montar__radio-indic {
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 50%;
+  border: 2px solid #c4c4c4;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.produto-montar__radio--ativo {
+  color: var(--brand);
+}
+
+.produto-montar__radio--ativo .produto-montar__radio-indic {
+  border-color: var(--brand);
+  background: var(--brand);
+}
+
+.produto-montar__radio--ativo .produto-montar__radio-indic::after {
+  content: '';
+  width: 0.32rem;
+  height: 0.55rem;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-0.02rem, -0.05rem);
+}
+
+.produto-montar__partes-dica {
+  margin: 0.65rem 0 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.produto-montar__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.produto-montar__link-carrinho {
+  text-decoration: none;
+}

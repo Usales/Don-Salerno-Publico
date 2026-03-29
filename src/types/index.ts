@@ -2,6 +2,22 @@ export type Categoria = 'pizzas' | 'esfihas' | 'calzones' | 'sobremesas' | 'bebi
 
 export type TamanhoCodigo = 'P' | 'M' | 'G'
 
+/** Pizza inteira ou meio a meio (segundo sabor pode ser indicado nas observações). */
+export type PartesPizza = 'inteira' | 'meio-meio'
+
+/** Adicional escolhido no carrinho (snapshot de nome e preço). */
+export interface CarrinhoAdicional {
+  id: string
+  nome: string
+  preco: number
+}
+
+/** Outra metade da pizza em pedido meio a meio. */
+export interface CarrinhoSegundoSabor {
+  produtoId: string
+  nome: string
+}
+
 export interface OpcaoMassa {
   id: string
   nome: string
@@ -60,6 +76,8 @@ export interface Produto {
   /** Quando presente, a página prioriza “Como criar a receita” e os tópicos. */
   receita?: ReceitaDetalhe
   ingredientes: string[]
+  /** Linha única estilo cardápio (ex.: “Molho, mussarela, … e orégano”). */
+  ingredientesCardapio?: string
   /** Texto legal para exibição destacada */
   alergenos: string[]
   tempoPreparoMin: number

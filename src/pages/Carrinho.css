@@ -186,6 +186,14 @@
   color: var(--text-muted);
 }
 
+.cart-table__extras {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.8125rem;
+  color: var(--brand);
+  font-weight: 600;
+}
+
 .cart-table__td--num {
   text-align: right;
   white-space: nowrap;

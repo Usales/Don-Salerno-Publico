@@ -1,4 +1,4 @@
-import type { Produto } from '@/types'
+import type { Produto, TamanhoCodigo } from '@/types'
 
 const massasPadrao: Produto['massas'] = [
   { id: 'italiana', nome: 'Massa italiana', descricao: 'Tradicional com fermentação lenta.', adicional: 0 },
@@ -16,17 +16,94 @@ const adicionaisPadrao: Produto['adicionais'] = [
 const alergenoPizzaPadrao =
   'Contém glúten e lactose. Pode conter ovos e outros; informe restrições no pedido.'
 
+/** Itens da lista interna a partir da linha do cardápio (separador: vírgula + espaço). */
+function linhaCardapioParaItens(linha: string): string[] {
+  return linha.split(', ').map((s) => s.trim()).filter(Boolean)
+}
+
+type FaixaPrecoCardapio = 'promo' | 'trad' | 'especial' | 'nobre' | 'doce'
+
+const precosPorFaixa: Record<FaixaPrecoCardapio, Record<TamanhoCodigo, number>> = {
+  promo: { P: 49.9, M: 62, G: 76 },
+  trad: { P: 59.9, M: 72, G: 86 },
+  especial: { P: 64.9, M: 76, G: 90 },
+  nobre: { P: 69.9, M: 82, G: 96 },
+  doce: { P: 64.9, M: 76, G: 90 },
+}
+
+/** Califórnia: não repetir o nome do sabor na lista de ingredientes (pedido do cardápio). */
+function pizzaSemPrefixoSaborNoIngrediente(nome: string, slug?: string): boolean {
+  const n = nome.trim().toLowerCase().normalize('NFC')
+  if (/^calif[oó]rnia$/.test(n)) return true
+  if (slug?.toLowerCase() === 'california' || slug?.toLowerCase() === 'california-doce') return true
+  return false
+}
+
+function stripDiacritics(s: string): string {
+  return s.normalize('NFD').replace(/\p{M}/gu, '')
+}
+
+const PALAVRAS_IGNORADAS_NO_NOME_PIZZA = new Set([
+  'com',
+  'e',
+  'ao',
+  'aos',
+  'à',
+  'a',
+  'da',
+  'de',
+  'do',
+  'das',
+  'dos',
+  'na',
+  'no',
+  'nas',
+  'nos',
+  'em',
+  'um',
+  'uma',
+])
+
+/**
+ * Se a lista ainda não “cita” o sabor pelo nome, coloca o nome como primeiro item.
+ * Evita duplicar quando o próprio nome já aparece (ex.: frango, pepperoni, quatro queijos).
+ */
+function ingredientesPizzaComSaborNoTopo(nome: string, slug: string | undefined, ingredientes: string[]): string[] {
+  if (pizzaSemPrefixoSaborNoIngrediente(nome, slug)) return ingredientes
+
+  const blob = stripDiacritics(ingredientes.join(' ').toLowerCase())
+  const nomeNorm = stripDiacritics(nome.trim().toLowerCase())
+
+  if (blob.includes(nomeNorm)) return ingredientes
+
+  const tokens = nomeNorm
+    .split(/[\s&/,-]+/)
+    .map((t) => t.trim())
+    .filter((t) => t.length >= 2 && !PALAVRAS_IGNORADAS_NO_NOME_PIZZA.has(t))
+
+  if (tokens.length > 0 && tokens.every((t) => blob.includes(t))) {
+    return ingredientes
+  }
+
+  return [nome.trim(), ...ingredientes]
+}
+
 function pizzaSabor(
   o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
     ingredientes?: string[]
+    ingredientesCardapio?: string
     alergenos?: string[]
     imagemDestaque?: string
   },
 ): Produto {
+  const card = o.ingredientesCardapio?.trim()
+  const base = card ? linhaCardapioParaItens(card) : (o.ingredientes ?? [o.descricao])
+  const ingredientes = card ? base : ingredientesPizzaComSaborNoTopo(o.nome, o.slug, base)
   return {
     ...o,
     categoria: 'pizzas',
-    ingredientes: o.ingredientes ?? [o.descricao],
+    ingredientes,
+    ingredientesCardapio: card ?? o.ingredientesCardapio,
     alergenos: o.alergenos ?? [alergenoPizzaPadrao],
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
@@ -36,6 +113,7 @@ function pizzaSabor(
 function esfihaSabor(
   o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
     ingredientes?: string[]
+    ingredientesCardapio?: string
     alergenos?: string[]
     imagemDestaque?: string
   },
@@ -44,6 +122,7 @@ function esfihaSabor(
     ...o,
     categoria: 'esfihas',
     ingredientes: o.ingredientes ?? [o.descricao],
+    ingredientesCardapio: o.ingredientesCardapio,
     alergenos: o.alergenos ?? [alergenoPizzaPadrao],
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
@@ -53,6 +132,7 @@ function esfihaSabor(
 function sobremesaSabor(
   o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
     ingredientes?: string[]
+    ingredientesCardapio?: string
     alergenos?: string[]
     imagemDestaque?: string
   },
@@ -61,6 +141,7 @@ function sobremesaSabor(
     ...o,
     categoria: 'sobremesas',
     ingredientes: o.ingredientes ?? [o.descricao],
+    ingredientesCardapio: o.ingredientesCardapio,
     alergenos: o.alergenos ?? ['Pode conter glúten, lactose e oleaginosas.'],
     massas: [],
     adicionais: [],
@@ -68,143 +149,360 @@ function sobremesaSabor(
 }
 
 export const produtos: Produto[] = [
+  // Pizzas — ingredientes e faixas conforme docs/cardapio-pizzas-ingredientes.md
   pizzaSabor({
-    id: 'p1',
-    slug: 'margherita',
-    nome: 'Margherita',
-    descricao:
-      'A rainha das clássicas: molho de tomates italianos encorpados, mussarela de búfala cremosa, manjericão fresco e final de azeite extravirgem. Leve, perfumada e elegante em cada fatia.',
-    tempoPreparoMin: 22,
-    imagem: '/hero-pizza-margherita.png',
-    imagemDestaque: '/hero-pizza-margherita-destaque.png',
-    precos: { P: 42, M: 58, G: 72 },
-    ingredientes: [
-      'Molho de tomate (tomates italianos encorpados)',
-      'mussarela de búfala cremosa',
-      'manjericão fresco',
-      'azeite extravirgem',
-    ],
+    id: 'p11',
+    slug: 'baiana',
+    nome: 'Baiana',
+    descricao: 'Picância e sabor de pizzaria no estilo do cardápio.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-baiana.png',
+    precos: precosPorFaixa.promo,
+    ingredientesCardapio:
+      'Molho, mussarela, calabresa, pimenta calabresa, pimenta de cheiro, cebola, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p2',
     slug: 'calabresa',
     nome: 'Calabresa',
-    descricao:
-      'Calabresa fatiada no ponto ideal, cebola fresca em rodelas e mussarela derretendo por cima. Sabor marcante de pizzaria raiz, com aquele equilíbrio que agrada sempre.',
+    descricao: 'Clássica calabresa com cebola e orégano, como no cardápio.',
     tempoPreparoMin: 22,
     imagem: '/hero-pizza-calabresa.png',
-    precos: { P: 44, M: 60, G: 74 },
-    ingredientes: ['Calabresa fatiada', 'Cebola fresca em rodelas', 'Mussarela derretida'],
-  }),
-  pizzaSabor({
-    id: 'p3',
-    slug: 'portuguesa',
-    nome: 'Portuguesa',
-    descricao:
-      'A tradicional bem servida: presunto, ovos, cebola, palmito, ervilha e mussarela em combinação harmônica. Uma pizza completa, cremosa e cheia de personalidade.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza-portuguesa.png',
-    precos: { P: 46, M: 62, G: 76 },
-    ingredientes: ['Presunto', 'ovos', 'cebola', 'palmito', 'ervilha', 'mussarela'],
+    precos: precosPorFaixa.promo,
+    ingredientesCardapio: 'Molho, mussarela, calabresa, cebola, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p4',
-    slug: 'pepperoni',
-    nome: 'Pepperoni',
-    descricao:
-      'Pepperoni levemente picante, mussarela abundante e toque de orégano. Estilo americano, bordas douradas e sabor intenso do primeiro ao último pedaço.',
+    slug: 'dois-queijos',
+    nome: 'Dois Queijos',
+    descricao: 'Mussarela e catupiry em equilíbrio com molho e tomate.',
     tempoPreparoMin: 22,
-    imagem: '/hero-pizza-pepperoni.png',
-    precos: { P: 48, M: 64, G: 78 },
-    ingredientes: ['Pepperoni levemente apimentado', 'mussarela', 'orégano'],
+    imagem: '/hero-pizza-quatro-queijos.png',
+    precos: precosPorFaixa.promo,
+    ingredientesCardapio: 'Molho, mussarela, catupiry, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p5',
-    slug: 'quatro-queijos',
-    nome: 'Quatro queijos',
-    descricao:
-      'Mussarela, provolone, gorgonzola e parmesão em camadas de cremosidade e aroma. Para quem ama queijo de verdade e final persistente no paladar.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-quatro-queijos.png',
-    precos: { P: 47, M: 63, G: 77 },
-    ingredientes: ['Mussarela', 'provolone', 'gorgonzola', 'parmesão'],
+    id: 'p1',
+    slug: 'margherita',
+    nome: 'Marguerita',
+    descricao: 'A clássica Marguerita do cardápio.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza-margherita.png',
+    imagemDestaque: '/hero-pizza-margherita-destaque.png',
+    precos: precosPorFaixa.promo,
+    ingredientesCardapio: 'Molho, mussarela, manjericão, catupiry, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p12',
+    slug: 'mussarela',
+    nome: 'Mussarela',
+    descricao: 'Simples e irresistível: molho, mussarela e tomate.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.promo,
+    ingredientesCardapio: 'Molho, mussarela, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p18',
+    slug: 'presunto',
+    nome: 'Presunto',
+    descricao: 'Tradicional presunto com mussarela e tomate.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza-portuguesa.png',
+    precos: precosPorFaixa.promo,
+    ingredientesCardapio: 'Molho, mussarela, presunto, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p19',
+    slug: 'atum',
+    nome: 'Atum',
+    descricao: 'Atum com cebola e tomate no molho da casa.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, atum, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p20',
+    slug: 'bacon',
+    nome: 'Bacon',
+    descricao: 'Bacon crocante com cebola e mussarela.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza-pepperoni.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, bacon, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p21',
+    slug: 'francesa',
+    nome: 'Francesa',
+    descricao: 'Lombinho defumado com creme de leite e orégano.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, lombinho defumado, creme de leite, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p22',
+    slug: 'frango',
+    nome: 'Frango',
+    descricao: 'Peito de frango desfiado com milho e cebola.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-frango-catupiry.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, peito de frango desfiado, milho, cebola, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p6',
-    slug: 'frango-catupiry',
-    nome: 'Frango com catupiry',
-    descricao:
-      'Frango desfiado bem temperado, catupiry original cremoso e toque de milho verde. Conforto em forma de pizza, com sabor caseiro e textura perfeita.',
+    slug: 'frango-ao-catupiry',
+    nome: 'Frango ao Catupiry',
+    descricao: 'Frango com catupiry cremoso, como no cardápio.',
     tempoPreparoMin: 24,
     imagem: '/hero-pizza-frango-catupiry.png',
-    precos: { P: 45, M: 61, G: 75 },
-    ingredientes: ['Frango desfiado temperado', 'catupiry original', 'milho verde'],
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, frango, catupiry, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p23',
+    slug: 'frango-ao-cheddar',
+    nome: 'Frango ao Cheddar',
+    descricao: 'Frango com cheddar derretido e orégano.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-frango-catupiry.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, frango, cheddar, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p24',
+    slug: 'frango-ao-creme',
+    nome: 'Frango ao Creme',
+    descricao: 'Frango com creme de leite, milho e cebola.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-frango-catupiry.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, frango, creme de leite, milho, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p25',
+    slug: 'frango-com-bacon',
+    nome: 'Frango com bacon',
+    descricao: 'Frango desfiado com bacon e cebola.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-frango-catupiry.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, frango desfiado, bacon, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p26',
+    slug: 'lombo',
+    nome: 'Lombo',
+    descricao: 'Lombo defumado com mussarela e tomate.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, lombo defumado, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p27',
+    slug: 'lombo-com-catupiry',
+    nome: 'Lombo com catupiry',
+    descricao: 'Lombo defumado com catupiry e orégano.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, lombo defumado, catupiry, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p8',
     slug: 'napolitana',
     nome: 'Napolitana',
-    descricao:
-      'Anchovas, alcaparras, tomate-cereja e mussarela em uma receita de perfil mediterrâneo. Salinidade elegante e acidez fresca na medida certa.',
+    descricao: 'Presunto, palmito e cebola no estilo tradicional do cardápio.',
     tempoPreparoMin: 23,
     imagem: '/hero-pizza-napolitana.png',
-    precos: { P: 49, M: 65, G: 79 },
-    ingredientes: ['Anchovas', 'alcaparras', 'tomate cereja', 'mussarela'],
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, presunto, palmito, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p3',
+    slug: 'portuguesa',
+    nome: 'Portuguesa',
+    descricao: 'Presunto, ovo, ervilha e cebola — a Portuguesa do cardápio.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-portuguesa.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, presunto, ervilha, ovo, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p28',
+    slug: 'primavera',
+    nome: 'Primavera',
+    descricao: 'Calabresa ralada com catupiry e tomate.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-calabresa.png',
+    precos: precosPorFaixa.trad,
+    ingredientesCardapio: 'Molho, mussarela, calabresa ralada, catupiry, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p29',
+    slug: 'brocolis',
+    nome: 'Brócolis',
+    descricao: 'Brócolis com catupiry, bacon e alho frito.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-vegetariana.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, brócolis, catupiry, bacon, alho frito, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p30',
+    slug: 'calabresa-com-bacon',
+    nome: 'Calabresa com Bacon',
+    descricao: 'Calabresa e bacon com cebola e orégano.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-calabresa.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, calabresa, bacon, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p31',
+    slug: 'calabresa-com-banana',
+    nome: 'Calabresa com banana',
+    descricao: 'Calabresa com banana frita — clássica especial da casa.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-calabresa.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, calabresa, banana frita, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p32',
+    slug: 'calabresa-com-catupiry',
+    nome: 'Calabresa com catupiry',
+    descricao: 'Calabresa com catupiry, cebola e tomate.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-calabresa.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, calabresa, catupiry, tomate e orégano, cebola',
+  }),
+  pizzaSabor({
+    id: 'p33',
+    slug: 'dom-camilo',
+    nome: 'Dom Camilo',
+    descricao: 'Presunto, calabresa e creme de leite no molho da casa.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-portuguesa.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, presunto, calabresa, creme de leite, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p34',
+    slug: 'frango-com-palmito',
+    nome: 'Frango com Palmito',
+    descricao: 'Frango com palmito e catupiry.',
+    tempoPreparoMin: 24,
+    imagem: '/hero-pizza-frango-catupiry.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, frango, palmito, catupiry, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p5',
+    slug: 'quatro-queijos',
+    nome: 'Quatro Queijos',
+    descricao: 'Mussarela, provolone, catupiry e cheddar com tomate.',
+    tempoPreparoMin: 23,
+    imagem: '/hero-pizza-quatro-queijos.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, provolone, catupiry, cheddar, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p35',
+    slug: 'tomate-seco',
+    nome: 'Tomate Seco',
+    descricao: 'Tomate seco com rúcula e orégano.',
+    tempoPreparoMin: 22,
+    imagem: '/hero-pizza-vegetariana.png',
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio: 'Molho, mussarela, tomate seco, rúcula e orégano',
   }),
   pizzaSabor({
     id: 'p9',
     slug: 'vegetariana',
     nome: 'Vegetariana',
-    descricao:
-      'Pimentões coloridos, champignon, palmito, cebola roxa e mussarela. Leve, aromática e muito saborosa para quem prefere uma opção sem carnes.',
+    descricao: 'Palmito, ervilha, milho e manjericão — vegetariana do cardápio.',
     tempoPreparoMin: 23,
     imagem: '/hero-pizza-vegetariana.png',
-    precos: { P: 45, M: 61, G: 75 },
-    ingredientes: ['Pimentões', 'champignon', 'palmito', 'cebola roxa', 'mussarela'],
+    precos: precosPorFaixa.especial,
+    ingredientesCardapio:
+      'Molho, mussarela, palmito, ervilha, milho, manjericão, cebola, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p10',
-    slug: 'carne-seca-cream-cheese',
-    nome: 'Carne seca com cream cheese',
-    descricao:
-      'Carne seca desfiada, cream cheese cremoso, cebola roxa e mussarela. Um contraste perfeito entre intensidade, cremosidade e toque regional.',
+    slug: 'carne-de-sol',
+    nome: 'Carne de Sol',
+    descricao: 'Carne de sol com catupiry e cebola, faixa nobre do cardápio.',
     tempoPreparoMin: 25,
     imagem: '/hero-pizza-carne-seca-cream-cheese.png',
-    precos: { P: 52, M: 68, G: 82 },
-    ingredientes: ['Carne seca desfiada', 'cream cheese', 'cebola roxa', 'mussarela'],
+    precos: precosPorFaixa.nobre,
+    ingredientesCardapio: 'Molho, mussarela, carne de sol, catupiry, cebola, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p11',
-    slug: 'baiana',
-    nome: 'Baiana',
-    descricao:
-      'Calabresa moída, pimenta, cebola, azeitona e mussarela para quem gosta de sabor com atitude. Picância equilibrada e final marcante.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-baiana.png',
-    precos: { P: 46, M: 62, G: 76 },
-    ingredientes: ['Calabresa moída', 'pimenta', 'cebola', 'azeitona', 'mussarela'],
-  }),
-  pizzaSabor({
-    id: 'p12',
-    slug: 'moda-da-casa',
-    nome: 'Moda da casa',
-    descricao:
-      'Nossa assinatura da casa: frango, bacon, milho, mussarela e catupiry em um recheio robusto e cremoso. A pedida certa para quem quer surpreender no sabor.',
+    id: 'p36',
+    slug: 'chilena',
+    nome: 'Chilena',
+    descricao: 'Atum, palmito e catupiry com cebola.',
     tempoPreparoMin: 24,
     imagem: '/hero-pizza.png',
-    precos: { P: 50, M: 66, G: 80 },
-    ingredientes: ['Frango', 'bacon', 'milho', 'mussarela', 'catupiry'],
+    precos: precosPorFaixa.nobre,
+    ingredientesCardapio: 'Molho, mussarela, atum, palmito, catupiry, cebola, tomate e orégano',
+  }),
+  pizzaSabor({
+    id: 'p37',
+    slug: 'dom-pedrito',
+    nome: 'Dom Pedrito',
+    descricao: 'Pizza nobre — lista completa de ingredientes em atualização no app e no balcão.',
+    tempoPreparoMin: 25,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.nobre,
+    ingredientesCardapio:
+      'Composição nobre conforme cardápio físico ou app — consulte o balcão para detalhes.',
+  }),
+  pizzaSabor({
+    id: 'p38',
+    slug: 'banana-doce',
+    nome: 'Banana',
+    descricao: 'Doce de banana com açúcar e canela.',
+    tempoPreparoMin: 18,
+    imagem: '/hero-pizza.png',
+    precos: precosPorFaixa.doce,
+    ingredientesCardapio: 'Mussarela, banana, açúcar e canela',
+  }),
+  pizzaSabor({
+    id: 'p39',
+    slug: 'chocolate-doce',
+    nome: 'Chocolate',
+    descricao: 'Chocolate com creme de leite.',
+    tempoPreparoMin: 18,
+    imagem: '/hero-pizza-duo-chocolate-morango.png',
+    precos: precosPorFaixa.doce,
+    ingredientesCardapio: 'Mussarela, chocolate e creme de leite',
   }),
   pizzaSabor({
     id: 'p13',
-    slug: 'm-m',
-    nome: 'M&M',
-    descricao:
-      'Chocolate cremoso com morangos frescos em uma combinação doce, intensa e equilibrada. Sobremesa em formato de pizza para fechar o pedido com chave de ouro.',
+    slug: 'chocolate-com-morango',
+    nome: 'Chocolate com Morango',
+    descricao: 'Chocolate, morango e creme de leite.',
     tempoPreparoMin: 18,
     imagem: '/hero-pizza-duo-chocolate-morango.png',
-    precos: { P: 38, M: 52, G: 64 },
-    ingredientes: ['Morango fresco', 'Chocolate', 'Base doce da casa'],
+    precos: precosPorFaixa.doce,
+    ingredientesCardapio: 'Mussarela, chocolate, morango e creme de leite',
+  }),
+  pizzaSabor({
+    id: 'p40',
+    slug: 'choconana',
+    nome: 'Choconana',
+    descricao: 'Banana com chocolate — doce do cardápio.',
+    tempoPreparoMin: 18,
+    imagem: '/hero-pizza-duo-chocolate-morango.png',
+    precos: precosPorFaixa.doce,
+    ingredientesCardapio: 'Mussarela, banana e chocolate',
   }),
   esfihaSabor({
     id: 'p7',
@@ -290,7 +588,7 @@ export const produtos: Produto[] = [
     imagem: '/hero-sobremesa-trufas-tiramisu.png',
     imagemDestaque: '/hero-sobremesa-trufas-tiramisu.png',
     precos: { P: 6.4, M: 32, G: 64 },
-    ingredientes: ['Cacau', 'creme tiramisu', 'café'],
+    ingredientes: ['Cacau', 'massa de biscoito champagne', 'café'],
     alergenos: ['Pode conter glúten, lactose e ovos.'],
   }),
   {
@@ -332,12 +630,20 @@ const slugLegadoParaId: Record<string, string> = {
   'esfiha-carne': 'p7',
   'massa-napoletana': 'p1',
   'massa-romana-al-teglia': 'p1',
-  'massa-new-york': 'p4',
+  /** Antigo pepperoni (p4) — redireciona para pizza salgada genérica do cardápio */
+  'massa-new-york': 'p5',
   'massa-chicago-deep-dish': 'p5',
   'massa-detroit': 'p6',
-  'massa-siciliana': 'p12',
+  /** Antiga moda da casa (ex-p12) */
+  'massa-siciliana': 'p33',
   'molho-caseiro': 'p1',
   'romeu-e-julieta': 'p13',
+  'm-m': 'p13',
+  'frango-catupiry': 'p6',
+  'frango-com-catupiry': 'p6',
+  'carne-seca-cream-cheese': 'p10',
+  'moda-da-casa': 'p33',
+  pepperoni: 'p2',
 }
 
 /** Aceita id (ex.: p1) ou slug (ex.: margherita) ou slug legado. */

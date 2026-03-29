@@ -184,6 +184,12 @@ a:hover {
   transform: scale(0.98);
 }
 
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
 .btn--primario {
   background: var(--brand);
   color: #fff;

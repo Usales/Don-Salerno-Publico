@@ -2,12 +2,12 @@ import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { rotulosCategoria } from '@/data/categorias'
-import { getProdutoPorId } from '@/data/produtos'
+import { getProdutoPorId, getProdutosPorCategoria } from '@/data/produtos'
 import { brl } from '@/lib/format'
 import { useAuth } from '@/stores/useAuth'
 import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
-import type { Categoria, TamanhoCodigo } from '@/types'
+import type { CarrinhoAdicional, Categoria, PartesPizza, TamanhoCodigo } from '@/types'
 import './Produto.css'
 
 /** Tempo para o toast de confirmação aparecer antes do redirect do fluxo de montagem do pedido. */
@@ -41,6 +41,10 @@ export function Produto() {
   const [nota, setNota] = useState(5)
   const [comentario, setComentario] = useState('')
   const [tamanho, setTamanho] = useState<TamanhoCodigo>('P')
+  const [qtdCompra, setQtdCompra] = useState(1)
+  const [partes, setPartes] = useState<PartesPizza>('inteira')
+  const [segundoSaborId, setSegundoSaborId] = useState('')
+  const [adicionalIds, setAdicionalIds] = useState<string[]>([])
   const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
   const adicionarAoCarrinho = useCart((s) => s.adicionar)
   const categoriaProduto = p?.categoria
@@ -80,6 +84,44 @@ export function Produto() {
 
   const produto = p
 
+  useEffect(() => {
+    setQtdCompra(1)
+    setPartes('inteira')
+    setSegundoSaborId('')
+    setAdicionalIds([])
+  }, [produto.id])
+
+  const outrasPizzas = useMemo(() => {
+    if (produto.categoria !== 'pizzas') return []
+    return getProdutosPorCategoria('pizzas')
+      .filter((x) => x.id !== produto.id)
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+  }, [produto.categoria, produto.id])
+
+  const adicionaisSelecionados = useMemo((): CarrinhoAdicional[] => {
+    const set = new Set(adicionalIds)
+    return produto.adicionais.filter((a) => set.has(a.id)).map((a) => ({ id: a.id, nome: a.nome, preco: a.preco }))
+  }, [produto.adicionais, adicionalIds])
+
+  const precoBaseTamanho = useMemo(() => {
+    const p1 = produto.precos[tamanho]
+    if (partes !== 'meio-meio' || !segundoSaborId) return p1
+    const p2 = getProdutoPorId(segundoSaborId)
+    if (!p2) return p1
+    return Math.max(p1, p2.precos[tamanho])
+  }, [produto, tamanho, partes, segundoSaborId])
+
+  const extrasSoma = adicionaisSelecionados.reduce((s, a) => s + a.preco, 0)
+  const precoUnitario = Math.round((precoBaseTamanho + extrasSoma) * 100) / 100
+  const valorExibido = Math.round(precoUnitario * qtdCompra * 100) / 100
+
+  const bloqueadoMeioMeio =
+    produto.categoria === 'pizzas' && partes === 'meio-meio' && segundoSaborId.length === 0
+
+  function toggleAdicional(id: string) {
+    setAdicionalIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
+  }
+
   function enviarReview(e: FormEvent) {
     e.preventDefault()
     if (!usuario) return
@@ -94,33 +136,49 @@ export function Produto() {
   }
 
   return (
-    <article className="container" style={{ padding: '2rem 1rem', maxWidth: 720 }}>
-      <nav aria-label="Navegação estrutural">
+    <article className="container produto-page">
+      <nav className="produto-page__nav" aria-label="Navegação estrutural">
         <Link to={`/cardapio/${produto.categoria}`}>← {rotulosCategoria[produto.categoria]}</Link>
       </nav>
-      <header style={{ marginTop: '1rem' }}>
-        <h1 style={{ fontSize: '2rem', margin: '0 0 0.5rem' }}>{produto.nome}</h1>
-        <p style={{ color: 'var(--text-muted)', margin: 0, lineHeight: 1.55 }}>
-          {produto.receita?.resumo ?? produto.descricao}
-        </p>
-        {produto.receita && (
-          <ul className="receita-topicos" aria-label="Tópicos da receita">
-            {produto.receita.topicos.map((t) => (
-              <li key={t} className="receita-topicos__item">
-                {t}
-              </li>
-            ))}
-          </ul>
-        )}
-        <p style={{ marginTop: '1rem' }}>
-          {produto.categoria === 'sobremesas'
-            ? 'Sai da geladeira em 10 minutos.'
-            : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
-        </p>
-      </header>
+
+      <div className="produto-hero">
+        <header className="produto-hero__texto">
+          <h1 className="produto-hero__titulo">{produto.nome}</h1>
+          <p className="produto-hero__descricao">
+            {produto.receita?.resumo ?? produto.descricao}
+          </p>
+          {produto.receita && (
+            <ul className="receita-topicos" aria-label="Tópicos da receita">
+              {produto.receita.topicos.map((t) => (
+                <li key={t} className="receita-topicos__item">
+                  {t}
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="produto-hero__tempo">
+            {produto.categoria === 'sobremesas'
+              ? 'Sai da geladeira em 10 minutos.'
+              : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
+          </p>
+        </header>
+        <div className="produto-hero__media">
+          <div className="produto-foto-wrap">
+            <img
+              className="produto-foto"
+              src={produto.imagemDestaque ?? produto.imagem}
+              alt={produto.nome}
+              width={320}
+              height={320}
+              decoding="async"
+              loading="eager"
+            />
+          </div>
+        </div>
+      </div>
 
       {produto.receita?.fichaTecnica && (
-        <dl className="receita-ficha-tecnica">
+        <dl className="receita-ficha-tecnica produto-bloco-apos-hero">
           <dt>Origem</dt>
           <dd>{produto.receita.fichaTecnica.origem}</dd>
           {produto.receita.fichaTecnica.farinhaTipo != null && (
@@ -163,7 +221,7 @@ export function Produto() {
       )}
 
       {produto.receita?.ingredientesPorSecao && produto.receita.ingredientesPorSecao.length > 0 ? (
-        <section className="receita-ingredientes" aria-labelledby="ing-medidas-titulo">
+        <section className="receita-ingredientes produto-bloco-apos-hero" aria-labelledby="ing-medidas-titulo">
           <h2 id="ing-medidas-titulo" className="receita-como__titulo">
             Ingredientes com medidas
           </h2>
@@ -190,7 +248,7 @@ export function Produto() {
           ))}
         </section>
       ) : (
-        <section className="produto-ingredientes" aria-labelledby="ing-produto-titulo">
+        <section className="produto-ingredientes produto-bloco-apos-hero" aria-labelledby="ing-produto-titulo">
           <h2 id="ing-produto-titulo" className="receita-como__titulo">
             Ingredientes selecionados
           </h2>
@@ -202,31 +260,48 @@ export function Produto() {
         </section>
       )}
 
-      <div className="produto-foto-wrap">
-        <img
-          className="produto-foto"
-          src={produto.imagem}
-          alt={produto.nome}
-          decoding="async"
-          loading="lazy"
-        />
-      </div>
+      {produto.adicionais.length > 0 ? (
+        <section className="produto-adicionais produto-bloco-apos-hero" aria-labelledby="adic-produto-titulo">
+          <h2 id="adic-produto-titulo" className="receita-como__titulo">
+            Adicionais
+          </h2>
+          <ul className="produto-adicionais__lista">
+            {produto.adicionais.map((a) => {
+              const marcado = adicionalIds.includes(a.id)
+              return (
+                <li key={a.id} className="produto-adicionais__item">
+                  <label className="produto-adicionais__label">
+                    <input
+                      type="checkbox"
+                      className="produto-adicionais__check"
+                      checked={marcado}
+                      onChange={() => toggleAdicional(a.id)}
+                    />
+                    <span className="produto-adicionais__nome">{a.nome}</span>
+                    <span className="produto-adicionais__preco">+ {brl(a.preco)}</span>
+                  </label>
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      ) : null}
 
-      <section className="produto-comprar" aria-labelledby="produto-comprar-titulo" style={{ marginTop: '1.75rem' }}>
+      <section className="produto-comprar produto-bloco-comprar" aria-labelledby="produto-comprar-titulo">
         <h2 id="produto-comprar-titulo" className="receita-como__titulo">
           Montar pedido
         </h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-end' }}>
-          <div>
-            <label htmlFor="produto-tamanho" style={{ display: 'block', fontWeight: 600, marginBottom: 6 }}>
+        <div className="produto-montar">
+          <div className="produto-montar__tamanho">
+            <label className="produto-montar__field-label" htmlFor="produto-tamanho">
               Tamanho
             </label>
             <select
               id="produto-tamanho"
+              className="produto-montar__select"
               value={tamanho}
               onChange={(e) => setTamanho(e.target.value as TamanhoCodigo)}
               disabled={tamanhosDisponiveis.length === 1}
-              style={{ width: '100%', minWidth: 180, padding: '0.5rem 0.65rem', fontSize: '1rem' }}
             >
               {tamanhosDisponiveis.map((t) => (
                 <option key={t} value={t}>
@@ -235,27 +310,151 @@ export function Produto() {
               ))}
             </select>
           </div>
-          <button
-            type="button"
-            className="btn btn--primario"
-            onClick={() => {
-              adicionarAoCarrinho(produto, tamanho)
-              setFeedbackCarrinho(true)
-              const next = fluxoProximaCategoria[produto.categoria]
-              window.setTimeout(() => {
-                if (next === 'carrinho') {
-                  navigate('/carrinho')
-                  return
-                }
-                navigate(`/cardapio/${next}`)
-              }, CARRINHO_TOAST_NAV_DELAY_MS)
-            }}
-          >
-            Adicionar ao carrinho
-          </button>
-          <Link to="/carrinho" className="btn btn--secundario" style={{ textDecoration: 'none' }}>
-            Ver carrinho
-          </Link>
+
+          <div className="produto-montar__card">
+            <div className="produto-montar__col produto-montar__col--esq">
+              <div className="produto-montar__bloco-qtd">
+                <span className="produto-montar__label" id="label-qtd-produto">
+                  Qtd:
+                </span>
+                <div
+                  className="produto-montar__qtd"
+                  role="group"
+                  aria-labelledby="label-qtd-produto"
+                >
+                  <button
+                    type="button"
+                    className="produto-montar__qtd-btn"
+                    aria-label="Diminuir quantidade"
+                    disabled={qtdCompra <= 1}
+                    onClick={() => setQtdCompra((q) => Math.max(1, q - 1))}
+                  >
+                    −
+                  </button>
+                  <span className="produto-montar__qtd-val" aria-live="polite">
+                    {qtdCompra}
+                  </span>
+                  <button
+                    type="button"
+                    className="produto-montar__qtd-btn"
+                    aria-label="Aumentar quantidade"
+                    disabled={qtdCompra >= 99}
+                    onClick={() => setQtdCompra((q) => Math.min(99, q + 1))}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+              <div className="produto-montar__valor">
+                <span className="produto-montar__label">Valor:</span>
+                <p className="produto-montar__valor-num">{brl(valorExibido)}</p>
+              </div>
+            </div>
+
+            {produto.categoria === 'pizzas' ? (
+              <div className="produto-montar__col produto-montar__col--dir">
+                <span className="produto-montar__label produto-montar__label--partes">Partes</span>
+                <fieldset className="produto-montar__partes">
+                  <legend className="visually-hidden">Inteira ou meio a meio</legend>
+                  <label
+                    className={`produto-montar__radio ${partes === 'inteira' ? 'produto-montar__radio--ativo' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      className="visually-hidden"
+                      name="partes-pizza"
+                      value="inteira"
+                      checked={partes === 'inteira'}
+                      onChange={() => {
+                        setPartes('inteira')
+                        setSegundoSaborId('')
+                      }}
+                    />
+                    <span className="produto-montar__radio-indic" aria-hidden />
+                    Inteira
+                  </label>
+                  <label
+                    className={`produto-montar__radio ${partes === 'meio-meio' ? 'produto-montar__radio--ativo' : ''}`}
+                  >
+                    <input
+                      type="radio"
+                      className="visually-hidden"
+                      name="partes-pizza"
+                      value="meio-meio"
+                      checked={partes === 'meio-meio'}
+                      onChange={() => setPartes('meio-meio')}
+                    />
+                    <span className="produto-montar__radio-indic" aria-hidden />
+                    Meio a meio
+                  </label>
+                </fieldset>
+                {partes === 'meio-meio' ? (
+                  <div className="produto-montar__segundo-sabor">
+                    <label className="produto-montar__field-label" htmlFor="produto-segundo-sabor">
+                      Segundo sabor
+                    </label>
+                    <select
+                      id="produto-segundo-sabor"
+                      className="produto-montar__select produto-montar__select--bloco"
+                      value={segundoSaborId}
+                      onChange={(e) => setSegundoSaborId(e.target.value)}
+                      required={partes === 'meio-meio'}
+                    >
+                      <option value="">Escolha o outro sabor</option>
+                      {outrasPizzas.map((pz) => (
+                        <option key={pz.id} value={pz.id}>
+                          {pz.nome} — {brl(pz.precos[tamanho])}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="produto-montar__partes-dica">
+                      O valor segue o tamanho escolhido e o <strong>maior preço</strong> entre as duas metades
+                      (regra usual de pizzaria), mais adicionais.
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="produto-montar__acoes">
+            <button
+              type="button"
+              className="btn btn--primario"
+              disabled={bloqueadoMeioMeio}
+              title={bloqueadoMeioMeio ? 'Selecione o segundo sabor para meio a meio' : undefined}
+              onClick={() => {
+                if (bloqueadoMeioMeio) return
+                const segundo =
+                  partes === 'meio-meio' && segundoSaborId
+                    ? (() => {
+                        const pz = getProdutoPorId(segundoSaborId)
+                        return pz ? { produtoId: pz.id, nome: pz.nome } : undefined
+                      })()
+                    : undefined
+                adicionarAoCarrinho(produto, tamanho, {
+                  quantidade: qtdCompra,
+                  partes: produto.categoria === 'pizzas' ? partes : undefined,
+                  segundoSabor: segundo,
+                  adicionais: adicionaisSelecionados.length ? adicionaisSelecionados : undefined,
+                })
+                setFeedbackCarrinho(true)
+                const next = fluxoProximaCategoria[produto.categoria]
+                window.setTimeout(() => {
+                  if (next === 'carrinho') {
+                    navigate('/carrinho')
+                    return
+                  }
+                  navigate(`/cardapio/${next}`)
+                }, CARRINHO_TOAST_NAV_DELAY_MS)
+              }}
+            >
+              Adicionar ao carrinho
+            </button>
+            <Link to="/carrinho" className="btn btn--secundario produto-montar__link-carrinho">
+              Ver carrinho
+            </Link>
+          </div>
         </div>
         {feedbackCarrinho ? (
           <div className="produto-carrinho-toast" role="status" aria-live="polite">
@@ -276,7 +475,7 @@ export function Produto() {
       </section>
 
       {produto.receita ? (
-        <section className="receita-como" aria-labelledby="como-receita-titulo">
+        <section className="receita-como produto-bloco-receita" aria-labelledby="como-receita-titulo">
           <h2 id="como-receita-titulo" className="receita-como__titulo">
             {produto.receita.tituloSecaoComo ?? 'Como criar a receita'}
           </h2>
@@ -291,7 +490,7 @@ export function Produto() {
         </section>
       ) : null}
 
-      <section style={{ marginTop: '2rem' }} aria-labelledby="reviews-titulo">
+      <section className="produto-reviews" aria-labelledby="reviews-titulo">
         <h2 id="reviews-titulo" className="processo__titulo">
           Avaliações
         </h2>

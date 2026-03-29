@@ -48,12 +48,24 @@ export function Carrinho() {
 
   const enviarPedidoWhatsapp = useCallback(() => {
     const linhas = itens
-      .map(
-        (linha) =>
-          `- ${linha.nome} | Tamanho ${linha.tamanho} | Qtd: ${linha.quantidade} | Total: ${brl(
+      .map((linha) => {
+        const meioTxt =
+          linha.partes === 'meio-meio' && linha.segundoSabor
+            ? ` | Meio a meio com ${linha.segundoSabor.nome}`
+            : linha.partes === 'meio-meio'
+              ? ' | Meio a meio'
+              : linha.partes === 'inteira'
+                ? ' | Inteira'
+                : ''
+        const extrasTxt = linha.adicionais?.length
+          ? ` | Adicionais: ${linha.adicionais.map((a) => `${a.nome} (${brl(a.preco)})`).join(', ')}`
+          : ''
+        return (
+          `- ${linha.nome}${meioTxt} | Tam. ${linha.tamanho}${extrasTxt} | Qtd: ${linha.quantidade} | Total: ${brl(
             linha.precoUnit * linha.quantidade,
-          )}`,
-      )
+          )}`
+        )
+      })
       .join('\n')
     const obs = observacaoPedido.trim()
     let mensagemPedido =
@@ -140,7 +152,21 @@ export function Carrinho() {
                       <Link to={`/produto/${linha.produtoId}`} className="cart-table__nome">
                         {linha.nome}
                       </Link>
-                      <span className="cart-table__tam">Tamanho {linha.tamanho}</span>
+                      <span className="cart-table__tam">
+                        Tamanho {linha.tamanho}
+                        {linha.partes === 'meio-meio' && linha.segundoSabor
+                          ? ` · Meio a meio · ½ ${linha.segundoSabor.nome}`
+                          : linha.partes === 'meio-meio'
+                            ? ' · Meio a meio'
+                            : linha.partes === 'inteira'
+                              ? ' · Inteira'
+                              : ''}
+                      </span>
+                      {linha.adicionais?.length ? (
+                        <span className="cart-table__extras">
+                          + {linha.adicionais.map((a) => a.nome).join(', ')}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="cart-table__td cart-table__td--num">
                       <strong>{brl(linha.precoUnit)}</strong>
