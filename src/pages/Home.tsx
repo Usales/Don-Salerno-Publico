@@ -97,7 +97,7 @@ const banners = [
   },
   {
     tag: 'Don Salerno',
-    title: 'Esfihas & abertas',
+    title: 'Esfihas abertas',
     sub: 'Receita do dia',
     ctaClass: 'home-banner__cta--orange' as const,
     to: '/cardapio/esfihas',

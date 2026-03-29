@@ -398,8 +398,7 @@
   line-height: 1.15;
   color: #fff;
   margin: 0 0 0.35rem;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
 }
 
 .home-banner__sub {
