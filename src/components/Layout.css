@@ -330,7 +330,9 @@
 .site-footer__rule {
   height: 1px;
   background: var(--site-footer-line);
-  margin: 0;
+  /* Respiro mínimo em relação ao bloco .site-footer__mid (e demais seções adjacentes) */
+  margin-block: 3px;
+  flex-shrink: 0;
 }
 
 .site-footer__mid {
