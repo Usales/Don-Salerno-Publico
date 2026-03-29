@@ -132,6 +132,8 @@ a:hover {
   padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
   padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
   box-sizing: border-box;
+  /* Evita flex/grid filhos com min-width:auto estourarem a largura no zoom mobile */
+  min-width: 0;
 }
 
 .page-section {

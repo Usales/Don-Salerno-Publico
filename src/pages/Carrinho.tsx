@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { empresa } from '@/data/empresa'
@@ -292,36 +293,44 @@ export function Carrinho() {
         </>
       )}
 
-      {mostrarAvisoPedido ? (
-        <div className="cart-aviso-modal" role="dialog" aria-modal="true" aria-labelledby="cart-aviso-titulo">
-          <div className="cart-aviso-modal__box">
-            <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
-              Aviso importante
-            </h2>
-            <p className="cart-aviso-modal__texto">{AVISO_PEDIDO}</p>
-            <div className="cart-aviso-modal__acoes">
-              <button
-                type="button"
-                className="btn btn--secundario"
-                onClick={() => setMostrarAvisoPedido(false)}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="btn btn--primario cart-aviso-modal__enviar"
-                onClick={() => {
-                  setAvisoPedidoLido(true)
-                  setMostrarAvisoPedido(false)
-                  enviarPedidoWhatsapp()
-                }}
-              >
-                Entendi, enviar pedido
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {mostrarAvisoPedido
+        ? createPortal(
+            <div
+              className="cart-aviso-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cart-aviso-titulo"
+            >
+              <div className="cart-aviso-modal__box">
+                <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
+                  Aviso importante
+                </h2>
+                <p className="cart-aviso-modal__texto">{AVISO_PEDIDO}</p>
+                <div className="cart-aviso-modal__acoes">
+                  <button
+                    type="button"
+                    className="btn btn--secundario"
+                    onClick={() => setMostrarAvisoPedido(false)}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn--primario cart-aviso-modal__enviar"
+                    onClick={() => {
+                      setAvisoPedidoLido(true)
+                      setMostrarAvisoPedido(false)
+                      enviarPedidoWhatsapp()
+                    }}
+                  >
+                    Entendi, enviar pedido
+                  </button>
+                </div>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   )
 }
