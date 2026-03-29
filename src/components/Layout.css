@@ -211,7 +211,8 @@
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  overflow-x: clip;
+  /* Não usar overflow-x: clip aqui — corta animação do hero (throw) e sombras; html/body já limitam scroll horizontal */
+  overflow-x: visible;
 }
 
 /* Rodapé corporativo (fundo escuro, colunas, dados cadastrais) */
@@ -501,6 +502,8 @@
   display: grid;
   gap: clamp(1.25rem, 5vw, 3.5rem);
   align-items: center;
+  min-width: 0;
+  width: 100%;
 }
 
 @media (max-width: 899px) {
@@ -527,6 +530,8 @@
   animation: hero-visual-slide-in 2s cubic-bezier(0.2, 0.72, 0.2, 1) 120ms both;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
+  overflow-x: visible;
 }
 
 @media (max-width: 899px) {
@@ -595,20 +600,39 @@
 
 .hero__pizza-dots {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: 0.45rem;
+  align-content: center;
+  gap: 0.35rem 0.4rem;
   margin-top: 0.25rem;
   min-height: 12px;
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding-inline: 0.25rem;
 }
 
 .hero__pizza-dot {
-  width: 9px;
-  height: 9px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: var(--border);
   flex-shrink: 0;
+}
+
+@media (min-width: 900px) {
+  .hero__pizza-dots {
+    flex-wrap: nowrap;
+    gap: 0.45rem;
+    padding-inline: 0;
+  }
+
+  .hero__pizza-dot {
+    width: 9px;
+    height: 9px;
+  }
 }
 
 .hero__pizza-dot--on {
@@ -620,12 +644,14 @@
 .hero__pizza-stage {
   position: relative;
   width: min(78vw, 600px);
-  max-width: 100%;
+  max-width: min(100%, 600px);
   /* Com camadas absolute no throw, não há filho no fluxo: aspect-ratio mantém altura estável */
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Arremesso lateral usa >100% translateX: respiro para não cortar no pai com overflow implícito */
+  overflow: visible;
 }
 
 @media (min-width: 900px) {
@@ -832,21 +858,32 @@
 }
 
 .hero__titulo {
-  font-size: clamp(1.85rem, 4.8vw, 3rem);
+  /* Mobile-first: teto menor no celular; desktop sobe com vw */
+  font-size: clamp(1.5rem, 4.2vw + 0.5rem, 3rem);
   margin: 0 0 0.6rem;
   font-weight: 800;
   color: #141414;
-  max-width: 22ch;
-  line-height: 1.12;
+  max-width: min(22ch, 100%);
+  line-height: 1.15;
   letter-spacing: -0.03em;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (min-width: 900px) {
+  .hero__titulo {
+    line-height: 1.12;
+  }
 }
 
 .hero__sub {
-  font-size: clamp(1rem, 2.2vw, 1.125rem);
+  font-size: clamp(0.9375rem, 1.5vw + 0.65rem, 1.125rem);
   color: #525252;
-  max-width: 38ch;
+  max-width: min(38ch, 100%);
   margin: 0 0 1.15rem;
   line-height: 1.5;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .hero__cattabs {
