@@ -39,9 +39,16 @@
   display: flex;
   align-items: center;
   margin: 0;
-  padding: 0 1.5rem;
+  padding-block: 0;
+  padding-inline: max(1rem, env(safe-area-inset-left, 0px)) max(1rem, env(safe-area-inset-right, 0px));
   list-style: none;
   gap: clamp(1rem, 3vw, 1.875rem);
+}
+
+@media (min-width: 720px) {
+  .home-marquee-strip__list {
+    padding-inline: 1.5rem;
+  }
 }
 
 .home-marquee-strip__list--display {
