@@ -127,7 +127,11 @@ a:hover {
   width: 100%;
   max-width: 1120px;
   margin: 0 auto;
-  padding: 0 1.25rem;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: max(1.25rem, env(safe-area-inset-left, 0px));
+  padding-right: max(1.25rem, env(safe-area-inset-right, 0px));
+  box-sizing: border-box;
 }
 
 .page-section {

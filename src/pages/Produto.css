@@ -68,10 +68,14 @@
 
 /* ——— Página produto: foto compacta ao lado do título e resumo ——— */
 .produto-page {
-  padding: 1.25rem 1rem 2rem;
+  width: 100%;
   max-width: min(920px, 100%);
   margin-inline: auto;
   box-sizing: border-box;
+  /* Vertical apenas — o .container já aplica padding horizontal + safe-area */
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+  min-width: 0;
 }
 
 .produto-page__nav a {
@@ -145,6 +149,8 @@
 }
 
 .produto-hero .produto-foto {
+  width: 100%;
+  max-width: 100%;
   max-height: 188px;
   object-fit: contain;
 }
@@ -197,12 +203,14 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  padding: 0.55rem 0.65rem;
+  min-height: 48px;
+  padding: 0.55rem 0.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   cursor: pointer;
   background: var(--bg-soft);
   transition: border-color 0.15s ease, background 0.15s ease;
+  touch-action: manipulation;
 }
 
 .produto-adicionais__label:hover {
@@ -210,8 +218,9 @@
 }
 
 .produto-adicionais__check {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  min-width: 1.25rem;
   accent-color: var(--brand);
   flex-shrink: 0;
 }
@@ -245,15 +254,23 @@
 }
 
 .produto-montar__select {
+  /* 16px+ evita zoom automático no foco (iOS Safari) */
   width: 100%;
-  max-width: 280px;
-  padding: 0.55rem 0.75rem;
+  max-width: 100%;
+  min-height: 48px;
+  padding: 0.65rem 0.85rem;
   font-size: 1rem;
   font-family: inherit;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg);
   color: var(--text);
+}
+
+@media (min-width: 480px) {
+  .produto-montar__tamanho .produto-montar__select {
+    max-width: 320px;
+  }
 }
 
 .produto-montar__select--bloco {
@@ -274,11 +291,18 @@
 .produto-montar__card {
   display: grid;
   gap: 1.15rem;
-  padding: 1rem 1.1rem;
+  padding: 1rem 0.85rem 1.1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   background: var(--bg);
   box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+@media (min-width: 400px) {
+  .produto-montar__card {
+    padding: 1rem 1.1rem;
+  }
 }
 
 @media (min-width: 560px) {
@@ -315,20 +339,34 @@
 }
 
 .produto-montar__qtd-btn {
-  width: 2.35rem;
-  height: 2.35rem;
+  /* Área mínima ~44×44px (WCAG / toque) */
+  width: 2.75rem;
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   border: none;
   border-radius: 50%;
   margin: 0.2rem;
   background: var(--brand);
   color: #fff;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.15s ease, opacity 0.15s ease;
+  touch-action: manipulation;
+}
+
+@media (min-width: 480px) {
+  .produto-montar__qtd-btn {
+    width: 2.5rem;
+    height: 2.5rem;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    font-size: 1.2rem;
+  }
 }
 
 .produto-montar__qtd-btn:hover:not(:disabled) {
@@ -341,10 +379,19 @@
 }
 
 .produto-montar__qtd-val {
-  min-width: 2.5rem;
+  min-width: 2.75rem;
+  padding: 0 0.25rem;
   text-align: center;
   font-weight: 700;
   font-size: 1.05rem;
+  line-height: 2.75rem;
+}
+
+@media (min-width: 480px) {
+  .produto-montar__qtd-val {
+    min-width: 2.5rem;
+    line-height: 2.5rem;
+  }
 }
 
 .produto-montar__valor-num {
@@ -365,11 +412,14 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.25rem 0;
   cursor: pointer;
   font-weight: 700;
   font-size: 0.9375rem;
-  margin-bottom: 0.55rem;
+  margin-bottom: 0.35rem;
   color: var(--text);
+  touch-action: manipulation;
 }
 
 .produto-montar__radio:last-of-type {
@@ -420,12 +470,40 @@
 
 .produto-montar__acoes {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: center;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 0.65rem;
+  align-items: stretch;
   margin-top: 1rem;
 }
 
+.produto-montar__acoes .btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+  box-sizing: border-box;
+  touch-action: manipulation;
+}
+
 .produto-montar__link-carrinho {
+  display: inline-flex;
   text-decoration: none;
+  width: 100%;
+  justify-content: center;
+  min-height: 48px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 480px) {
+  .produto-montar__acoes {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .produto-montar__acoes .btn,
+  .produto-montar__link-carrinho {
+    width: auto;
+    min-height: unset;
+  }
 }
