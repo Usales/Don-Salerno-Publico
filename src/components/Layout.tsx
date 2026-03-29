@@ -1,10 +1,14 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import { CookieBanner } from './CookieBanner'
 import { Footer } from './Footer'
 import { Header } from './Header'
 import { ScrollToTop } from './ScrollToTop'
 
 export function Layout() {
+  const { pathname } = useLocation()
+  const mainClass =
+    pathname === '/carrinho' ? 'main-area main-area--cart' : 'main-area'
+
   return (
     <>
       <ScrollToTop />
@@ -12,7 +16,7 @@ export function Layout() {
         Pular para o conteúdo
       </a>
       <Header />
-      <main id="conteudo" className="main-area" tabIndex={-1}>
+      <main id="conteudo" className={mainClass} tabIndex={-1}>
         <Outlet />
       </main>
       <Footer />

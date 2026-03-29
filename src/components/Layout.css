@@ -215,6 +215,11 @@
   overflow-x: visible;
 }
 
+/* Carrinho: sem barra de rolagem horizontal na página; tabela continua com scroll oculto em Carrinho.css */
+.main-area--cart {
+  overflow-x: clip;
+}
+
 /* Rodapé corporativo (fundo escuro, colunas, dados cadastrais) */
 .site-footer {
   --site-footer-fg: rgba(255, 255, 255, 0.88);

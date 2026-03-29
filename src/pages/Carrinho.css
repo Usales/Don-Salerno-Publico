@@ -84,6 +84,14 @@
   border-radius: var(--radius-lg);
   background: var(--bg);
   box-shadow: var(--shadow-sm);
+  /* Scroll horizontal por toque/trackpad, sem barra visível */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.cart-table-wrap::-webkit-scrollbar {
+  display: none;
+  height: 0;
 }
 
 .cart-table {
