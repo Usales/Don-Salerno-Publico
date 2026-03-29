@@ -66,8 +66,12 @@ export function Carrinho() {
     mensagemPedido += '\n\nObrigado!'
     const waUrl = `https://wa.me/${empresa.whatsappDigits}?text=${encodeURIComponent(mensagemPedido)}`
 
-    window.open(waUrl, '_blank', 'noopener,noreferrer')
-  }, [itens, observacaoPedido, subtotal, total])
+    const win = window.open(waUrl, '_blank', 'noopener,noreferrer')
+    if (win != null) {
+      limparCarrinho()
+      setAvisoPedidoLido(false)
+    }
+  }, [itens, limparCarrinho, observacaoPedido, subtotal, total])
 
   const onEnviarPedido = useCallback(() => {
     if (!avisoPedidoLido) {
