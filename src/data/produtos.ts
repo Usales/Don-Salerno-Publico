@@ -478,17 +478,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, atum, palmito, catupiry, cebola, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p37',
-    slug: 'dom-pedrito',
-    nome: 'Dom Pedrito',
-    descricao: 'Pizza nobre — lista completa de ingredientes em atualização no app e no balcão.',
-    tempoPreparoMin: 25,
-    imagem: '/hero-pizza.png',
-    precos: precosPorFaixa.nobre,
-    ingredientesCardapio:
-      'Composição nobre conforme cardápio físico ou app — consulte o balcão para detalhes.',
-  }),
-  pizzaSabor({
     id: 'p38',
     slug: 'banana-doce',
     nome: 'Banana',
@@ -739,6 +728,9 @@ const slugLegadoParaId: Record<string, string> = {
   'carne-seca-cream-cheese': 'p10',
   'moda-da-casa': 'p33',
   pepperoni: 'p2',
+  /* Pizza removida do cardápio */
+  p37: 'p36',
+  'dom-pedrito': 'p36',
   /* Bebidas Gatorade removidas do cardápio — links antigos caem no Limão */
   'gt-tropical': 'gt-limao',
   'gt-melancia': 'gt-limao',
