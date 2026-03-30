@@ -11,19 +11,6 @@ import './Home.css'
 
 const populares = produtos.filter((p) => p.categoria === 'pizzas').slice(0, 4)
 
-const HERO_CALZONES = [
-  {
-    id: 'calz-pepperoni',
-    src: '/hero-calzone-pepperoni.png',
-    nome: 'Calzone pepperoni & cebola',
-  },
-  {
-    id: 'calz-presunto',
-    src: '/hero-calzone-presunto-queijo.png',
-    nome: 'Calzone presunto & queijo',
-  },
-] as const
-
 const HERO_PIZZA_INTERVAL_MS = 4000
 const HERO_SWIPE_MIN_PX = 56
 /** Duração da animação de “arremesso” entre fotos do hero (ms) */
@@ -64,7 +51,9 @@ function heroSlidesParaCategoria(cat: Categoria): HeroSlide[] {
     }))
   }
   if (cat === 'calzones') {
-    return HERO_CALZONES.map((p) => ({ id: p.id, src: p.src, nome: p.nome }))
+    return produtos
+      .filter((p) => p.categoria === 'calzones')
+      .map((p) => ({ id: p.id, src: srcHeroProduto(p), nome: p.nome }))
   }
   if (cat === 'bebidas') {
     return [
