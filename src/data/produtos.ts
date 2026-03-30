@@ -148,6 +148,30 @@ function sobremesaSabor(
   }
 }
 
+/** Bebidas (garrafa / lata): sem massa nem adicionais de pizza; preço único em P no app. */
+function bebidaItem(
+  o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'precos' | 'tempoPreparoMin'> & {
+    imagem?: string
+    ingredientes?: string[]
+    ingredientesCardapio?: string
+    alergenos?: string[]
+    imagemDestaque?: string
+  },
+): Produto {
+  const unit = o.precos.P
+  return {
+    ...o,
+    imagem: o.imagem ?? `/bebidas/${o.slug}.png`,
+    categoria: 'bebidas',
+    ingredientes: o.ingredientes ?? [o.descricao],
+    ingredientesCardapio: o.ingredientesCardapio,
+    alergenos: o.alergenos ?? ['Contém corantes. Pode conter derivados de soja.'],
+    massas: [],
+    adicionais: [],
+    precos: { P: unit, M: unit, G: unit },
+  }
+}
+
 export const produtos: Produto[] = [
   // Pizzas — ingredientes e faixas conforme docs/cardapio-pizzas-ingredientes.md
   pizzaSabor({
@@ -591,6 +615,77 @@ export const produtos: Produto[] = [
     ingredientes: ['Cacau', 'massa de biscoito champagne', 'café'],
     alergenos: ['Pode conter glúten, lactose e ovos.'],
   }),
+  /* Gatorade — fotos reais enviadas (ordem: limão, laranja, uva, maracujá; morango & maracujá = última imagem) */
+  bebidaItem({
+    id: 'gt-limao',
+    slug: 'gatorade-limao',
+    nome: 'Gatorade Limão',
+    descricao: 'Isotônico sabor limão. Reposição de sais e energia — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-limao.png',
+    imagemDestaque: '/bebidas/gatorade-limao.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
+  bebidaItem({
+    id: 'gt-laranja',
+    slug: 'gatorade-laranja',
+    nome: 'Gatorade Laranja',
+    descricao: 'Isotônico sabor laranja — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-laranja.png',
+    imagemDestaque: '/bebidas/gatorade-laranja.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
+  bebidaItem({
+    id: 'gt-uva',
+    slug: 'gatorade-uva',
+    nome: 'Gatorade Uva',
+    descricao: 'Isotônico sabor uva — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-uva.png',
+    imagemDestaque: '/bebidas/gatorade-uva.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
+  bebidaItem({
+    id: 'gt-maracuja',
+    slug: 'gatorade-maracuja',
+    nome: 'Gatorade Maracujá',
+    descricao: 'Isotônico sabor maracujá — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-maracuja.png',
+    imagemDestaque: '/bebidas/gatorade-maracuja.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
+  bebidaItem({
+    id: 'gt-morango-maracuja',
+    slug: 'gatorade-morango-maracuja',
+    nome: 'Gatorade Morango & Maracujá',
+    descricao: 'Isotônico sabor morango e maracujá — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-morango-maracuja.png',
+    imagemDestaque: '/bebidas/gatorade-morango-maracuja.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
+  bebidaItem({
+    id: 'gt-berry-blue',
+    slug: 'gatorade-berry-blue',
+    nome: 'Gatorade Berry Blue',
+    descricao: 'Isotônico sabor berry blue — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-berry-blue.png',
+    imagemDestaque: '/bebidas/gatorade-berry-blue.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
+  bebidaItem({
+    id: 'gt-tangerina',
+    slug: 'gatorade-tangerina',
+    nome: 'Gatorade Tangerina',
+    descricao: 'Isotônico sabor tangerina — garrafa 500 ml.',
+    tempoPreparoMin: 2,
+    imagem: '/bebidas/gatorade-tangerina.png',
+    imagemDestaque: '/bebidas/gatorade-tangerina.png',
+    precos: { P: 8.9, M: 8.9, G: 8.9 },
+  }),
   {
     id: 'c1',
     nome: 'Calzone presunto & mussarela',
@@ -644,6 +739,25 @@ const slugLegadoParaId: Record<string, string> = {
   'carne-seca-cream-cheese': 'p10',
   'moda-da-casa': 'p33',
   pepperoni: 'p2',
+  /* Bebidas Gatorade removidas do cardápio — links antigos caem no Limão */
+  'gt-tropical': 'gt-limao',
+  'gt-melancia': 'gt-limao',
+  'gt-morango': 'gt-limao',
+  'gt-citrus': 'gt-limao',
+  'gt-melancia-morango': 'gt-limao',
+  'gt-zero-limao': 'gt-limao',
+  'gt-zero-laranja': 'gt-limao',
+  'gt-zero-uva': 'gt-limao',
+  'gt-zero-tropical': 'gt-limao',
+  'gatorade-tropical': 'gt-limao',
+  'gatorade-melancia': 'gt-limao',
+  'gatorade-morango': 'gt-limao',
+  'gatorade-citrus': 'gt-limao',
+  'gatorade-melancia-morango': 'gt-limao',
+  'gatorade-zero-limao': 'gt-limao',
+  'gatorade-zero-laranja': 'gt-limao',
+  'gatorade-zero-uva': 'gt-limao',
+  'gatorade-zero-tropical': 'gt-limao',
 }
 
 /** Aceita id (ex.: p1) ou slug (ex.: margherita) ou slug legado. */

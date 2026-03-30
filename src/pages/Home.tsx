@@ -29,6 +29,10 @@ const HERO_SWIPE_MIN_PX = 56
 /** Duração da animação de “arremesso” entre fotos do hero (ms) */
 const HERO_THROW_MS = 540
 
+/** Hero em “Bebidas”: uma única arte (linha de garrafas), sem carrossel por SKU */
+const HERO_BEBIDAS_SLIDE_ID = 'hero-bebidas-gatorade'
+const HERO_BEBIDAS_SRC = '/hero-bebidas-gatorade.png'
+
 /** Categorias cujo destaque visual no hero não usa rotação contínua (foto fixa). Pizza gira no forno visual. */
 const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas', 'bebidas']
 
@@ -43,6 +47,7 @@ function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
   if (slide.src.endsWith('.svg')) c += ' hero__pizza--logo'
   if (HERO_CATEGORIAS_VISUAL_ESTATICO.includes(categoria)) c += ' hero__pizza--static'
   if (categoria === 'calzones') c += ' hero__pizza--calzone-float'
+  if (slide.id === HERO_BEBIDAS_SLIDE_ID) c += ' hero__pizza--bebidas-linha'
   return c
 }
 
@@ -60,6 +65,15 @@ function heroSlidesParaCategoria(cat: Categoria): HeroSlide[] {
   }
   if (cat === 'calzones') {
     return HERO_CALZONES.map((p) => ({ id: p.id, src: p.src, nome: p.nome }))
+  }
+  if (cat === 'bebidas') {
+    return [
+      {
+        id: HERO_BEBIDAS_SLIDE_ID,
+        src: HERO_BEBIDAS_SRC,
+        nome: 'Gatorade — isotônicos 500 ml',
+      },
+    ]
   }
   const doCardapio = produtos
     .filter((p) => p.categoria === cat)
@@ -322,7 +336,7 @@ export function Home() {
             onPointerCancel={onHeroVisualPointerCancel}
           >
             <div
-              className={`hero__pizza-stage${heroThrowing ? ' hero__pizza-stage--throwing' : ''}`}
+              className={`hero__pizza-stage${heroThrowing ? ' hero__pizza-stage--throwing' : ''}${heroCategoria === 'bebidas' ? ' hero__pizza-stage--bebidas' : ''}`}
             >
               {heroThrowState.phase === 'running' ? (
                 <>

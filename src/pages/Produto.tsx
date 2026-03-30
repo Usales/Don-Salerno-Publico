@@ -56,14 +56,17 @@ export function Produto() {
     bebidas: 'carrinho',
   }
   const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
-    () => (categoriaProduto === 'esfihas' ? ['P'] : ['P', 'M', 'G']),
+    () =>
+      categoriaProduto === 'esfihas' || categoriaProduto === 'bebidas' ? ['P'] : ['P', 'M', 'G'],
     [categoriaProduto],
   )
   const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
     () =>
       categoriaProduto === 'sobremesas'
         ? { P: '1', M: '5', G: '10' }
-        : { P: 'P', M: 'M', G: 'G' },
+        : categoriaProduto === 'bebidas'
+          ? { P: '500 ml', M: '500 ml', G: '500 ml' }
+          : { P: 'P', M: 'M', G: 'G' },
     [categoriaProduto],
   )
 
@@ -159,7 +162,9 @@ export function Produto() {
           <p className="produto-hero__tempo">
             {produto.categoria === 'sobremesas'
               ? 'Sai da geladeira em 10 minutos.'
-              : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
+              : produto.categoria === 'bebidas'
+                ? 'Bebida gelada — retirada rápida no balcão.'
+                : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
           </p>
         </header>
         <div className="produto-hero__media">
