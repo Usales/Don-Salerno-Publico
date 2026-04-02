@@ -41,8 +41,8 @@ export function CookieBanner() {
           Privacidade e cookies
         </h2>
         <p className="cookie-banner__txt">
-          Usamos cookies essenciais para o login e preferências, e — com seu consentimento — dados para melhorar a
-          experiência (LGPD). Leia a{' '}
+          Usamos cookies essenciais para o funcionamento do site e preferências, e — com seu consentimento — dados
+          para melhorar a experiência (LGPD). Leia a{' '}
           <a href="/privacidade">política de privacidade</a>.
         </p>
         <div className="cookie-banner__acoes">

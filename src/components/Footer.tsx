@@ -115,16 +115,13 @@ export function Footer() {
             </ul>
           </nav>
 
-          <nav className="site-footer__col" aria-labelledby="footer-nav-termos">
-            <h2 id="footer-nav-termos" className="site-footer__h">
-              Termos e privacidade
+          <nav className="site-footer__col" aria-labelledby="footer-nav-privacidade">
+            <h2 id="footer-nav-privacidade" className="site-footer__h">
+              Privacidade
             </h2>
             <ul className="site-footer__ul">
               <li>
                 <Link to="/privacidade">Política de privacidade (LGPD)</Link>
-              </li>
-              <li>
-                <Link to="/privacidade#termos">Termos de uso do site</Link>
               </li>
             </ul>
           </nav>
