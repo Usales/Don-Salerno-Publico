@@ -237,16 +237,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, presunto, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p19',
-    slug: 'atum',
-    nome: 'Atum',
-    descricao: 'Atum com cebola e tomate no molho da casa.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, atum, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
     id: 'p20',
     slug: 'bacon',
     nome: 'Bacon',
@@ -466,16 +456,6 @@ export const produtos: Produto[] = [
     imagem: '/hero-pizza-carne-seca-cream-cheese.png',
     precos: precosPorFaixa.nobre,
     ingredientesCardapio: 'Molho, mussarela, carne de sol, catupiry, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p36',
-    slug: 'chilena',
-    nome: 'Chilena',
-    descricao: 'Atum, palmito e catupiry com cebola.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza.png',
-    precos: precosPorFaixa.nobre,
-    ingredientesCardapio: 'Molho, mussarela, atum, palmito, catupiry, cebola, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p38',
@@ -835,9 +815,13 @@ const slugLegadoParaId: Record<string, string> = {
   'carne-seca-cream-cheese': 'p10',
   'moda-da-casa': 'p33',
   pepperoni: 'p2',
-  /* Pizza removida do cardápio */
-  p37: 'p36',
-  'dom-pedrito': 'p36',
+  /* Pizzas removidas do cardápio */
+  p19: 'p2',
+  atum: 'p2',
+  p36: 'p2',
+  chilena: 'p2',
+  p37: 'p2',
+  'dom-pedrito': 'p2',
   /* Bebidas Gatorade removidas do cardápio — links antigos caem no Limão */
   'gt-tropical': 'gt-limao',
   'gt-melancia': 'gt-limao',
