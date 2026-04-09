@@ -1,0 +1,75 @@
+/* Composição estilo flat lay: pizza em vista de cima (centro) + bebida em primeiro plano */
+
+.combo-dual {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.combo-dual__pizza {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+  object-position: center center;
+  pointer-events: none;
+}
+
+.combo-dual__bebida {
+  position: absolute;
+  right: -8%;
+  bottom: 2%;
+  width: 44%;
+  height: auto;
+  max-height: 72%;
+  object-fit: contain;
+  object-position: bottom right;
+  z-index: 2;
+  pointer-events: none;
+  filter: drop-shadow(3px 8px 14px rgba(15, 23, 42, 0.28));
+  transform: rotate(-6deg);
+}
+
+.combo-dual--hero {
+  width: 100%;
+  max-width: 260px;
+  aspect-ratio: 1;
+  margin: 0 auto;
+  border-radius: 1.25rem;
+}
+
+.combo-dual--hero .combo-dual__pizza {
+  width: 88%;
+  height: 88%;
+}
+
+.combo-dual--hero .combo-dual__bebida {
+  right: -6%;
+  bottom: 6%;
+  width: 40%;
+  max-height: 68%;
+}
+
+.pcard__img-wrap--combo {
+  padding: 0;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgba(226, 232, 240, 0.9);
+  overflow: hidden;
+}
+
+.pcard:hover .pcard__img-wrap--combo,
+.pcard:focus-within .pcard__img-wrap--combo {
+  background: #f8fafc;
+  box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.45);
+}
+
+.pcard:hover .combo-dual,
+.pcard:focus-within .combo-dual {
+  background: #f8fafc;
+}

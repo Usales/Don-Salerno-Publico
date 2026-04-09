@@ -1,0 +1,43 @@
+.empty-state-mascote {
+  display: block;
+  width: min(100%, 260px);
+  height: auto;
+  margin: 0 auto 1.25rem;
+  object-fit: contain;
+  /* Fundo branco da arte → mesma cor da página (var(--bg), como o hero) */
+  mix-blend-mode: multiply;
+}
+
+.empty-state-page {
+  text-align: center;
+  padding: 1.5rem 0 2.5rem;
+  max-width: 28rem;
+  margin-inline: auto;
+}
+
+.empty-state-page p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  margin: 0 0 0.75rem;
+}
+
+.empty-state-page a {
+  color: var(--brand);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.empty-state-page a:hover {
+  text-decoration: underline;
+}
+
+.cardapio-vazio-wrap {
+  text-align: center;
+  padding: 2rem 0 3rem;
+  max-width: 24rem;
+  margin-inline: auto;
+}
+
+.cardapio-vazio-wrap .cardapio-vazio {
+  margin-top: 0 !important;
+}

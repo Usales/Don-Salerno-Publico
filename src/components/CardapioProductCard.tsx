@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { Produto } from '@/types'
 import { brl } from '@/lib/format'
+import { ComboDualImage } from '@/components/ComboDualImage'
 
 const produtoPath = (id: string) => `/produto/${id}`
 
@@ -65,16 +66,25 @@ export function CardapioProductCard({ produto: p }: { produto: Produto }) {
     <article className="pcard">
       <div className="pcard__pattern" aria-hidden />
       <Link to={to} className="pcard__link">
-        <div className="pcard__img-wrap">
-          <img
-            className="pcard__img"
-            src={p.imagemDestaque ?? p.imagem}
-            alt={p.nome}
-            width={128}
-            height={128}
-            loading="lazy"
-            decoding="async"
-          />
+        <div className={`pcard__img-wrap${p.comboVisual ? ' pcard__img-wrap--combo' : ''}`}>
+          {p.comboVisual ? (
+            <ComboDualImage
+              layout="card"
+              pizzaSrc={p.comboVisual.pizza}
+              bebidaSrc={p.comboVisual.bebida}
+              alt={p.nome}
+            />
+          ) : (
+            <img
+              className="pcard__img"
+              src={p.imagemDestaque ?? p.imagem}
+              alt={p.nome}
+              width={128}
+              height={128}
+              loading="lazy"
+              decoding="async"
+            />
+          )}
         </div>
         <h3 className="pcard__nome">{p.nome}</h3>
         <p className="pcard__meta">{p.descricao}</p>

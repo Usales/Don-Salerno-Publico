@@ -1,5 +1,6 @@
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { Link } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { empresa } from '@/data/empresa'
@@ -103,10 +104,13 @@ export function Carrinho() {
       <h1 className="cart-page__titulo">Carrinho</h1>
 
       {itens.length === 0 ? (
-        <p className="cart-page__vazio">
-          Seu carrinho está vazio.{' '}
-          <Link to="/cardapio/pizzas">Ver cardápio</Link>
-        </p>
+        <div className="empty-state-page cart-page__vazio-bloco">
+          <EmptyStateMascote alt="Carrinho vazio" />
+          <p className="cart-page__vazio">
+            Seu carrinho está vazio.{' '}
+            <Link to="/cardapio/pizzas">Ver cardápio</Link>
+          </p>
+        </div>
       ) : (
         <>
           <div className="cart-table-wrap" role="region" aria-label="Itens do pedido">

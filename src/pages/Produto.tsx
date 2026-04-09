@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
+import { ComboDualImage } from '@/components/ComboDualImage'
+import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { rotulosCategoria } from '@/data/categorias'
 import { getProdutoPorId, getProdutosPorCategoria } from '@/data/produtos'
 import { brl } from '@/lib/format'
@@ -51,13 +53,18 @@ export function Produto() {
   const fluxoProximaCategoria: Record<Categoria, Categoria | 'carrinho'> = {
     pizzas: 'esfihas',
     esfihas: 'calzones',
-    calzones: 'sobremesas',
+    calzones: 'combos',
+    combos: 'sobremesas',
     sobremesas: 'bebidas',
     bebidas: 'carrinho',
   }
   const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
     () =>
-      categoriaProduto === 'esfihas' || categoriaProduto === 'bebidas' ? ['P'] : ['P', 'M', 'G'],
+      categoriaProduto === 'esfihas' ||
+      categoriaProduto === 'bebidas' ||
+      categoriaProduto === 'combos'
+        ? ['P']
+        : ['P', 'M', 'G'],
     [categoriaProduto],
   )
   const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
@@ -66,7 +73,9 @@ export function Produto() {
         ? { P: '1', M: '5', G: '10' }
         : categoriaProduto === 'bebidas'
           ? { P: '500 ml', M: '500 ml', G: '500 ml' }
-          : { P: 'P', M: 'M', G: 'G' },
+          : categoriaProduto === 'combos'
+            ? { P: 'Combo', M: 'Combo', G: 'Combo' }
+            : { P: 'P', M: 'M', G: 'G' },
     [categoriaProduto],
   )
 
@@ -79,8 +88,11 @@ export function Produto() {
   if (!p) {
     return (
       <div className="container" style={{ padding: '2rem' }}>
-        <p>Produto não encontrado.</p>
-        <Link to="/cardapio/pizzas">Voltar ao cardápio</Link>
+        <div className="empty-state-page">
+          <EmptyStateMascote alt="Produto não encontrado" />
+          <p>Produto não encontrado.</p>
+          <Link to="/cardapio/pizzas">Voltar ao cardápio</Link>
+        </div>
       </div>
     )
   }
@@ -164,20 +176,31 @@ export function Produto() {
               ? 'Sai da geladeira em 10 minutos.'
               : produto.categoria === 'bebidas'
                 ? 'Bebida gelada — retirada rápida no balcão.'
-                : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
+                : produto.categoria === 'combos'
+                  ? `Preparo combinado dos itens do pacote — cerca de ${produto.tempoPreparoMin} minutos. Combine sabores no pedido.`
+                  : `Sai do forno em cerca de ${produto.tempoPreparoMin} minutos.`}
           </p>
         </header>
         <div className="produto-hero__media">
-          <div className="produto-foto-wrap">
-            <img
-              className="produto-foto"
-              src={produto.imagemDestaque ?? produto.imagem}
-              alt={produto.nome}
-              width={320}
-              height={320}
-              decoding="async"
-              loading="eager"
-            />
+          <div className={`produto-foto-wrap${produto.comboVisual ? ' produto-foto-wrap--combo' : ''}`}>
+            {produto.comboVisual ? (
+              <ComboDualImage
+                layout="hero"
+                pizzaSrc={produto.comboVisual.pizza}
+                bebidaSrc={produto.comboVisual.bebida}
+                alt={produto.nome}
+              />
+            ) : (
+              <img
+                className="produto-foto"
+                src={produto.imagemDestaque ?? produto.imagem}
+                alt={produto.nome}
+                width={320}
+                height={320}
+                decoding="async"
+                loading="eager"
+              />
+            )}
           </div>
         </div>
       </div>
@@ -299,7 +322,7 @@ export function Produto() {
         <div className="produto-montar">
           <div className="produto-montar__tamanho">
             <label className="produto-montar__field-label" htmlFor="produto-tamanho">
-              Tamanho
+              {produto.categoria === 'combos' ? 'Pacote' : 'Tamanho'}
             </label>
             <select
               id="produto-tamanho"

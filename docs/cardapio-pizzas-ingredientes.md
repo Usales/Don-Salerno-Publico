@@ -44,7 +44,6 @@ Preços indicados como no cardápio de referência.
 
 | Sabor | Ingredientes |
 |-------|--------------|
-| **Brócolis** | Molho, mussarela, brócolis, catupiry, bacon, alho frito, tomate e orégano |
 | **Calabresa com Bacon** | Molho, mussarela, calabresa, bacon, cebola, tomate e orégano |
 | **Calabresa com banana** | Molho, mussarela, calabresa, banana frita, tomate e orégano |
 | **Calabresa com catupiry** | Molho, mussarela, calabresa, catupiry, tomate e orégano, cebola |

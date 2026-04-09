@@ -142,6 +142,10 @@
   line-height: 0;
 }
 
+.produto-hero .produto-foto-wrap--combo {
+  max-width: 280px;
+}
+
 @media (min-width: 720px) {
   .produto-hero .produto-foto-wrap {
     max-width: none;

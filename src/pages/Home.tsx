@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { EMPTY_STATE_MASCOTE_SRC } from '@/components/EmptyStateMascote'
 import { HomeBannersMarquee } from '@/components/HomeBannersMarquee'
 import { HomeMarqueeStrip } from '@/components/HomeMarqueeStrip'
 import { HomePopularMarquee } from '@/components/HomePopularMarquee'
@@ -12,6 +13,8 @@ import './Home.css'
 const populares = produtos.filter((p) => p.categoria === 'pizzas').slice(0, 4)
 
 const HERO_PIZZA_INTERVAL_MS = 4000
+/** Máximo de fotos no carrossel do hero (Pizza); uma imagem por arquivo, sem repetir arte. */
+const HERO_PIZZAS_MAX_SLIDES = 10
 const HERO_SWIPE_MIN_PX = 56
 /** Duração da animação de “arremesso” entre fotos do hero (ms) */
 const HERO_THROW_MS = 540
@@ -20,8 +23,8 @@ const HERO_THROW_MS = 540
 const HERO_BEBIDAS_SLIDE_ID = 'hero-bebidas-gatorade'
 const HERO_BEBIDAS_SRC = '/hero-bebidas-gatorade.png'
 
-/** Categorias cujo destaque visual no hero não usa rotação contínua (foto fixa). Pizza gira no forno visual. */
-const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas', 'bebidas']
+/** Categorias sem rotação “forno”; calzones usa flutuar próprio; bebidas usa drift suave (ver CSS). */
+const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas']
 
 type HeroSlide = { id: string; src: string; nome: string }
 
@@ -32,23 +35,31 @@ type HeroThrowState =
 function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
   let c = 'hero__pizza'
   if (slide.src.endsWith('.svg')) c += ' hero__pizza--logo'
+  if (slide.id.startsWith('placeholder-')) c += ' hero__pizza--empty-mascote'
   if (HERO_CATEGORIAS_VISUAL_ESTATICO.includes(categoria)) c += ' hero__pizza--static'
   if (categoria === 'calzones') c += ' hero__pizza--calzone-float'
   if (slide.id === HERO_BEBIDAS_SLIDE_ID) c += ' hero__pizza--bebidas-linha'
+  if (categoria === 'bebidas') c += ' hero__pizza--bebidas-drift'
   return c
 }
 
-function srcHeroProduto(p: { imagem: string; imagemDestaque?: string }): string {
+function srcHeroProduto(p: { imagem: string; imagemDestaque?: string; comboVisual?: { pizza: string } }): string {
+  if (p.comboVisual) return p.comboVisual.pizza
   return p.imagemDestaque ?? p.imagem
 }
 
 function heroSlidesParaCategoria(cat: Categoria): HeroSlide[] {
   if (cat === 'pizzas') {
-    return produtos.filter((p) => p.categoria === 'pizzas').map((p) => ({
-      id: p.id,
-      src: srcHeroProduto(p),
-      nome: p.nome,
-    }))
+    const seenSrc = new Set<string>()
+    const slides: HeroSlide[] = []
+    for (const p of produtos.filter((x) => x.categoria === 'pizzas')) {
+      const src = srcHeroProduto(p)
+      if (seenSrc.has(src)) continue
+      seenSrc.add(src)
+      slides.push({ id: p.id, src, nome: p.nome })
+      if (slides.length >= HERO_PIZZAS_MAX_SLIDES) break
+    }
+    return slides
   }
   if (cat === 'calzones') {
     return produtos
@@ -71,7 +82,7 @@ function heroSlidesParaCategoria(cat: Categoria): HeroSlide[] {
   return [
     {
       id: `placeholder-${cat}`,
-      src: '/logo.svg',
+      src: EMPTY_STATE_MASCOTE_SRC,
       nome: `${rotulosCategoria[cat]} — veja no cardápio`,
     },
   ]
@@ -81,6 +92,7 @@ const HERO_CARD_TABS: { categoria: Categoria; label: string }[] = [
   { categoria: 'pizzas', label: 'Pizza' },
   { categoria: 'esfihas', label: 'Esfihas' },
   { categoria: 'calzones', label: 'Calzones' },
+  { categoria: 'combos', label: 'Combos' },
   { categoria: 'sobremesas', label: 'Sobremesas' },
   { categoria: 'bebidas', label: 'Bebidas' },
 ]
@@ -307,7 +319,7 @@ export function Home() {
               </div>
             </nav>
             <div className="hero__acoes hero__acoes--after-tabs">
-              <Link to={`/cardapio/${heroCategoria}`} className="btn btn--primario">
+              <Link to={`/cardapio/${heroCategoria}`} className="btn btn--primario hero__cta-primario">
                 Ver cardápio agora
               </Link>
             </div>

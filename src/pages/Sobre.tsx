@@ -4,9 +4,9 @@ export function Sobre() {
       <div className="container sobre-page" style={{ maxWidth: 720 }}>
         <h1>Sobre o Don Salerno</h1>
         <p>
-          O Don Salerno posiciona-se na interseção entre a tradição italiana e a eficiência operacional
-          contemporânea. Unimos técnica, padronização e controle rigoroso para entregar um produto
-          consistente, de alta qualidade e replicável em escala.
+          Somos uma empresa <strong>ítalo-brasileira</strong>: unimos a tradição italiana à vivência e à
+          eficiência operacional contemporânea no Brasil. O Don Salerno combina técnica, padronização e controle
+          rigoroso para entregar um produto consistente, de alta qualidade e replicável em escala.
         </p>
         <p>
           Nossas massas passam por fermentação controlada, desenvolvidas para leveza, digestibilidade e
@@ -34,7 +34,7 @@ export function Sobre() {
         </ul>
         <p>
           O resultado é uma experiência premium com agilidade de serviço e alto nível de atendimento, onde
-          cada pedido mantém o mesmo padrão — independente de volume ou horário.
+          cada pedido mantém o mesmo padrão.
         </p>
       </div>
     </div>

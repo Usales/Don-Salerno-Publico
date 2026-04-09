@@ -2,6 +2,7 @@ import { useCallback, useRef } from 'react'
 import { NavLink, Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { Categoria } from '@/types'
 import { CardapioProductCard } from '@/components/CardapioProductCard'
+import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { categoriasOrdenadas, rotulosCategoria } from '@/data/categorias'
 import { produtos } from '@/data/produtos'
 
@@ -87,9 +88,12 @@ export function Cardapio() {
           <h2 className="visually-hidden">{rotulosCategoria[cat]}</h2>
           <div className="menu-panel menu-panel--cards">
             {lista.length === 0 ? (
-              <p className="cardapio-vazio" style={{ color: 'var(--text-muted)', margin: '1rem 0 0' }}>
-                Itens desta categoria em breve.
-              </p>
+              <div className="cardapio-vazio-wrap">
+                <EmptyStateMascote alt="Nenhum item nesta categoria por enquanto" />
+                <p className="cardapio-vazio" style={{ color: 'var(--text-muted)' }}>
+                  Itens desta categoria em breve.
+                </p>
+              </div>
             ) : (
               <div className="pgrid">
                 {lista.map((p) => (

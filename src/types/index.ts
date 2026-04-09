@@ -1,4 +1,4 @@
-export type Categoria = 'pizzas' | 'esfihas' | 'calzones' | 'sobremesas' | 'bebidas'
+export type Categoria = 'pizzas' | 'esfihas' | 'calzones' | 'combos' | 'sobremesas' | 'bebidas'
 
 export type TamanhoCodigo = 'P' | 'M' | 'G'
 
@@ -84,6 +84,8 @@ export interface Produto {
   imagem: string
   /** Foto alternativa para hero / marquee quando a página do produto usa `imagem` diferente. */
   imagemDestaque?: string
+  /** Combos: pizza ao fundo + bebida em primeiro plano (cardápio e página do produto). */
+  comboVisual?: { pizza: string; bebida: string }
   precos: Record<TamanhoCodigo, number>
   massas: OpcaoMassa[]
   adicionais: Adicional[]
