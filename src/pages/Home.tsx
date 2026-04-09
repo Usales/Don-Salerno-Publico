@@ -19,9 +19,9 @@ const HERO_SWIPE_MIN_PX = 56
 /** Duração da animação de “arremesso” entre fotos do hero (ms) */
 const HERO_THROW_MS = 540
 
-/** Hero em “Bebidas”: uma única arte (linha de garrafas), sem carrossel por SKU */
-const HERO_BEBIDAS_SLIDE_ID = 'hero-bebidas-gatorade'
-const HERO_BEBIDAS_SRC = '/hero-bebidas-gatorade.png'
+/** Arte em linha (vários Gatorades) — palco largo no hero */
+const HERO_BEBIDAS_GATORADE_SLIDE_ID = 'hero-bebidas-gatorade'
+const HERO_BEBIDAS_GATORADE_SRC = '/hero-bebidas-gatorade.png'
 
 /** Categorias sem rotação “forno”; calzones usa flutuar próprio; bebidas usa drift suave (ver CSS). */
 const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas']
@@ -32,13 +32,28 @@ type HeroThrowState =
   | { phase: 'idle' }
   | { phase: 'running'; from: HeroSlide; to: HeroSlide; dir: 'next' | 'prev' }
 
+function heroBebidasStageLargo(
+  categoria: Categoria,
+  slideAtual: HeroSlide,
+  throwState: HeroThrowState,
+): boolean {
+  if (categoria !== 'bebidas') return false
+  if (throwState.phase === 'running') {
+    return (
+      throwState.from.id === HERO_BEBIDAS_GATORADE_SLIDE_ID ||
+      throwState.to.id === HERO_BEBIDAS_GATORADE_SLIDE_ID
+    )
+  }
+  return slideAtual.id === HERO_BEBIDAS_GATORADE_SLIDE_ID
+}
+
 function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
   let c = 'hero__pizza'
   if (slide.src.endsWith('.svg')) c += ' hero__pizza--logo'
   if (slide.id.startsWith('placeholder-')) c += ' hero__pizza--empty-mascote'
   if (HERO_CATEGORIAS_VISUAL_ESTATICO.includes(categoria)) c += ' hero__pizza--static'
   if (categoria === 'calzones') c += ' hero__pizza--calzone-float'
-  if (slide.id === HERO_BEBIDAS_SLIDE_ID) c += ' hero__pizza--bebidas-linha'
+  if (slide.id === HERO_BEBIDAS_GATORADE_SLIDE_ID) c += ' hero__pizza--bebidas-linha'
   if (categoria === 'bebidas') c += ' hero__pizza--bebidas-drift'
   return c
 }
@@ -69,8 +84,18 @@ function heroSlidesParaCategoria(cat: Categoria): HeroSlide[] {
   if (cat === 'bebidas') {
     return [
       {
-        id: HERO_BEBIDAS_SLIDE_ID,
-        src: HERO_BEBIDAS_SRC,
+        id: 'hero-bebidas-crystal',
+        src: '/bebidas/hero-crystal-agua.png',
+        nome: 'Água Crystal',
+      },
+      {
+        id: 'hero-bebidas-coca-familia',
+        src: '/bebidas/hero-coca-familia.png',
+        nome: 'Coca-Cola & Coca-Cola Zero',
+      },
+      {
+        id: HERO_BEBIDAS_GATORADE_SLIDE_ID,
+        src: HERO_BEBIDAS_GATORADE_SRC,
         nome: 'Gatorade — isotônicos 500 ml',
       },
     ]
@@ -184,6 +209,7 @@ export function Home() {
 
   const heroSlide = heroSlides[heroVisualPauseMotion ? 0 : heroSlideIndex] ?? heroSlides[0]
   const heroSlideAtivo = heroVisualPauseMotion ? 0 : heroSlideIndex
+  const heroBebidasPalcoLargo = heroBebidasStageLargo(heroCategoria, heroSlide, heroThrowState)
 
   useLayoutEffect(() => {
     const curr = heroSlides[heroVisualPauseMotion ? 0 : heroSlideIndex] ?? heroSlides[0]
@@ -337,7 +363,7 @@ export function Home() {
             onPointerCancel={onHeroVisualPointerCancel}
           >
             <div
-              className={`hero__pizza-stage${heroThrowing ? ' hero__pizza-stage--throwing' : ''}${heroCategoria === 'bebidas' ? ' hero__pizza-stage--bebidas' : ''}`}
+              className={`hero__pizza-stage${heroThrowing ? ' hero__pizza-stage--throwing' : ''}${heroBebidasPalcoLargo ? ' hero__pizza-stage--bebidas' : ''}`}
             >
               {heroThrowState.phase === 'running' ? (
                 <>

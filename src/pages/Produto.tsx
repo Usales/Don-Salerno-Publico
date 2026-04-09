@@ -437,7 +437,7 @@ export function Produto() {
                     </select>
                     <p className="produto-montar__partes-dica">
                       O valor segue o tamanho escolhido e o <strong>maior preço</strong> entre as duas metades
-                      (regra usual de pizzaria), mais adicionais.
+                      (regra usual de pizzaria).
                     </p>
                   </div>
                 ) : null}

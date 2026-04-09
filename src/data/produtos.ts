@@ -6,12 +6,7 @@ const massasPadrao: Produto['massas'] = [
   { id: 'sem-gluten', nome: 'Sem glúten', descricao: 'Base dedicada; pode conter traços de glúten.', adicional: 12 },
 ]
 
-const adicionaisPadrao: Produto['adicionais'] = [
-  { id: 'bacon', nome: 'Bacon crocante', preco: 8 },
-  { id: 'catupiry', nome: 'Catupiry', preco: 10 },
-  { id: 'rucula', nome: 'Rúcula fresca', preco: 5 },
-  { id: 'azeitona', nome: 'Azeitona preta', preco: 4 },
-]
+const adicionaisPadrao: Produto['adicionais'] = []
 
 const alergenoPizzaPadrao =
   'Contém glúten e lactose. Pode conter ovos e outros; informe restrições no pedido.'
@@ -443,7 +438,7 @@ export const produtos: Produto[] = [
     nome: 'Banana',
     descricao: 'Doce de banana com açúcar e canela.',
     tempoPreparoMin: 18,
-    imagem: '/hero-pizza.png',
+    imagem: '/pizza-doce-banana.png',
     precos: precosPorFaixa.doce,
     ingredientesCardapio: 'Mussarela, banana, açúcar e canela',
   }),
@@ -453,7 +448,7 @@ export const produtos: Produto[] = [
     nome: 'Chocolate',
     descricao: 'Chocolate com creme de leite.',
     tempoPreparoMin: 18,
-    imagem: '/hero-pizza-duo-chocolate-morango.png',
+    imagem: '/pizza-doce-chocolate.png',
     precos: precosPorFaixa.doce,
     ingredientesCardapio: 'Mussarela, chocolate e creme de leite',
   }),
@@ -473,7 +468,7 @@ export const produtos: Produto[] = [
     nome: 'Choconana',
     descricao: 'Banana com chocolate — doce do cardápio.',
     tempoPreparoMin: 18,
-    imagem: '/hero-pizza-duo-chocolate-morango.png',
+    imagem: '/pizza-doce-choconana.png',
     precos: precosPorFaixa.doce,
     ingredientesCardapio: 'Mussarela, banana e chocolate',
   }),
