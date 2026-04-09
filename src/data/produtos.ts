@@ -427,16 +427,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, provolone, catupiry, cheddar, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p35',
-    slug: 'tomate-seco',
-    nome: 'Tomate Seco',
-    descricao: 'Tomate seco com rúcula e orégano.',
-    tempoPreparoMin: 22,
-    imagem: '/hero-pizza-vegetariana.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, tomate seco, rúcula e orégano',
-  }),
-  pizzaSabor({
     id: 'p9',
     slug: 'vegetariana',
     nome: 'Vegetariana',
@@ -821,6 +811,8 @@ const slugLegadoParaId: Record<string, string> = {
   p36: 'p2',
   chilena: 'p2',
   p37: 'p2',
+  p35: 'p2',
+  'tomate-seco': 'p2',
   'dom-pedrito': 'p2',
   /* Bebidas Gatorade removidas do cardápio — links antigos caem no Limão */
   'gt-tropical': 'gt-limao',

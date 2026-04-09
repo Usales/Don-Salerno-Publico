@@ -51,7 +51,6 @@ Preços indicados como no cardápio de referência.
 | **Dom Camilo** | Molho, mussarela, presunto, calabresa, creme de leite, tomate e orégano |
 | **Frango com Palmito** | Molho, mussarela, frango, palmito, catupiry, tomate e orégano |
 | **Quatro Queijos** | Molho, mussarela, provolone, catupiry, cheddar, tomate e orégano |
-| **Tomate Seco** | Molho, mussarela, tomate seco, rúcula e orégano |
 | **Vegetariana** | Molho, mussarela, palmito, ervilha, milho, manjericão, cebola, tomate e orégano |
 
 ---
