@@ -247,7 +247,7 @@ export const produtos: Produto[] = [
     nome: 'Francesa',
     descricao: 'Lombinho defumado com creme de leite e orégano.',
     tempoPreparoMin: 24,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-francesa.png',
     precos: precosPorFaixa.trad,
     ingredientesCardapio: 'Molho, mussarela, lombinho defumado, creme de leite, tomate e orégano',
   }),
