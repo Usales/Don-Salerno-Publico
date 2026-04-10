@@ -47,7 +47,7 @@ Preços indicados como no cardápio de referência.
 | **Calabresa com Bacon** | Molho, mussarela, calabresa, bacon, cebola, tomate e orégano |
 | **Calabresa com banana** | Molho, mussarela, calabresa, banana frita, tomate e orégano |
 | **Calabresa com catupiry** | Molho, mussarela, calabresa, catupiry, tomate e orégano, cebola |
-| **Dom Camilo** | Molho, mussarela, presunto, calabresa, creme de leite, tomate e orégano |
+| **Dom Salerno** | Molho, mussarela, presunto, calabresa, creme de leite, tomate e orégano |
 | **Frango com Palmito** | Molho, mussarela, frango, palmito, catupiry, tomate e orégano |
 | **Quatro Queijos** | Molho, mussarela, provolone, catupiry, cheddar, tomate e orégano |
 | **Vegetariana** | Molho, mussarela, palmito, ervilha, milho, manjericão, cebola, tomate e orégano |
