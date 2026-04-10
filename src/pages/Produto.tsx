@@ -64,7 +64,9 @@ export function Produto() {
       categoriaProduto === 'bebidas' ||
       categoriaProduto === 'combos'
         ? ['P']
-        : ['P', 'M', 'G'],
+        : categoriaProduto === 'pizzas'
+          ? ['P', 'G']
+          : ['P', 'M', 'G'],
     [categoriaProduto],
   )
   const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
@@ -75,7 +77,9 @@ export function Produto() {
           ? { P: '500 ml', M: '500 ml', G: '500 ml' }
           : categoriaProduto === 'combos'
             ? { P: 'Combo', M: 'Combo', G: 'Combo' }
-            : { P: 'P', M: 'M', G: 'G' },
+            : categoriaProduto === 'pizzas'
+              ? { P: 'Brotinho - 25CM', M: 'M', G: 'Grande 35CM' }
+              : { P: 'P', M: 'M', G: 'G' },
     [categoriaProduto],
   )
 
