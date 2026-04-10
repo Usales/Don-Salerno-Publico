@@ -78,7 +78,11 @@ export function Produto() {
           : categoriaProduto === 'combos'
             ? { P: 'Combo', M: 'Combo', G: 'Combo' }
             : categoriaProduto === 'pizzas'
-              ? { P: 'Brotinho - 25CM', M: 'M', G: 'Grande 35CM' }
+              ? {
+                  P: 'Brotinho - 25CM (6 fatias)',
+                  M: 'M',
+                  G: 'Grande 35CM (8 fatias)',
+                }
               : { P: 'P', M: 'M', G: 'G' },
     [categoriaProduto],
   )
