@@ -44,11 +44,6 @@ export function HomeBannersMarquee({ banners }: { banners: HomeBannerItem[] }) {
               className="home-banner"
               onClickCapture={onLinkClickCapture}
             >
-              <span className="home-banner__badge" aria-hidden>
-                50%
-                <br />
-                OFF
-              </span>
               <div className="home-banner__inner">
                 <span className="home-banner__tag">{b.tag}</span>
                 <p className="home-banner__title">{b.title}</p>
@@ -79,11 +74,6 @@ export function HomeBannersMarquee({ banners }: { banners: HomeBannerItem[] }) {
               tabIndex={-1}
               onClickCapture={onLinkClickCapture}
             >
-              <span className="home-banner__badge" aria-hidden>
-                50%
-                <br />
-                OFF
-              </span>
               <div className="home-banner__inner">
                 <span className="home-banner__tag">{b.tag}</span>
                 <p className="home-banner__title">{b.title}</p>
