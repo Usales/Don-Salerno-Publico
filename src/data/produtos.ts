@@ -362,16 +362,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, calabresa, bacon, cebola, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p31',
-    slug: 'calabresa-com-banana',
-    nome: 'Calabresa com banana',
-    descricao: 'Calabresa com banana frita — clássica especial da casa.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-calabresa.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, calabresa, banana frita, tomate e orégano',
-  }),
-  pizzaSabor({
     id: 'p32',
     slug: 'calabresa-com-catupiry',
     nome: 'Calabresa com catupiry',
@@ -863,6 +853,8 @@ const slugLegadoParaId: Record<string, string> = {
   'moda-da-casa': 'p33',
   pepperoni: 'p2',
   /* Pizzas removidas do cardápio */
+  p31: 'p30',
+  'calabresa-com-banana': 'p30',
   p19: 'p2',
   atum: 'p2',
   p36: 'p2',

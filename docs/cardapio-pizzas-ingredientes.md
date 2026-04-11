@@ -45,7 +45,6 @@ Preços indicados como no cardápio de referência.
 | Sabor | Ingredientes |
 |-------|--------------|
 | **Calabresa com Bacon** | Molho, mussarela, calabresa, bacon, cebola, tomate e orégano |
-| **Calabresa com banana** | Molho, mussarela, calabresa, banana frita, tomate e orégano |
 | **Calabresa com catupiry** | Molho, mussarela, calabresa, catupiry, tomate e orégano, cebola |
 | **Dom Salerno** | Molho, mussarela, presunto, calabresa, creme de leite, tomate e orégano |
 | **Frango com Palmito** | Molho, mussarela, frango, palmito, catupiry, tomate e orégano |
