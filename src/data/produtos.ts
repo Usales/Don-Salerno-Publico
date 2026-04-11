@@ -465,18 +465,6 @@ export const produtos: Produto[] = [
     ingredientes: ['Carne moída temperada', 'tomate', 'cebola', 'massa artesanal'],
   }),
   esfihaSabor({
-    id: 'p14',
-    slug: 'esfiha-calabresa-moida',
-    nome: 'Esfiha de Calabresa Moída',
-    descricao:
-      'Calabresa moída ao molho de tomate com tempero na medida certa. Sabor intenso, suculento e perfeito para quem gosta de um toque mais encorpado.',
-    tempoPreparoMin: 16,
-    imagem: '/hero-esfiha-calabresa-moida.png',
-    imagemDestaque: '/hero-esfiha-calabresa-moida.png',
-    precos: { P: 15, M: 19, G: 25 },
-    ingredientes: ['Calabresa moída', 'molho de tomate', 'cebola', 'ervas finas'],
-  }),
-  esfihaSabor({
     id: 'p15',
     slug: 'esfiha-mussarela',
     nome: 'Esfiha de Mussarela',
@@ -847,6 +835,8 @@ const slugLegadoParaId: Record<string, string> = {
   'calabresa-com-banana': 'p30',
   p27: 'p26',
   'lombo-com-catupiry': 'p26',
+  p14: 'p7',
+  'esfiha-calabresa-moida': 'p7',
   p19: 'p2',
   atum: 'p2',
   p36: 'p2',
