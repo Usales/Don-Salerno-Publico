@@ -312,16 +312,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, lombo defumado, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p27',
-    slug: 'lombo-com-catupiry',
-    nome: 'Lombo com catupiry',
-    descricao: 'Lombo defumado com catupiry e orégano.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, lombo defumado, catupiry, tomate e orégano',
-  }),
-  pizzaSabor({
     id: 'p8',
     slug: 'napolitana',
     nome: 'Napolitana',
@@ -855,6 +845,8 @@ const slugLegadoParaId: Record<string, string> = {
   /* Pizzas removidas do cardápio */
   p31: 'p30',
   'calabresa-com-banana': 'p30',
+  p27: 'p26',
+  'lombo-com-catupiry': 'p26',
   p19: 'p2',
   atum: 'p2',
   p36: 'p2',

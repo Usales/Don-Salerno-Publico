@@ -33,7 +33,6 @@ Preços indicados como no cardápio de referência.
 | **Frango ao Creme** | Molho, mussarela, frango, creme de leite, milho, cebola, tomate e orégano |
 | **Frango com bacon** | Molho, mussarela, frango desfiado, bacon, cebola, tomate e orégano |
 | **Lombo** | Molho, mussarela, lombo defumado, tomate e orégano |
-| **Lombo com catupiry** | Molho, mussarela, lombo defumado, catupiry, tomate e orégano |
 | **Napolitana** | Molho, mussarela, presunto, palmito, cebola, tomate e orégano |
 | **Portuguesa** | Molho, mussarela, presunto, ervilha, ovo, cebola, tomate e orégano |
 | **Primavera** | Molho, mussarela, calabresa ralada, catupiry, tomate e orégano |
