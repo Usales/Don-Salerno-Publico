@@ -307,7 +307,7 @@ export const produtos: Produto[] = [
     nome: 'Lombo',
     descricao: 'Lombo defumado com mussarela e tomate.',
     tempoPreparoMin: 23,
-    imagem: '/hero-pizza.png',
+    imagem: '/hero-pizza-francesa.png',
     precos: precosPorFaixa.trad,
     ingredientesCardapio: 'Molho, mussarela, lombo defumado, tomate e orégano',
   }),
