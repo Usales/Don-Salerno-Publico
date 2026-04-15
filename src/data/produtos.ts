@@ -502,19 +502,6 @@ export const produtos: Produto[] = [
     alergenos: ['Contém glúten e lactose. Pode conter amendoim e oleaginosas.'],
   }),
   sobremesaSabor({
-    id: 's1',
-    slug: 'milky-acai',
-    nome: 'Milky Açaí',
-    descricao:
-      'Camadas cremosas de açaí com leite condensado e leite em pó especial, servido bem gelado. Refrescante, aveludado e perfeito para adoçar sem pesar.',
-    tempoPreparoMin: 8,
-    imagem: '/hero-sobremesa-milky-acai.png',
-    imagemDestaque: '/hero-sobremesa-milky-acai.png',
-    precos: { P: 6.4, M: 32, G: 64 },
-    ingredientes: ['Açaí', 'leite condensado', 'leite em pó especial'],
-    alergenos: ['Contém lactose. Pode conter traços de oleaginosas.'],
-  }),
-  sobremesaSabor({
     id: 's2',
     slug: 'trufas-tiramisu',
     nome: 'Trufas de Tiramisu',
@@ -810,6 +797,8 @@ export const produtos: Produto[] = [
 
 /** Slugs antigos (receitas de massa / molho) → id de produto atual. */
 const slugLegadoParaId: Record<string, string> = {
+  s1: 's2',
+  'milky-acai': 's2',
   'dom-camilo': 'p33',
   margherita: 'p1',
   calabresa: 'p2',
