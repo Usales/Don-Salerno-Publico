@@ -211,6 +211,22 @@
   font-weight: 600;
 }
 
+.cart-table__combo-selecoes {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8125rem;
+  color: var(--texto-secundario, #555);
+}
+
+.cart-table__combo-selecoes li {
+  margin-top: 0.1rem;
+}
+
+.cart-table__combo-selecoes li strong {
+  color: var(--texto, #222);
+}
+
 .cart-table__td--num {
   text-align: right;
   white-space: nowrap;

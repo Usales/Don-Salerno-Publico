@@ -31,6 +31,27 @@ export interface Adicional {
   preco: number
 }
 
+/** Slot de seleção dentro de um combo (pizza, bebida, etc.). */
+export interface ComboItemSlot {
+  /** Identificador único do slot (ex.: 'pizza1', 'bebida1'). */
+  id: string
+  /** Rótulo exibido ao usuário (ex.: 'Pizza 25cm'). */
+  titulo: string
+  /** Quantas unidades deste item o combo inclui. */
+  quantidade: number
+  /** IDs de produtos disponíveis para este slot. */
+  opcoesIds: string[]
+}
+
+/** Seleção do usuário para um slot de combo. */
+export interface ComboSelecao {
+  slotId: string
+  titulo: string
+  produtoId: string
+  nome: string
+  quantidade: number
+}
+
 /** Linha de ingrediente com medida. */
 export interface IngredienteMedido {
   nome: string
@@ -86,6 +107,8 @@ export interface Produto {
   imagemDestaque?: string
   /** Combos: pizza ao fundo + bebida em primeiro plano (cardápio e página do produto). */
   comboVisual?: { pizza: string; bebida: string }
+  /** Combos: slots de seleção (pizza, bebida, etc.) que o cliente deve escolher. */
+  comboItens?: ComboItemSlot[]
   precos: Record<TamanhoCodigo, number>
   massas: OpcaoMassa[]
   adicionais: Adicional[]

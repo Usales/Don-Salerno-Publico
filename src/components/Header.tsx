@@ -3,9 +3,10 @@ import { useCart } from '@/stores/useCart'
 
 import './Layout.css'
 
-/** URL HTTPS da loja no iFood (ex.: página do restaurante ou `.../lista/chain:uuid`). Defina em `.env`: VITE_IFOOD_STORE_URL */
+/** URL HTTPS da loja no iFood. Defina em `.env`: VITE_IFOOD_STORE_URL */
 const IFOOD_STORE_URL =
-  import.meta.env.VITE_IFOOD_STORE_URL?.trim() || 'https://www.ifood.com.br/'
+  import.meta.env.VITE_IFOOD_STORE_URL?.trim() ||
+  'https://www.ifood.com.br/delivery/goiania-go/don-salerno-i-pizzaria-premium-santo-hilario/4f101baa-e8cf-4bca-a25f-36a1021ae545'
 
 function isLikelyMobile(): boolean {
   const ua = navigator.userAgent

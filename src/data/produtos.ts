@@ -19,11 +19,11 @@ function linhaCardapioParaItens(linha: string): string[] {
 type FaixaPrecoCardapio = 'promo' | 'trad' | 'especial' | 'nobre' | 'doce'
 
 const precosPorFaixa: Record<FaixaPrecoCardapio, Record<TamanhoCodigo, number>> = {
-  promo: { P: 49.9, M: 62, G: 76 },
-  trad: { P: 59.9, M: 72, G: 86 },
-  especial: { P: 64.9, M: 76, G: 90 },
-  nobre: { P: 69.9, M: 82, G: 96 },
-  doce: { P: 64.9, M: 76, G: 90 },
+  promo: { P: 59.9, M: 62, G: 79.9 },
+  trad: { P: 59.9, M: 72, G: 79.9 },
+  especial: { P: 59.9, M: 76, G: 79.9 },
+  nobre: { P: 59.9, M: 82, G: 79.9 },
+  doce: { P: 59.9, M: 76, G: 79.9 },
 }
 
 /** Califórnia: não repetir o nome do sabor na lista de ingredientes (pedido do cardápio). */
@@ -166,6 +166,18 @@ function bebidaItem(
     precos: { P: unit, M: unit, G: unit },
   }
 }
+
+/** IDs de pizzas tradicionais (promo + trad) para seleção em combos. */
+const PIZZAS_TRAD_IDS = [
+  'p11', 'p2', 'p4', 'p1', 'p12', 'p18', // promo
+  'p20', 'p21', 'p22', 'p6', 'p23', 'p24', 'p25', 'p26', 'p8', 'p3', 'p28', // trad
+]
+
+/** IDs de refrigerantes lata 350 ml para combos. */
+const BEBIDAS_LATA_IDS = ['be-coca-lata', 'be-coca-zero-lata']
+
+/** IDs de refrigerantes 2 L para combos. */
+const BEBIDAS_2L_IDS = ['be-coca-2l', 'be-coca-zero-2l', 'be-guarana-2l', 'be-fanta-2l', 'be-sprite-2l']
 
 export const produtos: Produto[] = [
   // Pizzas — ingredientes e faixas conforme docs/cardapio-pizzas-ingredientes.md
@@ -656,6 +668,47 @@ export const produtos: Produto[] = [
     imagemDestaque: '/bebidas/h2oh-limoneto-500ml.png',
     precos: { P: 8.9, M: 8.9, G: 8.9 },
   }),
+  /* Refrigerantes 2 L — usados nos combos */
+  bebidaItem({
+    id: 'be-coca-2l',
+    slug: 'coca-cola-2l',
+    nome: 'Coca-Cola 2 L',
+    descricao: 'Refrigerante sabor original — garrafa PET 2 L.',
+    tempoPreparoMin: 2,
+    precos: { P: 14, M: 14, G: 14 },
+  }),
+  bebidaItem({
+    id: 'be-coca-zero-2l',
+    slug: 'coca-cola-zero-2l',
+    nome: 'Coca-Cola Zero 2 L',
+    descricao: 'Refrigerante cola sem açúcar — garrafa PET 2 L.',
+    tempoPreparoMin: 2,
+    precos: { P: 14, M: 14, G: 14 },
+  }),
+  bebidaItem({
+    id: 'be-guarana-2l',
+    slug: 'guarana-2l',
+    nome: 'Guaraná 2 L',
+    descricao: 'Refrigerante sabor guaraná — garrafa PET 2 L.',
+    tempoPreparoMin: 2,
+    precos: { P: 14, M: 14, G: 14 },
+  }),
+  bebidaItem({
+    id: 'be-fanta-2l',
+    slug: 'fanta-2l',
+    nome: 'Fanta 2 L',
+    descricao: 'Refrigerante sabor laranja — garrafa PET 2 L.',
+    tempoPreparoMin: 2,
+    precos: { P: 14, M: 14, G: 14 },
+  }),
+  bebidaItem({
+    id: 'be-sprite-2l',
+    slug: 'sprite-2l',
+    nome: 'Sprite 2 L',
+    descricao: 'Refrigerante sabor limão — garrafa PET 2 L.',
+    tempoPreparoMin: 2,
+    precos: { P: 14, M: 14, G: 14 },
+  }),
   {
     id: 'c1',
     nome: 'Calzone presunto & mussarela',
@@ -792,6 +845,125 @@ export const produtos: Produto[] = [
     precos: { P: 69.9, M: 69.9, G: 69.9 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
+  },
+  // ────────────────────────────────────────────────────────────
+  // COMBOS
+  // ────────────────────────────────────────────────────────────
+  {
+    id: 'cb1',
+    nome: 'Combo Individual',
+    slug: 'combo-individual',
+    categoria: 'combos',
+    descricao: '1 Pizza 25cm (qualquer sabor tradicional) + 1 Refrigerante Lata 350ml.',
+    ingredientes: ['Pizza 25cm (sabor tradicional)', 'Refrigerante Lata 350ml'],
+    alergenos: ['Contém glúten e lactose.'],
+    tempoPreparoMin: 18,
+    imagem: '/combos/combo-individual.png',
+    imagemDestaque: '/combos/combo-individual.png',
+    precos: { P: 62.9, M: 62.9, G: 62.9 },
+    massas: [],
+    adicionais: [],
+    comboItens: [
+      { id: 'pizza1', titulo: 'Pizza 25cm', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'bebida1', titulo: 'Refrigerante Lata 350ml', quantidade: 1, opcoesIds: BEBIDAS_LATA_IDS },
+    ],
+  },
+  {
+    id: 'cb2',
+    nome: 'Combo Casal',
+    slug: 'combo-casal',
+    categoria: 'combos',
+    descricao: '1 Pizza 35cm (qualquer sabor tradicional) + 1 Refrigerante 2L.',
+    ingredientes: ['Pizza 35cm (sabor tradicional)', 'Refrigerante 2L'],
+    alergenos: ['Contém glúten e lactose.'],
+    tempoPreparoMin: 22,
+    imagem: '/combos/combo-casal.png',
+    imagemDestaque: '/combos/combo-casal.png',
+    precos: { P: 87.9, M: 87.9, G: 87.9 },
+    massas: [],
+    adicionais: [],
+    comboItens: [
+      { id: 'pizza1', titulo: 'Pizza 35cm', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'bebida1', titulo: 'Refrigerante 2L', quantidade: 1, opcoesIds: BEBIDAS_2L_IDS },
+    ],
+  },
+  {
+    id: 'cb3',
+    nome: 'Combo Dupla',
+    slug: 'combo-dupla',
+    categoria: 'combos',
+    descricao: '2 Pizzas 25cm (sabores tradicionais) + 1 Refrigerante 2L.',
+    ingredientes: ['2 Pizzas 25cm (sabores tradicionais)', 'Refrigerante 2L'],
+    alergenos: ['Contém glúten e lactose.'],
+    tempoPreparoMin: 25,
+    imagem: '/combos/combo-dupla.png',
+    precos: { P: 124.9, M: 124.9, G: 124.9 },
+    massas: [],
+    adicionais: [],
+    comboItens: [
+      { id: 'pizza1', titulo: 'Pizza 25cm (1ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'pizza2', titulo: 'Pizza 25cm (2ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'bebida1', titulo: 'Refrigerante 2L', quantidade: 1, opcoesIds: BEBIDAS_2L_IDS },
+    ],
+  },
+  {
+    id: 'cb4',
+    nome: 'Combo Premium',
+    slug: 'combo-premium',
+    categoria: 'combos',
+    descricao: '1 Pizza 35cm (sabor tradicional) + 1 Pizza 25cm (sabor tradicional) + 1 Refrigerante 2L.',
+    ingredientes: ['Pizza 35cm (sabor tradicional)', 'Pizza 25cm (sabor tradicional)', 'Refrigerante 2L'],
+    alergenos: ['Contém glúten e lactose.'],
+    tempoPreparoMin: 28,
+    imagem: '/hero-pizza.png',
+    precos: { P: 144.9, M: 144.9, G: 144.9 },
+    massas: [],
+    adicionais: [],
+    comboItens: [
+      { id: 'pizza1', titulo: 'Pizza 35cm', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'pizza2', titulo: 'Pizza 25cm', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'bebida1', titulo: 'Refrigerante 2L', quantidade: 1, opcoesIds: BEBIDAS_2L_IDS },
+    ],
+  },
+  {
+    id: 'cb5',
+    nome: 'Combo Família',
+    slug: 'combo-familia',
+    categoria: 'combos',
+    descricao: '2 Pizzas 35cm (sabores tradicionais) + 1 Refrigerante 2L.',
+    ingredientes: ['2 Pizzas 35cm (sabores tradicionais)', 'Refrigerante 2L'],
+    alergenos: ['Contém glúten e lactose.'],
+    tempoPreparoMin: 30,
+    imagem: '/hero-pizza.png',
+    precos: { P: 159.9, M: 159.9, G: 159.9 },
+    massas: [],
+    adicionais: [],
+    comboItens: [
+      { id: 'pizza1', titulo: 'Pizza 35cm (1ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'pizza2', titulo: 'Pizza 35cm (2ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'bebida1', titulo: 'Refrigerante 2L', quantidade: 1, opcoesIds: BEBIDAS_2L_IDS },
+    ],
+  },
+  {
+    id: 'cb6',
+    nome: 'Combo Festa',
+    slug: 'combo-festa',
+    categoria: 'combos',
+    descricao: '3 Pizzas 35cm (sabores tradicionais) + 2 Refrigerantes 2L.',
+    ingredientes: ['3 Pizzas 35cm (sabores tradicionais)', '2 Refrigerantes 2L'],
+    alergenos: ['Contém glúten e lactose.'],
+    tempoPreparoMin: 38,
+    imagem: '/hero-pizza.png',
+    precos: { P: 249.9, M: 249.9, G: 249.9 },
+    massas: [],
+    adicionais: [],
+    comboItens: [
+      { id: 'pizza1', titulo: 'Pizza 35cm (1ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'pizza2', titulo: 'Pizza 35cm (2ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'pizza3', titulo: 'Pizza 35cm (3ª)', quantidade: 1, opcoesIds: PIZZAS_TRAD_IDS },
+      { id: 'bebida1', titulo: 'Refrigerante 2L (1º)', quantidade: 1, opcoesIds: BEBIDAS_2L_IDS },
+      { id: 'bebida2', titulo: 'Refrigerante 2L (2º)', quantidade: 1, opcoesIds: BEBIDAS_2L_IDS },
+    ],
   },
 ]
 

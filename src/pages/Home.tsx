@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { EMPTY_STATE_MASCOTE_SRC } from '@/components/EmptyStateMascote'
 import { HomeBannersMarquee } from '@/components/HomeBannersMarquee'
 import { HomeMarqueeStrip } from '@/components/HomeMarqueeStrip'
 import { HomePopularMarquee } from '@/components/HomePopularMarquee'
+import { useHeroCarousel, type HeroSlide } from '@/hooks/useHeroCarousel'
 import { JsonLdRestaurant } from '@/lib/seo'
 import { rotulosCategoria } from '@/data/categorias'
 import { produtos } from '@/data/produtos'
@@ -15,21 +16,12 @@ const populares = produtos.filter((p) => p.categoria === 'pizzas').slice(0, 4)
 const HERO_PIZZA_INTERVAL_MS = 4000
 /** Máximo de fotos no carrossel do hero (Pizza); uma imagem por arquivo, sem repetir arte. */
 const HERO_PIZZAS_MAX_SLIDES = 10
-const HERO_SWIPE_MIN_PX = 56
-/** Duração da animação de “arremesso” entre fotos do hero (ms) */
-const HERO_THROW_MS = 540
 
 const HERO_BEBIDAS_GATORADE_SLIDE_ID = 'hero-bebidas-gatorade'
 const HERO_BEBIDAS_GATORADE_SRC = '/hero-bebidas-gatorade.png'
 
-/** Categorias sem rotação “forno”; calzones usa flutuar próprio; bebidas usa drift suave (ver CSS). */
+/** Categorias sem rotação "forno"; calzones usa flutuar próprio; bebidas usa drift suave (ver CSS). */
 const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas']
-
-type HeroSlide = { id: string; src: string; nome: string }
-
-type HeroThrowState =
-  | { phase: 'idle' }
-  | { phase: 'running'; from: HeroSlide; to: HeroSlide; dir: 'next' | 'prev' }
 
 function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
   let c = 'hero__pizza'
@@ -141,15 +133,15 @@ const banners = [
 export function Home() {
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [heroCategoria, setHeroCategoria] = useState<Categoria>('pizzas')
-  const [heroSlideIndex, setHeroSlideIndex] = useState(0)
-  const [heroVisualPauseMotion, setHeroVisualPauseMotion] = useState(false)
-  const [heroThrowState, setHeroThrowState] = useState<HeroThrowState>({ phase: 'idle' })
-  const heroSwipeDownRef = useRef<{ x: number; pointerId: number } | null>(null)
-  const prevHeroSlideRef = useRef<HeroSlide | null>(null)
-  const skipHeroThrowRef = useRef(true)
-  const lastHeroNavDirRef = useRef<'next' | 'prev'>('next')
 
   const heroSlides = useMemo(() => heroSlidesParaCategoria(heroCategoria), [heroCategoria])
+
+  const carousel = useHeroCarousel({
+    slides: heroSlides,
+    intervalMs: HERO_PIZZA_INTERVAL_MS,
+    throwMs: 540,
+    swipeMinPx: 56,
+  })
 
   useEffect(() => {
     const onScroll = () => setShowScrollTop(window.scrollY > 380)
@@ -158,132 +150,19 @@ export function Home() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  useEffect(() => {
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const sync = () => setHeroVisualPauseMotion(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
-
-  useEffect(() => {
-    skipHeroThrowRef.current = true
-    setHeroThrowState({ phase: 'idle' })
-    setHeroSlideIndex(0)
-  }, [heroCategoria])
-
-  useEffect(() => {
-    heroSlides.forEach((p) => {
-      const img = new Image()
-      img.src = p.src
-    })
-  }, [heroSlides])
-
-  useEffect(() => {
-    if (heroVisualPauseMotion || heroSlides.length <= 1) return
-    const n = heroSlides.length
-    const id = window.setInterval(() => {
-      lastHeroNavDirRef.current = 'next'
-      skipHeroThrowRef.current = false
-      setHeroSlideIndex((i) => (i + 1) % n)
-    }, HERO_PIZZA_INTERVAL_MS)
-    return () => clearInterval(id)
-  }, [heroVisualPauseMotion, heroSlides])
-
-  const heroSlide = heroSlides[heroVisualPauseMotion ? 0 : heroSlideIndex] ?? heroSlides[0]
-  const heroSlideAtivo = heroVisualPauseMotion ? 0 : heroSlideIndex
-
-  useLayoutEffect(() => {
-    const curr = heroSlides[heroVisualPauseMotion ? 0 : heroSlideIndex] ?? heroSlides[0]
-    if (skipHeroThrowRef.current) {
-      skipHeroThrowRef.current = false
-      prevHeroSlideRef.current = curr
-      setHeroThrowState({ phase: 'idle' })
-      return
-    }
-    if (heroVisualPauseMotion || heroSlides.length <= 1) {
-      prevHeroSlideRef.current = curr
-      setHeroThrowState({ phase: 'idle' })
-      return
-    }
-    const prev = prevHeroSlideRef.current
-    if (!prev) {
-      prevHeroSlideRef.current = curr
-      return
-    }
-    if (prev.id === curr.id) {
-      return
-    }
-    setHeroThrowState({
-      phase: 'running',
-      from: prev,
-      to: curr,
-      dir: lastHeroNavDirRef.current,
-    })
-    const t = window.setTimeout(() => {
-      setHeroThrowState({ phase: 'idle' })
-      prevHeroSlideRef.current = curr
-    }, HERO_THROW_MS)
-    return () => clearTimeout(t)
-  }, [heroSlideIndex, heroSlides, heroVisualPauseMotion])
-
-  const heroThrowing = heroThrowState.phase === 'running'
+  const heroSlide = carousel.slide
+  const heroSlideAtivo = carousel.slideAtivo
+  const heroThrowing = carousel.throwing
   const captionSlide =
-    heroThrowState.phase === 'running' ? heroThrowState.to : heroSlide
+    carousel.throwState.phase === 'running' ? carousel.throwState.to : heroSlide
 
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [])
 
-  const onHeroVisualPointerDown = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
-      if (e.button !== 0 || heroSlides.length <= 1 || heroThrowing) return
-      heroSwipeDownRef.current = { x: e.clientX, pointerId: e.pointerId }
-      e.currentTarget.setPointerCapture(e.pointerId)
-    },
-    [heroSlides.length, heroThrowing],
-  )
-
-  const endHeroSwipe = useCallback(
-    (e: React.PointerEvent<HTMLElement>, applySlide: boolean) => {
-      const d = heroSwipeDownRef.current
-      if (!d || d.pointerId !== e.pointerId) return
-      heroSwipeDownRef.current = null
-      try {
-        e.currentTarget.releasePointerCapture(e.pointerId)
-      } catch {
-        /* já liberado */
-      }
-      if (!applySlide) return
-      const dx = e.clientX - d.x
-      if (Math.abs(dx) < HERO_SWIPE_MIN_PX) return
-      const n = heroSlides.length
-      if (dx > 0) {
-        lastHeroNavDirRef.current = 'prev'
-        skipHeroThrowRef.current = false
-        setHeroSlideIndex((i) => (i - 1 + n) % n)
-      } else {
-        lastHeroNavDirRef.current = 'next'
-        skipHeroThrowRef.current = false
-        setHeroSlideIndex((i) => (i + 1) % n)
-      }
-    },
-    [heroSlides.length],
-  )
-
-  const onHeroVisualPointerUp = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
-      endHeroSwipe(e, true)
-    },
-    [endHeroSwipe],
-  )
-
-  const onHeroVisualPointerCancel = useCallback(
-    (e: React.PointerEvent<HTMLElement>) => {
-      endHeroSwipe(e, false)
-    },
-    [endHeroSwipe],
-  )
+  const onHeroVisualPointerDown = carousel.onPointerDown
+  const onHeroVisualPointerUp = carousel.onPointerUp
+  const onHeroVisualPointerCancel = carousel.onPointerCancel
 
   return (
     <div>
@@ -345,14 +224,14 @@ export function Home() {
             onPointerCancel={onHeroVisualPointerCancel}
           >
             <div className={`hero__pizza-stage${heroThrowing ? ' hero__pizza-stage--throwing' : ''}`}>
-              {heroThrowState.phase === 'running' ? (
+              {carousel.throwState.phase === 'running' ? (
                 <>
                   <div
-                    className={`hero__pizza-layer hero__pizza-layer--absolute hero__pizza-layer--out hero__pizza-layer--out-${heroThrowState.dir}`}
+                    className={`hero__pizza-layer hero__pizza-layer--absolute hero__pizza-layer--out hero__pizza-layer--out-${carousel.throwState.dir}`}
                   >
                     <img
-                      className={heroPizzaImgClass(heroThrowState.from, heroCategoria)}
-                      src={heroThrowState.from.src}
+                      className={heroPizzaImgClass(carousel.throwState.from, heroCategoria)}
+                      src={carousel.throwState.from.src}
                       alt=""
                       width={480}
                       height={480}
@@ -360,12 +239,12 @@ export function Home() {
                     />
                   </div>
                   <div
-                    className={`hero__pizza-layer hero__pizza-layer--absolute hero__pizza-layer--in hero__pizza-layer--in-${heroThrowState.dir}`}
+                    className={`hero__pizza-layer hero__pizza-layer--absolute hero__pizza-layer--in hero__pizza-layer--in-${carousel.throwState.dir}`}
                   >
                     <img
-                      className={heroPizzaImgClass(heroThrowState.to, heroCategoria)}
-                      src={heroThrowState.to.src}
-                      alt={`${heroThrowState.to.nome} — Don Salerno`}
+                      className={heroPizzaImgClass(carousel.throwState.to, heroCategoria)}
+                      src={carousel.throwState.to.src}
+                      alt={`${carousel.throwState.to.nome} — Don Salerno`}
                       width={480}
                       height={480}
                       decoding="async"

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getProdutoPorId } from '@/data/produtos'
-import type { CarrinhoAdicional, CarrinhoSegundoSabor, PartesPizza, Produto, TamanhoCodigo } from '@/types'
+import type { CarrinhoAdicional, CarrinhoSegundoSabor, ComboSelecao, PartesPizza, Produto, TamanhoCodigo } from '@/types'
 
 export interface LinhaCarrinho {
   id: string
@@ -17,6 +17,8 @@ export interface LinhaCarrinho {
   /** Metade complementar (meio a meio). */
   segundoSabor?: CarrinhoSegundoSabor
   adicionais?: CarrinhoAdicional[]
+  /** Seleções de combo (pizza, bebida, etc.). */
+  comboSelecoes?: ComboSelecao[]
 }
 
 export interface OpcoesAdicionarCarrinho {
@@ -24,6 +26,7 @@ export interface OpcoesAdicionarCarrinho {
   partes?: PartesPizza
   segundoSabor?: CarrinhoSegundoSabor
   adicionais?: CarrinhoAdicional[]
+  comboSelecoes?: ComboSelecao[]
 }
 
 interface CupomAplicado {
@@ -115,7 +118,8 @@ export const useCart = create<CartState>()(
           partesEff === 'meio-meio' && opcoes?.segundoSabor?.produtoId
             ? { ...opcoes.segundoSabor }
             : undefined
-        const base = basePrecoPizza(produto, tamanho, segundo)
+        const comboSel = opcoes?.comboSelecoes?.length ? [...opcoes.comboSelecoes] : undefined
+        const base = produto.categoria === 'combos' ? produto.precos[tamanho] : basePrecoPizza(produto, tamanho, segundo)
         const precoUnit = precoComAdicionais(base, ads)
         const nomeLinha = nomeMeioMeio(produto.nome, segundo)
         const qtdAdd = Math.min(99, Math.max(1, Math.floor(opcoes?.quantidade ?? 1)))
@@ -127,7 +131,8 @@ export const useCart = create<CartState>()(
               i.tamanho === tamanho &&
               partesNormalizada(produto.categoria, i.partes) === partesEff &&
               chaveAdicionais(i.adicionais) === chaveAdicionais(ads) &&
-              chaveSegundoSabor(i.segundoSabor) === chaveSegundoSabor(segundo),
+              chaveSegundoSabor(i.segundoSabor) === chaveSegundoSabor(segundo) &&
+              !comboSel, /* combos sempre adicionam nova linha */
           )
           if (idx >= 0) {
             const next = [...s.itens]
@@ -155,6 +160,7 @@ export const useCart = create<CartState>()(
             partes: partesEff ?? undefined,
             segundoSabor: segundo,
             adicionais: ads,
+            comboSelecoes: comboSel,
           }
           return { itens: [...s.itens, linha] }
         })
@@ -242,6 +248,13 @@ export const useCart = create<CartState>()(
         return Math.max(0, Math.round((sub - get().descontoValor()) * 100) / 100)
       },
     }),
-    { name: 'don-salerno-cart' },
+    {
+      name: 'don-salerno-cart',
+      onRehydrateStorage: () => {
+        return (state) => {
+          if (state) state.sincronizarPrecos()
+        }
+      },
+    },
   ),
 )

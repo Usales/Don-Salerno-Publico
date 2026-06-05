@@ -1,19 +1,16 @@
-import { Fragment, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Fragment, useEffect, useMemo, useState } from 'react'
+import { Link, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { ComboDualImage } from '@/components/ComboDualImage'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
+import { ProdutoReviews } from '@/components/ProdutoReviews'
 import { rotulosCategoria } from '@/data/categorias'
 import { getProdutoPorId, getProdutosPorCategoria } from '@/data/produtos'
 import { brl } from '@/lib/format'
-import { useAuth } from '@/stores/useAuth'
 import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
-import type { CarrinhoAdicional, Categoria, PartesPizza, TamanhoCodigo } from '@/types'
+import type { CarrinhoAdicional, ComboSelecao, PartesPizza, TamanhoCodigo } from '@/types'
 import './Produto.css'
-
-/** Tempo para o toast de confirmação aparecer antes do redirect do fluxo de montagem do pedido. */
-const CARRINHO_TOAST_NAV_DELAY_MS = 1600
 
 function PassoTextoReceita({ texto }: { texto: string }) {
   const linhas = texto.split('\n')
@@ -30,34 +27,22 @@ function PassoTextoReceita({ texto }: { texto: string }) {
 }
 
 export function Produto() {
-  const navigate = useNavigate()
   const { id: idParam } = useParams<{ id: string }>()
   const p = idParam ? getProdutoPorId(idParam) : undefined
   const reviewProdutoId = p?.id ?? idParam ?? ''
-  const usuario = useAuth((s) => s.usuario)
-  const adicionarReview = useReviews((s) => s.adicionar)
   const listaReviews = useReviews(
     useShallow((s) => s.porProduto(reviewProdutoId)),
   )
 
-  const [nota, setNota] = useState(5)
-  const [comentario, setComentario] = useState('')
+  const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
+  const adicionarAoCarrinho = useCart((s) => s.adicionar)
   const [tamanho, setTamanho] = useState<TamanhoCodigo>('P')
   const [qtdCompra, setQtdCompra] = useState(1)
   const [partes, setPartes] = useState<PartesPizza>('inteira')
   const [segundoSaborId, setSegundoSaborId] = useState('')
   const [adicionalIds, setAdicionalIds] = useState<string[]>([])
-  const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
-  const adicionarAoCarrinho = useCart((s) => s.adicionar)
+  const [comboSelecoes, setComboSelecoes] = useState<Record<string, string>>({})
   const categoriaProduto = p?.categoria
-  const fluxoProximaCategoria: Record<Categoria, Categoria | 'carrinho'> = {
-    pizzas: 'esfihas',
-    esfihas: 'calzones',
-    calzones: 'combos',
-    combos: 'sobremesas',
-    sobremesas: 'bebidas',
-    bebidas: 'carrinho',
-  }
   const tamanhosDisponiveis = useMemo<TamanhoCodigo[]>(
     () =>
       categoriaProduto === 'esfihas' ||
@@ -112,6 +97,7 @@ export function Produto() {
     setPartes('inteira')
     setSegundoSaborId('')
     setAdicionalIds([])
+    setComboSelecoes({})
   }, [produto.id])
 
   const outrasPizzas = useMemo(() => {
@@ -141,21 +127,28 @@ export function Produto() {
   const bloqueadoMeioMeio =
     produto.categoria === 'pizzas' && partes === 'meio-meio' && segundoSaborId.length === 0
 
+  const comboIncompleto = useMemo(() => {
+    if (!produto.comboItens?.length) return false
+    return produto.comboItens.some((slot) => !comboSelecoes[slot.id])
+  }, [produto.comboItens, comboSelecoes])
+
+  const bloqueadoCombo = produto.categoria === 'combos' && comboIncompleto
+
+  const bloqueado = bloqueadoMeioMeio || bloqueadoCombo
+
+  /** Imagem dinâmica do combo: mostra a pizza selecionada ou a imagem padrão do combo. */
+  const imagemComboAtiva = useMemo(() => {
+    if (produto.categoria !== 'combos' || !produto.comboItens?.length) return null
+    const slotPizza = produto.comboItens.find((s) => s.opcoesIds.some((oid) => getProdutoPorId(oid)?.categoria === 'pizzas'))
+    if (!slotPizza) return null
+    const selecionadoId = comboSelecoes[slotPizza.id]
+    if (!selecionadoId) return null
+    const pizzaSelecionada = getProdutoPorId(selecionadoId)
+    return pizzaSelecionada?.imagemDestaque ?? pizzaSelecionada?.imagem ?? null
+  }, [produto.categoria, produto.comboItens, comboSelecoes])
+
   function toggleAdicional(id: string) {
     setAdicionalIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))
-  }
-
-  function enviarReview(e: FormEvent) {
-    e.preventDefault()
-    if (!usuario) return
-    adicionarReview({
-      produtoId: produto.id,
-      usuarioId: usuario.id,
-      nome: usuario.nome,
-      nota,
-      comentario: comentario.trim() || 'Sem comentário',
-    })
-    setComentario('')
   }
 
   return (
@@ -194,9 +187,19 @@ export function Produto() {
             {produto.comboVisual ? (
               <ComboDualImage
                 layout="hero"
-                pizzaSrc={produto.comboVisual.pizza}
+                pizzaSrc={imagemComboAtiva ?? produto.comboVisual.pizza}
                 bebidaSrc={produto.comboVisual.bebida}
                 alt={produto.nome}
+              />
+            ) : imagemComboAtiva ? (
+              <img
+                className="produto-foto"
+                src={imagemComboAtiva}
+                alt={`Pizza selecionada no combo`}
+                width={320}
+                height={320}
+                decoding="async"
+                loading="eager"
               />
             ) : (
               <img
@@ -347,6 +350,39 @@ export function Produto() {
             </select>
           </div>
 
+          {/* Seleções de combo (sabores de pizza, bebidas) */}
+          {produto.comboItens?.length ? (
+            <div className="produto-montar__combo-selecoes">
+              {produto.comboItens.map((slot) => {
+                const opcoes = slot.opcoesIds.map((oid) => getProdutoPorId(oid)).filter(Boolean)
+                const selecionado = comboSelecoes[slot.id] ?? ''
+                return (
+                  <div key={slot.id} className="produto-montar__combo-slot">
+                    <label className="produto-montar__field-label" htmlFor={`combo-${slot.id}`}>
+                      {slot.titulo}
+                    </label>
+                    <select
+                      id={`combo-${slot.id}`}
+                      className="produto-montar__select"
+                      value={selecionado}
+                      onChange={(e) =>
+                        setComboSelecoes((prev) => ({ ...prev, [slot.id]: e.target.value }))
+                      }
+                      required
+                    >
+                      <option value="">Escolha o sabor</option>
+                      {opcoes.map((op) => (
+                        <option key={op!.id} value={op!.id}>
+                          {op!.nome}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )
+              })}
+            </div>
+          ) : null}
+
           <div className="produto-montar__card">
             <div className="produto-montar__col produto-montar__col--esq">
               <div className="produto-montar__bloco-qtd">
@@ -457,10 +493,16 @@ export function Produto() {
             <button
               type="button"
               className="btn btn--primario"
-              disabled={bloqueadoMeioMeio}
-              title={bloqueadoMeioMeio ? 'Selecione o segundo sabor para meio a meio' : undefined}
+              disabled={bloqueado}
+              title={
+                bloqueadoMeioMeio
+                  ? 'Selecione o segundo sabor para meio a meio'
+                  : bloqueadoCombo
+                    ? 'Selecione todos os itens do combo'
+                    : undefined
+              }
               onClick={() => {
-                if (bloqueadoMeioMeio) return
+                if (bloqueado) return
                 const segundo =
                   partes === 'meio-meio' && segundoSaborId
                     ? (() => {
@@ -468,21 +510,26 @@ export function Produto() {
                         return pz ? { produtoId: pz.id, nome: pz.nome } : undefined
                       })()
                     : undefined
+                const selecoes: ComboSelecao[] | undefined = produto.comboItens?.length
+                  ? produto.comboItens.map((slot) => {
+                      const prod = getProdutoPorId(comboSelecoes[slot.id] ?? '')
+                      return {
+                        slotId: slot.id,
+                        titulo: slot.titulo,
+                        produtoId: comboSelecoes[slot.id] ?? '',
+                        nome: prod?.nome ?? '',
+                        quantidade: slot.quantidade,
+                      }
+                    })
+                  : undefined
                 adicionarAoCarrinho(produto, tamanho, {
                   quantidade: qtdCompra,
                   partes: produto.categoria === 'pizzas' ? partes : undefined,
                   segundoSabor: segundo,
                   adicionais: adicionaisSelecionados.length ? adicionaisSelecionados : undefined,
+                  comboSelecoes: selecoes,
                 })
                 setFeedbackCarrinho(true)
-                const next = fluxoProximaCategoria[produto.categoria]
-                window.setTimeout(() => {
-                  if (next === 'carrinho') {
-                    navigate('/carrinho')
-                    return
-                  }
-                  navigate(`/cardapio/${next}`)
-                }, CARRINHO_TOAST_NAV_DELAY_MS)
               }}
             >
               Adicionar ao carrinho
@@ -526,41 +573,7 @@ export function Produto() {
         </section>
       ) : null}
 
-      <section className="produto-reviews" aria-labelledby="reviews-titulo">
-        <h2 id="reviews-titulo" className="processo__titulo">
-          Avaliações
-        </h2>
-        {listaReviews.length === 0 && <p>Nenhuma avaliação ainda. Seja o primeiro a nos avaliar no Ifood!</p>}
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {listaReviews.map((r) => (
-            <li key={r.id} style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--border)' }}>
-              <strong>{r.nome}</strong> — {r.nota}/5
-              <p style={{ margin: '0.35rem 0 0' }}>{r.comentario}</p>
-            </li>
-          ))}
-        </ul>
-        {usuario ? (
-          <form onSubmit={enviarReview} style={{ marginTop: '1rem' }}>
-            <label htmlFor="nota" style={{ display: 'block', fontWeight: 600 }}>
-              Nota
-            </label>
-            <select id="nota" value={nota} onChange={(e) => setNota(Number(e.target.value))}>
-              {[5, 4, 3, 2, 1].map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
-            <label htmlFor="com" style={{ display: 'block', fontWeight: 600, marginTop: 8 }}>
-              Comentário
-            </label>
-            <textarea id="com" value={comentario} onChange={(e) => setComentario(e.target.value)} rows={3} style={{ width: '100%', maxWidth: '100%' }} />
-            <button type="submit" className="btn btn--secundario" style={{ marginTop: 8 }}>
-              Publicar
-            </button>
-          </form>
-        ) : null}
-      </section>
+      <ProdutoReviews produtoId={produto.id} avaliacoes={listaReviews} />
     </article>
   )
 }

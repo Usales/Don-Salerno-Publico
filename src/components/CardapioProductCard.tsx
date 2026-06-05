@@ -1,8 +1,9 @@
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import type { Produto } from '@/types'
 import { brl } from '@/lib/format'
 import { ComboDualImage } from '@/components/ComboDualImage'
+import { useFavorites } from '@/stores/useFavorites'
 
 const produtoPath = (id: string) => `/produto/${id}`
 
@@ -53,14 +54,18 @@ function IconEye() {
 }
 
 export function CardapioProductCard({ produto: p }: { produto: Produto }) {
-  const [favorito, setFavorito] = useState(false)
+  const favorito = useFavorites((s) => s.isFav(p.id))
+  const toggleFav = useFavorites((s) => s.toggle)
   const to = produtoPath(p.id)
 
-  const toggleFav = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setFavorito((v) => !v)
-  }, [])
+  const handleToggleFav = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      toggleFav(p.id)
+    },
+    [toggleFav, p.id],
+  )
 
   return (
     <article className="pcard">
@@ -96,7 +101,7 @@ export function CardapioProductCard({ produto: p }: { produto: Produto }) {
       <button
         type="button"
         className={`pcard__fav${favorito ? ' pcard__fav--on' : ''}`}
-        onClick={toggleFav}
+        onClick={handleToggleFav}
         aria-label={favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
         aria-pressed={favorito}
       >
@@ -106,7 +111,7 @@ export function CardapioProductCard({ produto: p }: { produto: Produto }) {
         <button
           type="button"
           className={`pcard__rail-btn pcard__rail-btn--heart${favorito ? ' pcard__rail-btn--heart-on' : ''}`}
-          onClick={toggleFav}
+          onClick={handleToggleFav}
           aria-label={favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
           aria-pressed={favorito}
         >

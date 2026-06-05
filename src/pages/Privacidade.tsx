@@ -30,9 +30,10 @@ export function Privacidade() {
 
       <h2>2. Quais dados coletamos</h2>
       <p>
-        <strong>Este site não oferece criação de conta nem cadastro de usuários.</strong> Não coletamos nome, e-mail,
-        telefone ou endereço por meio de formulário de cadastro neste endereço. Os dados pessoais que podemos tratar
-        decorrem sobretudo do uso dos canais abaixo:
+        O site oferece criação de conta opcional para facilitar avaliações de produtos e histórico de preferências.
+        Os dados coletados no cadastro incluem: <strong>nome, e-mail, telefone e endereço</strong> (opcional).
+        Esses dados são armazenados localmente no navegador (localStorage) como parte do funcionamento da aplicação.
+        Além disso, podemos tratar dados pessoais decorrentes dos canais abaixo:
       </p>
       <ul>
         <li>

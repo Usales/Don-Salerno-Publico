@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { Link } from 'react-router-dom'
@@ -19,6 +19,9 @@ Don Salerno`
 export function Carrinho() {
   const [mostrarAvisoPedido, setMostrarAvisoPedido] = useState(false)
   const [avisoPedidoLido, setAvisoPedidoLido] = useState(false)
+  const [enviandoPedido, setEnviandoPedido] = useState(false)
+  const modalRef = useRef<HTMLDivElement>(null)
+  const triggerRef = useRef<HTMLButtonElement | null>(null)
   const {
     itens,
     observacaoPedido,
@@ -48,7 +51,17 @@ export function Carrinho() {
     limparCarrinho()
   }, [limparCarrinho])
 
+  // Auto-focus no modal ao abrir
+  useEffect(() => {
+    if (mostrarAvisoPedido && modalRef.current) {
+      const first = modalRef.current.querySelector<HTMLElement>('button, [href], input, select, textarea')
+      first?.focus()
+    }
+  }, [mostrarAvisoPedido])
+
   const enviarPedidoWhatsapp = useCallback(() => {
+    if (enviandoPedido) return
+    setEnviandoPedido(true)
     const linhas = itens
       .map((linha) => {
         const meioTxt =
@@ -62,10 +75,13 @@ export function Carrinho() {
         const extrasTxt = linha.adicionais?.length
           ? ` | Adicionais: ${linha.adicionais.map((a) => `${a.nome} (${brl(a.preco)})`).join(', ')}`
           : ''
+        const comboTxt = linha.comboSelecoes?.length
+          ? `\n  ↳ ${linha.comboSelecoes.map((s) => `${s.titulo}: ${s.nome}`).join(' | ')}`
+          : ''
         return (
           `- ${linha.nome}${meioTxt} | Tam. ${linha.tamanho}${extrasTxt} | Qtd: ${linha.quantidade} | Total: ${brl(
             linha.precoUnit * linha.quantidade,
-          )}`
+          )}${comboTxt}`
         )
       })
       .join('\n')
@@ -85,7 +101,9 @@ export function Carrinho() {
       limparCarrinho()
       setAvisoPedidoLido(false)
     }
-  }, [itens, limparCarrinho, observacaoPedido, subtotal, total])
+    // Cooldown de 2s para evitar múltiplos envios
+    window.setTimeout(() => setEnviandoPedido(false), 2000)
+  }, [itens, limparCarrinho, observacaoPedido, subtotal, total, enviandoPedido])
 
   const onEnviarPedido = useCallback(() => {
     if (!avisoPedidoLido) {
@@ -171,6 +189,15 @@ export function Carrinho() {
                         <span className="cart-table__extras">
                           + {linha.adicionais.map((a) => a.nome).join(', ')}
                         </span>
+                      ) : null}
+                      {linha.comboSelecoes?.length ? (
+                        <ul className="cart-table__combo-selecoes">
+                          {linha.comboSelecoes.map((s) => (
+                            <li key={s.slotId}>
+                              <strong>{s.titulo}:</strong> {s.nome}
+                            </li>
+                          ))}
+                        </ul>
                       ) : null}
                     </td>
                     <td className="cart-table__td cart-table__td--num">
@@ -283,7 +310,13 @@ export function Carrinho() {
             </dl>
 
             <div className="cart-enviar-wrap">
-              <button type="button" className="cart-enviar-btn" onClick={onEnviarPedido}>
+              <button
+                type="button"
+                className="cart-enviar-btn"
+                onClick={onEnviarPedido}
+                disabled={enviandoPedido}
+                ref={triggerRef}
+              >
                 <svg className="cart-enviar-btn__icon" viewBox="0 0 24 24" aria-hidden>
                   <path
                     fill="currentColor"
@@ -304,6 +337,29 @@ export function Carrinho() {
               role="dialog"
               aria-modal="true"
               aria-labelledby="cart-aviso-titulo"
+              ref={modalRef}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  setMostrarAvisoPedido(false)
+                  triggerRef.current?.focus()
+                }
+                // Focus trap
+                if (e.key === 'Tab' && modalRef.current) {
+                  const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+                    'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+                  )
+                  if (focusable.length === 0) return
+                  const first = focusable[0]
+                  const last = focusable[focusable.length - 1]
+                  if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault()
+                    last.focus()
+                  } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault()
+                    first.focus()
+                  }
+                }
+              }}
             >
               <div className="cart-aviso-modal__box">
                 <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
@@ -314,7 +370,10 @@ export function Carrinho() {
                   <button
                     type="button"
                     className="btn btn--secundario"
-                    onClick={() => setMostrarAvisoPedido(false)}
+                    onClick={() => {
+                      setMostrarAvisoPedido(false)
+                      triggerRef.current?.focus()
+                    }}
                   >
                     Cancelar
                   </button>
