@@ -6,6 +6,10 @@
   position: sticky;
   top: max(8px, env(safe-area-inset-top, 0px));
   z-index: 100;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .site-header__inner {
@@ -211,8 +215,8 @@
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  /* overflow-x: clip impede scroll horizontal indevido em mobile */
-  overflow-x: clip;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 /* Home: overflow visible para animações do hero carousel (throw) */
@@ -230,6 +234,10 @@
   background: linear-gradient(180deg, #1c1917 0%, #141210 100%);
   color: var(--site-footer-muted);
   border-top: 1px solid var(--site-footer-line);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .site-footer a {
