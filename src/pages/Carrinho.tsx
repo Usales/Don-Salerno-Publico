@@ -51,6 +51,34 @@ export function Carrinho() {
     limparCarrinho()
   }, [limparCarrinho])
 
+  // Bloqueia scroll da página (incl. horizontal do carrinho) enquanto o modal está aberto
+  useEffect(() => {
+    if (!mostrarAvisoPedido) return
+
+    const scrollX = window.scrollX
+    const scrollY = window.scrollY
+    const { style: bodyStyle } = document.body
+    const { style: htmlStyle } = document.documentElement
+    const prevBodyOverflow = bodyStyle.overflow
+    const prevBodyOverflowX = bodyStyle.overflowX
+    const prevHtmlOverflow = htmlStyle.overflow
+    const prevHtmlOverflowX = htmlStyle.overflowX
+
+    bodyStyle.overflow = 'hidden'
+    bodyStyle.overflowX = 'hidden'
+    htmlStyle.overflow = 'hidden'
+    htmlStyle.overflowX = 'hidden'
+    window.scrollTo(0, scrollY)
+
+    return () => {
+      bodyStyle.overflow = prevBodyOverflow
+      bodyStyle.overflowX = prevBodyOverflowX
+      htmlStyle.overflow = prevHtmlOverflow
+      htmlStyle.overflowX = prevHtmlOverflowX
+      window.scrollTo(scrollX, scrollY)
+    }
+  }, [mostrarAvisoPedido])
+
   // Auto-focus no modal ao abrir (preventScroll evita que o mobile role até o rodapé e oculte a mensagem)
   useEffect(() => {
     if (!mostrarAvisoPedido || !modalRef.current) return
