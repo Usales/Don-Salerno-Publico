@@ -547,29 +547,34 @@
   }
 }
 
-/* Mobile: modal em tela cheia para evitar corte e arrasto horizontal */
+/* Mobile: modal em tela cheia — position:fixed no box garante cobertura total da viewport */
 @media (max-width: 559px) {
   .cart-aviso-modal {
     padding: 0;
-    align-items: stretch;
-    justify-content: stretch;
   }
 
   .cart-aviso-modal__box {
+    /* fixed + inset:0 = preenche viewport diretamente, sem depender do pai */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     width: 100%;
-    height: 100dvh;
     height: 100%;
     max-height: none;
     border-radius: 0;
     border: none;
     box-shadow: none;
+    margin: 0;
     padding: max(1.5rem, env(safe-area-inset-top, 0px)) 1.25rem max(1.5rem, env(safe-area-inset-bottom, 0px));
     display: flex;
     flex-direction: column;
     overflow-x: hidden;
     overflow-y: auto;
-    flex-shrink: 0;
-    margin: 0;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+    z-index: 1001;
   }
 
   .cart-aviso-modal__titulo {
@@ -578,7 +583,7 @@
   }
 
   .cart-aviso-modal__texto {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
     margin-top: 0.75rem;
     font-size: 0.95rem;
