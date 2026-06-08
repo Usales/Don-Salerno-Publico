@@ -124,25 +124,6 @@ function esfihaSabor(
   }
 }
 
-function sobremesaSabor(
-  o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
-    ingredientes?: string[]
-    ingredientesCardapio?: string
-    alergenos?: string[]
-    imagemDestaque?: string
-  },
-): Produto {
-  return {
-    ...o,
-    categoria: 'sobremesas',
-    ingredientes: o.ingredientes ?? [o.descricao],
-    ingredientesCardapio: o.ingredientesCardapio,
-    alergenos: o.alergenos ?? ['Pode conter glúten, lactose e oleaginosas.'],
-    massas: [],
-    adicionais: [],
-  }
-}
-
 /** Bebidas (garrafa / lata): sem massa nem adicionais de pizza; preço único em P no app. */
 function bebidaItem(
   o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'precos' | 'tempoPreparoMin'> & {
@@ -512,19 +493,6 @@ export const produtos: Produto[] = [
     precos: { P: 15, M: 19, G: 25 },
     ingredientes: ['Creme de chocolate', 'M&Ms', 'massa doce'],
     alergenos: ['Contém glúten e lactose. Pode conter amendoim e oleaginosas.'],
-  }),
-  sobremesaSabor({
-    id: 's2',
-    slug: 'trufas-tiramisu',
-    nome: 'Trufas de Tiramisu',
-    descricao:
-      'Trufas artesanais com cacau intenso e notas suaves de café no estilo tiramisu. Sobremesa sofisticada para quem gosta de sabor elegante.',
-    tempoPreparoMin: 6,
-    imagem: '/hero-sobremesa-trufas-tiramisu.png',
-    imagemDestaque: '/hero-sobremesa-trufas-tiramisu.png',
-    precos: { P: 6.4, M: 32, G: 64 },
-    ingredientes: ['Cacau', 'massa de biscoito champagne', 'café'],
-    alergenos: ['Pode conter glúten, lactose e ovos.'],
   }),
   /* Gatorade — fotos reais enviadas (ordem: limão, laranja, uva, maracujá; morango & maracujá = última imagem) */
   bebidaItem({
@@ -915,7 +883,8 @@ export const produtos: Produto[] = [
     ingredientes: ['Pizza 35cm (sabor tradicional)', 'Pizza 25cm (sabor tradicional)', 'Refrigerante 2L'],
     alergenos: ['Contém glúten e lactose.'],
     tempoPreparoMin: 28,
-    imagem: '/hero-pizza.png',
+    imagem: '/combos/combo-premium.png',
+    imagemDestaque: '/combos/combo-premium.png',
     precos: { P: 144.9, M: 144.9, G: 144.9 },
     massas: [],
     adicionais: [],
@@ -934,7 +903,8 @@ export const produtos: Produto[] = [
     ingredientes: ['2 Pizzas 35cm (sabores tradicionais)', 'Refrigerante 2L'],
     alergenos: ['Contém glúten e lactose.'],
     tempoPreparoMin: 30,
-    imagem: '/hero-pizza.png',
+    imagem: '/combos/combo-familia.png',
+    imagemDestaque: '/combos/combo-familia.png',
     precos: { P: 159.9, M: 159.9, G: 159.9 },
     massas: [],
     adicionais: [],
@@ -953,7 +923,8 @@ export const produtos: Produto[] = [
     ingredientes: ['3 Pizzas 35cm (sabores tradicionais)', '2 Refrigerantes 2L'],
     alergenos: ['Contém glúten e lactose.'],
     tempoPreparoMin: 38,
-    imagem: '/hero-pizza.png',
+    imagem: '/combos/combo-festa.png',
+    imagemDestaque: '/combos/combo-festa.png',
     precos: { P: 249.9, M: 249.9, G: 249.9 },
     massas: [],
     adicionais: [],
@@ -969,8 +940,6 @@ export const produtos: Produto[] = [
 
 /** Slugs antigos (receitas de massa / molho) → id de produto atual. */
 const slugLegadoParaId: Record<string, string> = {
-  s1: 's2',
-  'milky-acai': 's2',
   'dom-camilo': 'p33',
   margherita: 'p1',
   calabresa: 'p2',

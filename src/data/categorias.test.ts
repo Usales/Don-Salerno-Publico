@@ -1,13 +1,12 @@
 import { categoriasOrdenadas, rotulosCategoria } from './categorias'
 
 describe('categorias', () => {
-  it('mantém ordem fixa pizzas → esfihas → calzones → sobremesas → bebidas', () => {
+  it('mantém ordem fixa pizzas → esfihas → calzones → combos → bebidas', () => {
     expect(categoriasOrdenadas).toEqual([
       'pizzas',
       'esfihas',
       'calzones',
       'combos',
-      'sobremesas',
       'bebidas',
     ])
   })
@@ -17,7 +16,6 @@ describe('categorias', () => {
     expect(rotulosCategoria.esfihas).toBe('Esfihas')
     expect(rotulosCategoria.calzones).toBe('Calzones')
     expect(rotulosCategoria.combos).toBe('Combos')
-    expect(rotulosCategoria.sobremesas).toBe('Sobremesas')
     expect(rotulosCategoria.bebidas).toBe('Bebidas')
   })
 })

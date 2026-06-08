@@ -5,7 +5,6 @@ export const rotulosCategoria: Record<Categoria, string> = {
   esfihas: 'Esfihas',
   calzones: 'Calzones',
   combos: 'Combos',
-  sobremesas: 'Sobremesas',
   bebidas: 'Bebidas',
 }
 
@@ -14,6 +13,5 @@ export const categoriasOrdenadas: Categoria[] = [
   'esfihas',
   'calzones',
   'combos',
-  'sobremesas',
   'bebidas',
 ]

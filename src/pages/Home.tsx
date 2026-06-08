@@ -21,7 +21,7 @@ const HERO_BEBIDAS_GATORADE_SLIDE_ID = 'hero-bebidas-gatorade'
 const HERO_BEBIDAS_GATORADE_SRC = '/hero-bebidas-gatorade.png'
 
 /** Categorias sem rotação "forno"; calzones usa flutuar próprio; bebidas usa drift suave (ver CSS). */
-const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones', 'sobremesas']
+const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones']
 
 function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
   let c = 'hero__pizza'
@@ -93,7 +93,6 @@ const HERO_CARD_TABS: { categoria: Categoria; label: string }[] = [
   { categoria: 'esfihas', label: 'Esfihas' },
   { categoria: 'calzones', label: 'Calzones' },
   { categoria: 'combos', label: 'Combos' },
-  { categoria: 'sobremesas', label: 'Sobremesas' },
   { categoria: 'bebidas', label: 'Bebidas' },
 ]
 

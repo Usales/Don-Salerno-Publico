@@ -56,9 +56,7 @@ export function Produto() {
   )
   const rotuloTamanho = useMemo<Record<TamanhoCodigo, string>>(
     () =>
-      categoriaProduto === 'sobremesas'
-        ? { P: '1', M: '5', G: '10' }
-        : categoriaProduto === 'bebidas'
+      categoriaProduto === 'bebidas'
           ? { P: '500 ml', M: '500 ml', G: '500 ml' }
           : categoriaProduto === 'combos'
             ? { P: 'Combo', M: 'Combo', G: 'Combo' }
@@ -173,9 +171,7 @@ export function Produto() {
             </ul>
           )}
           <p className="produto-hero__tempo">
-            {produto.categoria === 'sobremesas'
-              ? 'Sai da geladeira em 10 minutos.'
-              : produto.categoria === 'bebidas'
+            {produto.categoria === 'bebidas'
                 ? 'Bebida gelada — retirada rápida no balcão.'
                 : produto.categoria === 'combos'
                   ? `Preparo combinado dos itens do pacote — cerca de ${produto.tempoPreparoMin} minutos. Combine sabores no pedido.`

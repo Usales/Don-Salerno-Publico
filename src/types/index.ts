@@ -1,4 +1,4 @@
-export type Categoria = 'pizzas' | 'esfihas' | 'calzones' | 'combos' | 'sobremesas' | 'bebidas'
+export type Categoria = 'pizzas' | 'esfihas' | 'calzones' | 'combos' | 'bebidas'
 
 export type TamanhoCodigo = 'P' | 'M' | 'G'
 
