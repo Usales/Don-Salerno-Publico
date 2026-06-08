@@ -8,13 +8,38 @@ import { brl } from '@/lib/format'
 import { useCart } from '@/stores/useCart'
 import './Carrinho.css'
 
-const AVISO_PEDIDO = `Bom dia, cliente!
-
-Não fazemos entregas. Este canal é destinado apenas ao envio de pedidos para o WhatsApp corporativo, onde finalizaremos seu pedido para retirada em nosso endereço. Caso prefira entrega, recomendamos que faça o pedido pelo iFood.
-
-Atenciosamente.
-
-Don Salerno`
+function AvisoPedidoConteudo() {
+  return (
+    <div className="cart-aviso-modal__texto">
+      <p>Olá!</p>
+      <p>
+        Este canal é destinado exclusivamente ao envio de pedidos para nosso WhatsApp corporativo. Após o
+        envio, nossa equipe entrará em contato para finalizar o pedido e combinar a retirada em nosso
+        estabelecimento.
+      </p>
+      <p>
+        <strong>Não realizamos entregas.</strong>
+      </p>
+      <p>
+        Caso prefira receber seu pedido em casa, recomendamos utilizar o <strong>iFood</strong>, onde o
+        serviço de entrega está disponível.
+      </p>
+      <p>
+        <strong>Formas de pagamento aceitas:</strong>
+      </p>
+      <ul className="cart-aviso-modal__lista">
+        <li>Pix</li>
+        <li>Cartão de crédito</li>
+        <li>Cartão de débito</li>
+        <li>Dinheiro (preferencialmente)</li>
+      </ul>
+      <p>Agradecemos a preferência e ficamos à disposição para atendê-lo.</p>
+      <p>
+        <strong>Don Salerno</strong>
+      </p>
+    </div>
+  )
+}
 
 export function Carrinho() {
   const [mostrarAvisoPedido, setMostrarAvisoPedido] = useState(false)
@@ -395,7 +420,7 @@ export function Carrinho() {
                   <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
                     Aviso importante
                   </h2>
-                  <p className="cart-aviso-modal__texto">{AVISO_PEDIDO}</p>
+                  <AvisoPedidoConteudo />
                 </div>
                 <div className="cart-aviso-modal__acoes">
                   <button
