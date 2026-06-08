@@ -51,12 +51,13 @@ export function Carrinho() {
     limparCarrinho()
   }, [limparCarrinho])
 
-  // Auto-focus no modal ao abrir
+  // Auto-focus no modal ao abrir (preventScroll evita que o mobile role até o rodapé e oculte a mensagem)
   useEffect(() => {
-    if (mostrarAvisoPedido && modalRef.current) {
-      const first = modalRef.current.querySelector<HTMLElement>('button, [href], input, select, textarea')
-      first?.focus()
-    }
+    if (!mostrarAvisoPedido || !modalRef.current) return
+    const conteudo = modalRef.current.querySelector<HTMLElement>('.cart-aviso-modal__conteudo')
+    conteudo?.scrollTo(0, 0)
+    const first = modalRef.current.querySelector<HTMLElement>('button, [href], input, select, textarea')
+    first?.focus({ preventScroll: true })
   }, [mostrarAvisoPedido])
 
   const enviarPedidoWhatsapp = useCallback(() => {
@@ -362,10 +363,12 @@ export function Carrinho() {
               }}
             >
               <div className="cart-aviso-modal__box">
-                <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
-                  Aviso importante
-                </h2>
-                <p className="cart-aviso-modal__texto">{AVISO_PEDIDO}</p>
+                <div className="cart-aviso-modal__conteudo">
+                  <h2 id="cart-aviso-titulo" className="cart-aviso-modal__titulo">
+                    Aviso importante
+                  </h2>
+                  <p className="cart-aviso-modal__texto">{AVISO_PEDIDO}</p>
+                </div>
                 <div className="cart-aviso-modal__acoes">
                   <button
                     type="button"
