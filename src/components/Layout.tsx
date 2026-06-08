@@ -7,7 +7,9 @@ import { ScrollToTop } from './ScrollToTop'
 export function Layout() {
   const { pathname } = useLocation()
   const mainClass =
-    pathname === '/carrinho' ? 'main-area main-area--cart' : 'main-area'
+    pathname === '/'
+      ? 'main-area main-area--home'
+      : 'main-area'
 
   return (
     <>

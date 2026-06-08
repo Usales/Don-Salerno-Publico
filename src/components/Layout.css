@@ -211,13 +211,13 @@
   min-width: 0;
   width: 100%;
   max-width: 100%;
-  /* Não usar overflow-x: clip aqui — corta animação do hero (throw) e sombras; html/body já limitam scroll horizontal */
-  overflow-x: visible;
+  /* overflow-x: clip impede scroll horizontal indevido em mobile */
+  overflow-x: clip;
 }
 
-/* Carrinho: sem barra de rolagem horizontal na página; tabela continua com scroll oculto em Carrinho.css */
-.main-area--cart {
-  overflow-x: clip;
+/* Home: overflow visible para animações do hero carousel (throw) */
+.main-area--home {
+  overflow-x: visible;
 }
 
 /* Rodapé corporativo (fundo escuro, colunas, dados cadastrais) */

@@ -33,6 +33,7 @@ html {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -59,6 +60,7 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;
+  overscroll-behavior-x: none;
 }
 
 #root {
