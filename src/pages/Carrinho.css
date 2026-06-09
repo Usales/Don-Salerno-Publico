@@ -40,6 +40,10 @@
   font-weight: 800;
 }
 
+.cart-page__aviso-esfihas {
+  margin-bottom: 1rem;
+}
+
 .cart-page__vazio {
   color: var(--text-muted);
   font-size: 1.05rem;

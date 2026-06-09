@@ -5,7 +5,7 @@ import { ComboDualImage } from '@/components/ComboDualImage'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { ProdutoReviews } from '@/components/ProdutoReviews'
 import { rotulosCategoria } from '@/data/categorias'
-import { getProdutoPorId, getProdutosPorCategoria } from '@/data/produtos'
+import { getProdutoPorId, getProdutosPorCategoria, PEDIDO_MINIMO_ESFIHAS } from '@/data/produtos'
 import { brl } from '@/lib/format'
 import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
@@ -161,6 +161,11 @@ export function Produto() {
           <p className="produto-hero__descricao">
             {produto.receita?.resumo ?? produto.descricao}
           </p>
+          {produto.categoria === 'esfihas' ? (
+            <p className="cardapio-aviso" role="note">
+              {brl(produto.precos.P)} por unidade. Pedido mínimo de esfihas: {brl(PEDIDO_MINIMO_ESFIHAS)}.
+            </p>
+          ) : null}
           {produto.receita && (
             <ul className="receita-topicos" aria-label="Tópicos da receita">
               {produto.receita.topicos.map((t) => (

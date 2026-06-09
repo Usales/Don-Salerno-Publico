@@ -4,7 +4,8 @@ import type { Categoria } from '@/types'
 import { CardapioProductCard } from '@/components/CardapioProductCard'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { categoriasOrdenadas, rotulosCategoria } from '@/data/categorias'
-import { produtos } from '@/data/produtos'
+import { PEDIDO_MINIMO_ESFIHAS, produtos } from '@/data/produtos'
+import { brl } from '@/lib/format'
 
 const validas = categoriasOrdenadas
 
@@ -86,6 +87,11 @@ export function Cardapio() {
           </div>
 
           <h2 className="visually-hidden">{rotulosCategoria[cat]}</h2>
+          {cat === 'esfihas' ? (
+            <p className="cardapio-aviso" role="note">
+              Esfihas a {brl(5)} cada. Pedido mínimo de esfihas: {brl(PEDIDO_MINIMO_ESFIHAS)}.
+            </p>
+          ) : null}
           <div className="menu-panel menu-panel--cards">
             {lista.length === 0 ? (
               <div className="cardapio-vazio-wrap">

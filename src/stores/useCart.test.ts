@@ -3,16 +3,16 @@ import type { Produto } from '@/types'
 
 // Produto mock para testes
 const pizzaMock: Produto = {
-  id: 'p1',
-  nome: 'Margherita',
-  slug: 'margherita',
+  id: 'p11',
+  nome: 'Baiana',
+  slug: 'baiana',
   categoria: 'pizzas',
-  descricao: 'Pizza de margherita',
-  ingredientes: ['Molho', 'Mussarela', 'Manjericão'],
+  descricao: 'Pizza baiana',
+  ingredientes: ['Molho', 'Mussarela', 'Calabresa'],
   alergenos: ['Glúten', 'Lactose'],
   tempoPreparoMin: 15,
-  imagem: '/hero-pizza-margherita.png',
-  precos: { P: 49.9, M: 62, G: 76 },
+  imagem: '/hero-pizza-baiana.png',
+  precos: { P: 59.9, M: 68.9, G: 79.9 },
   massas: [],
   adicionais: [
     { id: 'a1', nome: 'Bacon', preco: 5 },
@@ -38,7 +38,7 @@ const esfihaMock: Produto = {
 // Mock do getProdutoPorId
 jest.mock('@/data/produtos', () => ({
   getProdutoPorId: (id: string) => {
-    if (id === 'p1') return pizzaMock
+    if (id === 'p11') return pizzaMock
     if (id === 'e1') return esfihaMock
     return undefined
   },
@@ -55,10 +55,10 @@ describe('useCart', () => {
     useCart.getState().adicionar(pizzaMock, 'P')
     const { itens } = useCart.getState()
     expect(itens).toHaveLength(1)
-    expect(itens[0].produtoId).toBe('p1')
+    expect(itens[0].produtoId).toBe('p11')
     expect(itens[0].tamanho).toBe('P')
     expect(itens[0].quantidade).toBe(1)
-    expect(itens[0].precoUnit).toBe(49.9)
+    expect(itens[0].precoUnit).toBe(59.9)
   })
 
   it('incrementa quantidade ao adicionar o mesmo item', () => {
@@ -80,7 +80,7 @@ describe('useCart', () => {
     useCart.getState().adicionar(pizzaMock, 'P')
     useCart.getState().adicionar(pizzaMock, 'G')
     const subtotal = useCart.getState().subtotal()
-    expect(subtotal).toBeCloseTo(49.9 + 76, 2)
+    expect(subtotal).toBeCloseTo(59.9 + 79.9, 2)
   })
 
   it('remove item do carrinho', () => {
@@ -125,10 +125,10 @@ describe('useCart', () => {
   })
 
   it('calcula desconto corretamente', () => {
-    useCart.getState().adicionar(pizzaMock, 'G') // 76
+    useCart.getState().adicionar(pizzaMock, 'G') // 79.9
     useCart.getState().aplicarCupom('PIZZA15') // 15%
     const desconto = useCart.getState().descontoValor()
-    expect(desconto).toBeCloseTo(76 * 0.15, 2)
+    expect(desconto).toBeCloseTo(79.9 * 0.15, 2)
   })
 
   it('total nunca é negativo', () => {
@@ -158,7 +158,7 @@ describe('useCart', () => {
     })
     const { itens } = useCart.getState()
     expect(itens[0].adicionais).toHaveLength(1)
-    expect(itens[0].precoUnit).toBeCloseTo(49.9 + 5, 2)
+    expect(itens[0].precoUnit).toBeCloseTo(59.9 + 5, 2)
   })
 
   it('totalItens soma todas as quantidades', () => {

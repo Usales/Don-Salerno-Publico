@@ -2,8 +2,8 @@ import type { Produto, TamanhoCodigo } from '@/types'
 
 const massasPadrao: Produto['massas'] = [
   { id: 'italiana', nome: 'Massa italiana', descricao: 'Tradicional com fermentação lenta.', adicional: 0 },
-  { id: 'integral', nome: 'Integral', descricao: 'Farinha integral.', adicional: 4 },
-  { id: 'sem-gluten', nome: 'Sem glúten', descricao: 'Base dedicada; pode conter traços de glúten.', adicional: 12 },
+  { id: 'integral', nome: 'Integral', descricao: 'Farinha integral.', adicional: 4.4 },
+  { id: 'sem-gluten', nome: 'Sem glúten', descricao: 'Base dedicada; pode conter traços de glúten.', adicional: 13.3 },
 ]
 
 const adicionaisPadrao: Produto['adicionais'] = []
@@ -18,12 +18,17 @@ function linhaCardapioParaItens(linha: string): string[] {
 
 type FaixaPrecoCardapio = 'promo' | 'trad' | 'especial' | 'nobre' | 'doce'
 
+/** Valor mínimo do pedido quando o carrinho contém esfihas. */
+export const PEDIDO_MINIMO_ESFIHAS = 25
+
+const PRECOS_ESFIHA: Record<TamanhoCodigo, number> = { P: 5, M: 5, G: 5 }
+
 const precosPorFaixa: Record<FaixaPrecoCardapio, Record<TamanhoCodigo, number>> = {
-  promo: { P: 59.9, M: 62, G: 79.9 },
-  trad: { P: 59.9, M: 72, G: 79.9 },
-  especial: { P: 59.9, M: 76, G: 79.9 },
-  nobre: { P: 59.9, M: 82, G: 79.9 },
-  doce: { P: 59.9, M: 76, G: 79.9 },
+  promo: { P: 59.9, M: 68.9, G: 79.9 },
+  trad: { P: 59.9, M: 80, G: 79.9 },
+  especial: { P: 59.9, M: 84.4, G: 79.9 },
+  nobre: { P: 59.9, M: 91.1, G: 79.9 },
+  doce: { P: 59.9, M: 84.4, G: 79.9 },
 }
 
 /** Califórnia: não repetir o nome do sabor na lista de ingredientes (pedido do cardápio). */
@@ -106,7 +111,8 @@ function pizzaSabor(
 }
 
 function esfihaSabor(
-  o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'precos' | 'tempoPreparoMin'> & {
+  o: Pick<Produto, 'id' | 'slug' | 'nome' | 'descricao' | 'imagem' | 'tempoPreparoMin'> & {
+    precos?: Record<TamanhoCodigo, number>
     ingredientes?: string[]
     ingredientesCardapio?: string
     alergenos?: string[]
@@ -116,6 +122,7 @@ function esfihaSabor(
   return {
     ...o,
     categoria: 'esfihas',
+    precos: o.precos ?? PRECOS_ESFIHA,
     ingredientes: o.ingredientes ?? [o.descricao],
     ingredientesCardapio: o.ingredientesCardapio,
     alergenos: o.alergenos ?? [alergenoPizzaPadrao],
@@ -150,8 +157,8 @@ function bebidaItem(
 
 /** IDs de pizzas tradicionais (promo + trad) para seleção em combos. */
 const PIZZAS_TRAD_IDS = [
-  'p11', 'p2', 'p4', 'p1', 'p12', 'p18', // promo
-  'p20', 'p21', 'p22', 'p6', 'p23', 'p24', 'p25', 'p26', 'p8', 'p3', 'p28', // trad
+  'p11', 'p2', 'p4', 'p12', // salgadas
+  'p20', 'p21', 'p22', 'p6', 'p23', 'p26', // salgadas
 ]
 
 /** IDs de refrigerantes lata 350 ml para combos. */
@@ -194,17 +201,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, catupiry, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p1',
-    slug: 'margherita',
-    nome: 'Marguerita',
-    descricao: 'A clássica Marguerita do cardápio.',
-    tempoPreparoMin: 22,
-    imagem: '/hero-pizza-margherita.png',
-    imagemDestaque: '/hero-pizza-margherita-destaque.png',
-    precos: precosPorFaixa.promo,
-    ingredientesCardapio: 'Molho, mussarela, manjericão, catupiry, tomate e orégano',
-  }),
-  pizzaSabor({
     id: 'p12',
     slug: 'mussarela',
     nome: 'Mussarela',
@@ -213,16 +209,6 @@ export const produtos: Produto[] = [
     imagem: '/hero-pizza-mussarela.png',
     precos: precosPorFaixa.promo,
     ingredientesCardapio: 'Molho, mussarela, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p18',
-    slug: 'presunto',
-    nome: 'Presunto',
-    descricao: 'Tradicional presunto com mussarela e tomate.',
-    tempoPreparoMin: 22,
-    imagem: '/hero-pizza-portuguesa.png',
-    precos: precosPorFaixa.promo,
-    ingredientesCardapio: 'Molho, mussarela, presunto, tomate e orégano',
   }),
   pizzaSabor({
     id: 'p20',
@@ -275,26 +261,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, frango, cheddar, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p24',
-    slug: 'frango-ao-creme',
-    nome: 'Frango ao Creme',
-    descricao: 'Frango com creme de leite, milho e cebola.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza-frango-catupiry.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, frango, creme de leite, milho, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p25',
-    slug: 'frango-com-bacon',
-    nome: 'Frango com bacon',
-    descricao: 'Frango desfiado com bacon e cebola.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza-frango-catupiry.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, frango desfiado, bacon, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
     id: 'p26',
     slug: 'lombo',
     nome: 'Lombo',
@@ -305,117 +271,6 @@ export const produtos: Produto[] = [
     ingredientesCardapio: 'Molho, mussarela, lombo defumado, tomate e orégano',
   }),
   pizzaSabor({
-    id: 'p8',
-    slug: 'napolitana',
-    nome: 'Napolitana',
-    descricao: 'Presunto, palmito e cebola no estilo tradicional do cardápio.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-napolitana.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, presunto, palmito, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p3',
-    slug: 'portuguesa',
-    nome: 'Portuguesa',
-    descricao: 'Presunto, ovo, ervilha e cebola — a Portuguesa do cardápio.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza-portuguesa.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, presunto, ervilha, ovo, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p28',
-    slug: 'primavera',
-    nome: 'Primavera',
-    descricao: 'Calabresa ralada com catupiry e tomate.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-calabresa.png',
-    precos: precosPorFaixa.trad,
-    ingredientesCardapio: 'Molho, mussarela, calabresa ralada, catupiry, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p30',
-    slug: 'calabresa-com-bacon',
-    nome: 'Calabresa com Bacon',
-    descricao: 'Calabresa e bacon com cebola e orégano.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-calabresa.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, calabresa, bacon, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p32',
-    slug: 'calabresa-com-catupiry',
-    nome: 'Calabresa com catupiry',
-    descricao: 'Calabresa com catupiry, cebola e tomate.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-calabresa-com-catupiry.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, calabresa, catupiry, tomate e orégano, cebola',
-  }),
-  pizzaSabor({
-    id: 'p33',
-    slug: 'dom-salerno',
-    nome: 'Dom Salerno',
-    descricao: 'Presunto, calabresa e creme de leite no molho da casa.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza-dom-salerno.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, presunto, calabresa, creme de leite, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p34',
-    slug: 'frango-com-palmito',
-    nome: 'Frango com Palmito',
-    descricao: 'Frango com palmito e catupiry.',
-    tempoPreparoMin: 24,
-    imagem: '/hero-pizza-frango-com-palmito.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, frango, palmito, catupiry, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p5',
-    slug: 'quatro-queijos',
-    nome: 'Quatro Queijos',
-    descricao: 'Mussarela, provolone, catupiry e cheddar com tomate.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-quatro-queijos.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio: 'Molho, mussarela, provolone, catupiry, cheddar, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p9',
-    slug: 'vegetariana',
-    nome: 'Vegetariana',
-    descricao: 'Palmito, ervilha, milho e manjericão — vegetariana do cardápio.',
-    tempoPreparoMin: 23,
-    imagem: '/hero-pizza-vegetariana.png',
-    precos: precosPorFaixa.especial,
-    ingredientesCardapio:
-      'Molho, mussarela, palmito, ervilha, milho, manjericão, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p10',
-    slug: 'carne-de-sol',
-    nome: 'Carne de Sol',
-    descricao: 'Carne de sol com catupiry e cebola, faixa nobre do cardápio.',
-    tempoPreparoMin: 25,
-    imagem: '/hero-pizza-carne-seca-cream-cheese.png',
-    precos: precosPorFaixa.nobre,
-    ingredientesCardapio: 'Molho, mussarela, carne de sol, catupiry, cebola, tomate e orégano',
-  }),
-  pizzaSabor({
-    id: 'p38',
-    slug: 'banana-doce',
-    nome: 'Banana',
-    descricao: 'Doce de banana com açúcar e canela.',
-    tempoPreparoMin: 18,
-    imagem: '/pizza-doce-banana.png',
-    precos: precosPorFaixa.doce,
-    ingredientesCardapio: 'Mussarela, banana, açúcar e canela',
-  }),
-  pizzaSabor({
     id: 'p39',
     slug: 'chocolate-doce',
     nome: 'Chocolate',
@@ -424,16 +279,6 @@ export const produtos: Produto[] = [
     imagem: '/pizza-doce-chocolate.png',
     precos: precosPorFaixa.doce,
     ingredientesCardapio: 'Mussarela, chocolate e creme de leite',
-  }),
-  pizzaSabor({
-    id: 'p13',
-    slug: 'chocolate-com-morango',
-    nome: 'Chocolate com Morango',
-    descricao: 'Chocolate, morango e creme de leite.',
-    tempoPreparoMin: 18,
-    imagem: '/hero-pizza-duo-chocolate-morango.png',
-    precos: precosPorFaixa.doce,
-    ingredientesCardapio: 'Mussarela, chocolate, morango e creme de leite',
   }),
   pizzaSabor({
     id: 'p40',
@@ -454,7 +299,6 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 16,
     imagem: '/hero-esfiha-carne-tomate-cebola.png',
     imagemDestaque: '/hero-esfiha-carne-tomate-cebola.png',
-    precos: { P: 14, M: 18, G: 24 },
     ingredientes: ['Carne moída temperada', 'tomate', 'cebola', 'massa artesanal'],
   }),
   esfihaSabor({
@@ -466,7 +310,6 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 14,
     imagem: '/hero-esfiha-mussarela.png',
     imagemDestaque: '/hero-esfiha-mussarela.png',
-    precos: { P: 13, M: 17, G: 23 },
     ingredientes: ['Mussarela', 'orégano', 'massa artesanal'],
   }),
   esfihaSabor({
@@ -478,7 +321,6 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 17,
     imagem: '/hero-esfiha-frango-catupiry.png',
     imagemDestaque: '/hero-esfiha-frango-catupiry.png',
-    precos: { P: 16, M: 20, G: 26 },
     ingredientes: ['Frango desfiado', 'catupiry', 'massa artesanal'],
   }),
   esfihaSabor({
@@ -490,8 +332,19 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 14,
     imagem: '/hero-esfiha-doce-chocolate-mms.png',
     imagemDestaque: '/hero-esfiha-doce-chocolate-mms.png',
-    precos: { P: 15, M: 19, G: 25 },
     ingredientes: ['Creme de chocolate', 'M&Ms', 'massa doce'],
+    alergenos: ['Contém glúten e lactose. Pode conter amendoim e oleaginosas.'],
+  }),
+  esfihaSabor({
+    id: 'p41',
+    slug: 'esfiha-sensacao',
+    nome: 'Esfiha Sensação',
+    descricao:
+      'Chocolate cremoso com fatias de morango frescas. Perfeita pra sua garota — ou pra quem merece um mimo doce no fim do dia.',
+    tempoPreparoMin: 14,
+    imagem: '/hero-esfiha-sensacao.png',
+    imagemDestaque: '/hero-esfiha-sensacao.png',
+    ingredientes: ['Chocolate cremoso', 'morango fresco', 'massa doce'],
     alergenos: ['Contém glúten e lactose. Pode conter amendoim e oleaginosas.'],
   }),
   /* Gatorade — fotos reais enviadas (ordem: limão, laranja, uva, maracujá; morango & maracujá = última imagem) */
@@ -503,7 +356,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-limao.png',
     imagemDestaque: '/bebidas/gatorade-limao.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   bebidaItem({
     id: 'gt-laranja',
@@ -513,7 +366,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-laranja.png',
     imagemDestaque: '/bebidas/gatorade-laranja.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   bebidaItem({
     id: 'gt-uva',
@@ -523,7 +376,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-uva.png',
     imagemDestaque: '/bebidas/gatorade-uva.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   bebidaItem({
     id: 'gt-maracuja',
@@ -533,7 +386,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-maracuja.png',
     imagemDestaque: '/bebidas/gatorade-maracuja.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   bebidaItem({
     id: 'gt-morango-maracuja',
@@ -543,7 +396,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-morango-maracuja.png',
     imagemDestaque: '/bebidas/gatorade-morango-maracuja.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   bebidaItem({
     id: 'gt-berry-blue',
@@ -553,7 +406,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-berry-blue.png',
     imagemDestaque: '/bebidas/gatorade-berry-blue.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   bebidaItem({
     id: 'gt-tangerina',
@@ -563,7 +416,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/gatorade-tangerina.png',
     imagemDestaque: '/bebidas/gatorade-tangerina.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
   /* Águas, refrigerantes e H2OH! — preços de referência; ajuste no balcão se necessário */
   bebidaItem({
@@ -574,7 +427,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/crystal-agua-15l.png',
     imagemDestaque: '/bebidas/crystal-agua-15l.png',
-    precos: { P: 7.9, M: 7.9, G: 7.9 },
+    precos: { P: 8.8, M: 8.8, G: 8.8 },
   }),
   bebidaItem({
     id: 'be-crystal-500',
@@ -584,7 +437,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/crystal-agua-500ml.png',
     imagemDestaque: '/bebidas/crystal-agua-500ml.png',
-    precos: { P: 3.9, M: 3.9, G: 3.9 },
+    precos: { P: 4.3, M: 4.3, G: 4.3 },
   }),
   bebidaItem({
     id: 'be-coca-600',
@@ -594,7 +447,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/coca-cola-600ml.png',
     imagemDestaque: '/bebidas/coca-cola-600ml.png',
-    precos: { P: 9.9, M: 9.9, G: 9.9 },
+    precos: { P: 11, M: 11, G: 11 },
   }),
   bebidaItem({
     id: 'be-coca-zero-600',
@@ -604,7 +457,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/coca-cola-zero-600ml.png',
     imagemDestaque: '/bebidas/coca-cola-zero-600ml.png',
-    precos: { P: 9.9, M: 9.9, G: 9.9 },
+    precos: { P: 11, M: 11, G: 11 },
   }),
   bebidaItem({
     id: 'be-coca-lata',
@@ -614,7 +467,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/coca-cola-lata-350ml.png',
     imagemDestaque: '/bebidas/coca-cola-lata-350ml.png',
-    precos: { P: 6.9, M: 6.9, G: 6.9 },
+    precos: { P: 7.7, M: 7.7, G: 7.7 },
   }),
   bebidaItem({
     id: 'be-coca-zero-lata',
@@ -624,7 +477,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/coca-cola-zero-lata-350ml.png',
     imagemDestaque: '/bebidas/coca-cola-zero-lata-350ml.png',
-    precos: { P: 6.9, M: 6.9, G: 6.9 },
+    precos: { P: 7.7, M: 7.7, G: 7.7 },
   }),
   bebidaItem({
     id: 'be-h2oh-limoneto',
@@ -634,16 +487,16 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 2,
     imagem: '/bebidas/h2oh-limoneto-500ml.png',
     imagemDestaque: '/bebidas/h2oh-limoneto-500ml.png',
-    precos: { P: 8.9, M: 8.9, G: 8.9 },
+    precos: { P: 9.9, M: 9.9, G: 9.9 },
   }),
-  /* Refrigerantes 2 L — usados nos combos */
+  /* Refrigerantes 2 L — usados nos combos (PNG em public/bebidas/) */
   bebidaItem({
     id: 'be-coca-2l',
     slug: 'coca-cola-2l',
     nome: 'Coca-Cola 2 L',
     descricao: 'Refrigerante sabor original — garrafa PET 2 L.',
     tempoPreparoMin: 2,
-    precos: { P: 14, M: 14, G: 14 },
+    precos: { P: 15.6, M: 15.6, G: 15.6 },
   }),
   bebidaItem({
     id: 'be-coca-zero-2l',
@@ -651,7 +504,7 @@ export const produtos: Produto[] = [
     nome: 'Coca-Cola Zero 2 L',
     descricao: 'Refrigerante cola sem açúcar — garrafa PET 2 L.',
     tempoPreparoMin: 2,
-    precos: { P: 14, M: 14, G: 14 },
+    precos: { P: 15.6, M: 15.6, G: 15.6 },
   }),
   bebidaItem({
     id: 'be-guarana-2l',
@@ -659,7 +512,7 @@ export const produtos: Produto[] = [
     nome: 'Guaraná 2 L',
     descricao: 'Refrigerante sabor guaraná — garrafa PET 2 L.',
     tempoPreparoMin: 2,
-    precos: { P: 14, M: 14, G: 14 },
+    precos: { P: 15.6, M: 15.6, G: 15.6 },
   }),
   bebidaItem({
     id: 'be-fanta-2l',
@@ -667,7 +520,7 @@ export const produtos: Produto[] = [
     nome: 'Fanta 2 L',
     descricao: 'Refrigerante sabor laranja — garrafa PET 2 L.',
     tempoPreparoMin: 2,
-    precos: { P: 14, M: 14, G: 14 },
+    precos: { P: 15.6, M: 15.6, G: 15.6 },
   }),
   bebidaItem({
     id: 'be-sprite-2l',
@@ -675,7 +528,7 @@ export const produtos: Produto[] = [
     nome: 'Sprite 2 L',
     descricao: 'Refrigerante sabor limão — garrafa PET 2 L.',
     tempoPreparoMin: 2,
-    precos: { P: 14, M: 14, G: 14 },
+    precos: { P: 15.6, M: 15.6, G: 15.6 },
   }),
   {
     id: 'c1',
@@ -688,7 +541,7 @@ export const produtos: Produto[] = [
     alergenos: ['CONTÉM TRIGO E DERIVADOS DO LEITE.'],
     tempoPreparoMin: 22,
     imagem: '/hero-calzone-presunto-queijo.png',
-    precos: { P: 32, M: 38, G: 44 },
+    precos: { P: 35.6, M: 42.2, G: 48.9 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -703,7 +556,7 @@ export const produtos: Produto[] = [
     alergenos: ['CONTÉM TRIGO E DERIVADOS DO LEITE.'],
     tempoPreparoMin: 22,
     imagem: '/hero-calzone-pepperoni.png',
-    precos: { P: 34, M: 40, G: 46 },
+    precos: { P: 37.8, M: 44.4, G: 51.1 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -728,7 +581,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 24,
     imagem: '/hero-calzone-carne-de-sol.png',
     imagemDestaque: '/hero-calzone-carne-de-sol.png',
-    precos: { P: 69.9, M: 69.9, G: 69.9 },
+    precos: { P: 77.7, M: 77.7, G: 77.7 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -743,7 +596,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 23,
     imagem: '/hero-calzone-frango-catupiry.png',
     imagemDestaque: '/hero-calzone-frango-catupiry.png',
-    precos: { P: 69.9, M: 69.9, G: 69.9 },
+    precos: { P: 77.7, M: 77.7, G: 77.7 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -769,7 +622,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 24,
     imagem: '/hero-calzone-moda.png',
     imagemDestaque: '/hero-calzone-moda.png',
-    precos: { P: 69.9, M: 69.9, G: 69.9 },
+    precos: { P: 77.7, M: 77.7, G: 77.7 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -784,7 +637,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 23,
     imagem: '/hero-calzone-quatro-queijos.png',
     imagemDestaque: '/hero-calzone-quatro-queijos.png',
-    precos: { P: 69.9, M: 69.9, G: 69.9 },
+    precos: { P: 77.7, M: 77.7, G: 77.7 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -810,7 +663,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 23,
     imagem: '/hero-calzone-vegetariana.png',
     imagemDestaque: '/hero-calzone-vegetariana.png',
-    precos: { P: 69.9, M: 69.9, G: 69.9 },
+    precos: { P: 77.7, M: 77.7, G: 77.7 },
     massas: massasPadrao,
     adicionais: adicionaisPadrao,
   },
@@ -828,7 +681,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 18,
     imagem: '/combos/combo-individual.png',
     imagemDestaque: '/combos/combo-individual.png',
-    precos: { P: 62.9, M: 62.9, G: 62.9 },
+    precos: { P: 69.9, M: 69.9, G: 69.9 },
     massas: [],
     adicionais: [],
     comboItens: [
@@ -847,7 +700,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 22,
     imagem: '/combos/combo-casal.png',
     imagemDestaque: '/combos/combo-casal.png',
-    precos: { P: 87.9, M: 87.9, G: 87.9 },
+    precos: { P: 97.7, M: 97.7, G: 97.7 },
     massas: [],
     adicionais: [],
     comboItens: [
@@ -865,7 +718,7 @@ export const produtos: Produto[] = [
     alergenos: ['Contém glúten e lactose.'],
     tempoPreparoMin: 25,
     imagem: '/combos/combo-dupla.png',
-    precos: { P: 124.9, M: 124.9, G: 124.9 },
+    precos: { P: 138.8, M: 138.8, G: 138.8 },
     massas: [],
     adicionais: [],
     comboItens: [
@@ -885,7 +738,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 28,
     imagem: '/combos/combo-premium.png',
     imagemDestaque: '/combos/combo-premium.png',
-    precos: { P: 144.9, M: 144.9, G: 144.9 },
+    precos: { P: 161, M: 161, G: 161 },
     massas: [],
     adicionais: [],
     comboItens: [
@@ -905,7 +758,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 30,
     imagem: '/combos/combo-familia.png',
     imagemDestaque: '/combos/combo-familia.png',
-    precos: { P: 159.9, M: 159.9, G: 159.9 },
+    precos: { P: 177.6, M: 177.6, G: 177.6 },
     massas: [],
     adicionais: [],
     comboItens: [
@@ -925,7 +778,7 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 38,
     imagem: '/combos/combo-festa.png',
     imagemDestaque: '/combos/combo-festa.png',
-    precos: { P: 249.9, M: 249.9, G: 249.9 },
+    precos: { P: 277.6, M: 277.6, G: 277.6 },
     massas: [],
     adicionais: [],
     comboItens: [
@@ -940,29 +793,57 @@ export const produtos: Produto[] = [
 
 /** Slugs antigos (receitas de massa / molho) → id de produto atual. */
 const slugLegadoParaId: Record<string, string> = {
-  'dom-camilo': 'p33',
-  margherita: 'p1',
+  'dom-camilo': 'p2',
+  margherita: 'p12',
   calabresa: 'p2',
   'esfiha-carne': 'p7',
-  'massa-napoletana': 'p1',
-  'massa-romana-al-teglia': 'p1',
-  /** Antigo pepperoni (p4) — redireciona para pizza salgada genérica do cardápio */
-  'massa-new-york': 'p5',
-  'massa-chicago-deep-dish': 'p5',
+  'massa-napoletana': 'p12',
+  'massa-romana-al-teglia': 'p12',
+  'massa-new-york': 'p4',
+  'massa-chicago-deep-dish': 'p4',
   'massa-detroit': 'p6',
-  /** Antiga moda da casa (ex-p12) */
-  'massa-siciliana': 'p33',
-  'molho-caseiro': 'p1',
-  'romeu-e-julieta': 'p13',
-  'm-m': 'p13',
+  'massa-siciliana': 'p2',
+  'molho-caseiro': 'p12',
+  'romeu-e-julieta': 'p40',
+  'm-m': 'p40',
   'frango-catupiry': 'p6',
   'frango-com-catupiry': 'p6',
-  'carne-seca-cream-cheese': 'p10',
-  'moda-da-casa': 'p33',
+  'carne-seca-cream-cheese': 'p2',
+  'moda-da-casa': 'p2',
   pepperoni: 'p2',
-  /* Pizzas removidas do cardápio */
-  p31: 'p30',
-  'calabresa-com-banana': 'p30',
+  presunto: 'p12',
+  'frango-ao-creme': 'p6',
+  'frango-com-bacon': 'p22',
+  napolitana: 'p2',
+  portuguesa: 'p12',
+  primavera: 'p2',
+  'calabresa-com-bacon': 'p2',
+  'calabresa-com-catupiry': 'p2',
+  'dom-salerno': 'p2',
+  'frango-com-palmito': 'p6',
+  'quatro-queijos': 'p4',
+  vegetariana: 'p12',
+  'carne-de-sol': 'p2',
+  'banana-doce': 'p40',
+  'chocolate-com-morango': 'p39',
+  p1: 'p12',
+  p3: 'p12',
+  p5: 'p4',
+  p8: 'p2',
+  p9: 'p12',
+  p10: 'p2',
+  p13: 'p39',
+  p18: 'p12',
+  p24: 'p6',
+  p25: 'p22',
+  p28: 'p2',
+  p30: 'p2',
+  p31: 'p2',
+  p32: 'p2',
+  p33: 'p2',
+  p34: 'p6',
+  p38: 'p40',
+  'calabresa-com-banana': 'p2',
   p27: 'p26',
   'lombo-com-catupiry': 'p26',
   p14: 'p7',

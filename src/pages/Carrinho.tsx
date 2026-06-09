@@ -1,12 +1,21 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { Link } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { empresa } from '@/data/empresa'
+import { getProdutoPorId, PEDIDO_MINIMO_ESFIHAS } from '@/data/produtos'
 import { brl } from '@/lib/format'
-import { useCart } from '@/stores/useCart'
+import { useCart, type LinhaCarrinho } from '@/stores/useCart'
 import './Carrinho.css'
+
+function subtotalEsfihas(linhas: LinhaCarrinho[]): number {
+  return linhas.reduce((acc, linha) => {
+    const produto = getProdutoPorId(linha.produtoId)
+    if (produto?.categoria !== 'esfihas') return acc
+    return acc + linha.precoUnit * linha.quantidade
+  }, 0)
+}
 
 function AvisoPedidoConteudo() {
   return (
@@ -71,6 +80,9 @@ export function Carrinho() {
     })),
   )
 
+  const totalEsfihas = useMemo(() => subtotalEsfihas(itens), [itens])
+  const esfihasAbaixoMinimo = totalEsfihas > 0 && totalEsfihas < PEDIDO_MINIMO_ESFIHAS
+
   const onLimparCarrinho = useCallback(() => {
     if (!window.confirm('Deseja remover todos os itens do carrinho?')) return
     limparCarrinho()
@@ -115,6 +127,13 @@ export function Carrinho() {
 
   const enviarPedidoWhatsapp = useCallback(() => {
     if (enviandoPedido) return
+    const totalEsfihas = subtotalEsfihas(itens)
+    if (totalEsfihas > 0 && totalEsfihas < PEDIDO_MINIMO_ESFIHAS) {
+      window.alert(
+        `Pedido mínimo de esfihas: ${brl(PEDIDO_MINIMO_ESFIHAS)}. O subtotal em esfihas no carrinho é ${brl(totalEsfihas)}.`,
+      )
+      return
+    }
     setEnviandoPedido(true)
     const linhas = itens
       .map((linha) => {
@@ -174,6 +193,12 @@ export function Carrinho() {
       </nav>
 
       <h1 className="cart-page__titulo">Carrinho</h1>
+
+      {esfihasAbaixoMinimo ? (
+        <p className="cardapio-aviso cart-page__aviso-esfihas" role="alert">
+          Pedido mínimo de esfihas: {brl(PEDIDO_MINIMO_ESFIHAS)}. Subtotal em esfihas: {brl(totalEsfihas)}.
+        </p>
+      ) : null}
 
       {itens.length === 0 ? (
         <div className="empty-state-page cart-page__vazio-bloco">

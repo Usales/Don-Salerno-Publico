@@ -1655,6 +1655,18 @@ button.hero__cattab {
   touch-action: pan-y;
 }
 
+.cardapio-aviso {
+  margin: 0.75rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-alergia-borda);
+  background: var(--color-alergia-bg);
+  color: var(--color-alergia-texto);
+  font-size: 0.9rem;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
 /* Wrapper só organiza o grid; sem caixa própria (fundo vem do main) */
 .menu-panel {
   background: transparent;
