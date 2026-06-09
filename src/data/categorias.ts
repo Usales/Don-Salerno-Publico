@@ -15,3 +15,10 @@ export const categoriasOrdenadas: Categoria[] = [
   'combos',
   'bebidas',
 ]
+
+/** Categorias ocultas nas abas do cardápio (produtos e imagens permanecem no catálogo). */
+const CATEGORIAS_CARDAPIO_OCULTAS: Categoria[] = ['calzones']
+
+export const categoriasCardapioVisiveis: Categoria[] = categoriasOrdenadas.filter(
+  (c) => !CATEGORIAS_CARDAPIO_OCULTAS.includes(c),
+)

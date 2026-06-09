@@ -91,7 +91,6 @@ function heroSlidesParaCategoria(cat: Categoria): HeroSlide[] {
 const HERO_CARD_TABS: { categoria: Categoria; label: string }[] = [
   { categoria: 'pizzas', label: 'Pizza' },
   { categoria: 'esfihas', label: 'Esfihas' },
-  { categoria: 'calzones', label: 'Calzones' },
   { categoria: 'combos', label: 'Combos' },
   { categoria: 'bebidas', label: 'Bebidas' },
 ]

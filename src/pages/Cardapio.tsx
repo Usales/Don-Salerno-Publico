@@ -3,11 +3,11 @@ import { NavLink, Navigate, useNavigate, useParams } from 'react-router-dom'
 import type { Categoria } from '@/types'
 import { CardapioProductCard } from '@/components/CardapioProductCard'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
-import { categoriasOrdenadas, rotulosCategoria } from '@/data/categorias'
+import { categoriasCardapioVisiveis, rotulosCategoria } from '@/data/categorias'
 import { PEDIDO_MINIMO_ESFIHAS, produtos } from '@/data/produtos'
 import { brl } from '@/lib/format'
 
-const validas = categoriasOrdenadas
+const validas = categoriasCardapioVisiveis
 
 /** Mínimo horizontal (px) para contar como swipe; evita troca acidental. */
 const SWIPE_MIN_DX = 56

@@ -1,4 +1,4 @@
-import { categoriasOrdenadas, rotulosCategoria } from './categorias'
+import { categoriasCardapioVisiveis, categoriasOrdenadas, rotulosCategoria } from './categorias'
 
 describe('categorias', () => {
   it('mantém ordem fixa pizzas → esfihas → calzones → combos → bebidas', () => {
@@ -9,6 +9,11 @@ describe('categorias', () => {
       'combos',
       'bebidas',
     ])
+  })
+
+  it('oculta calzones nas abas do cardápio sem remover do catálogo', () => {
+    expect(categoriasCardapioVisiveis).toEqual(['pizzas', 'esfihas', 'combos', 'bebidas'])
+    expect(categoriasOrdenadas).toContain('calzones')
   })
 
   it('expõe rótulos em português', () => {
