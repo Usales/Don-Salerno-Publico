@@ -1,11 +1,10 @@
 import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
-import type { Produto } from '@/types'
-import { brl } from '@/lib/format'
 import { ComboDualImage } from '@/components/ComboDualImage'
+import { brl } from '@/lib/format'
+import { produtoPath } from '@/lib/produtoPath'
 import { useFavorites } from '@/stores/useFavorites'
-
-const produtoPath = (id: string) => `/produto/${id}`
+import type { Produto } from '@/types'
 
 function IconHeart({ filled }: { filled: boolean }) {
   return (
@@ -56,7 +55,7 @@ function IconEye() {
 export function CardapioProductCard({ produto: p }: { produto: Produto }) {
   const favorito = useFavorites((s) => s.isFav(p.id))
   const toggleFav = useFavorites((s) => s.toggle)
-  const to = produtoPath(p.id)
+  const to = produtoPath(p)
 
   const handleToggleFav = useCallback(
     (e: React.MouseEvent) => {
@@ -108,15 +107,6 @@ export function CardapioProductCard({ produto: p }: { produto: Produto }) {
         <IconHeart filled={favorito} />
       </button>
       <div className="pcard__rail" role="group" aria-label="Ações rápidas do item">
-        <button
-          type="button"
-          className={`pcard__rail-btn pcard__rail-btn--heart${favorito ? ' pcard__rail-btn--heart-on' : ''}`}
-          onClick={handleToggleFav}
-          aria-label={favorito ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-          aria-pressed={favorito}
-        >
-          <IconHeart filled={favorito} />
-        </button>
         <Link to={to} className="pcard__rail-btn pcard__rail-btn--ghost" aria-label={`${p.nome} — ver detalhes e pedir`}>
           <IconCart />
         </Link>

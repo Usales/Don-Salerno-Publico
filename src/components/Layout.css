@@ -1908,6 +1908,34 @@ button.hero__cattab {
   white-space: nowrap;
 }
 
+/* Botão flutuante WhatsApp (mobile-first) */
+.whatsapp-float {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 999px;
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(37, 211, 102, 0.45);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.whatsapp-float:hover {
+  background: #1ebe57;
+  transform: scale(1.04);
+}
+
+.whatsapp-float:focus-visible {
+  outline: 2px solid #25d366;
+  outline-offset: 3px;
+}
+
 .receita-medidas tbody tr:last-child td {
   border-bottom: none;
 }

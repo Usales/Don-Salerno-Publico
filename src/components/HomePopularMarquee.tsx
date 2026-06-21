@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import type { Produto } from '@/types'
 import { brl } from '@/lib/format'
+import { produtoPath } from '@/lib/produtoPath'
 import { useInfiniteMarqueeDrag } from '@/hooks/useInfiniteMarqueeDrag'
 
 export function HomePopularMarquee({ items }: { items: Produto[] }) {
@@ -35,7 +36,7 @@ export function HomePopularMarquee({ items }: { items: Produto[] }) {
             return (
               <Link
                 key={p.id}
-                to={`/produto/${p.id}`}
+                to={produtoPath(p)}
                 className="home-pop-card"
                 onClickCapture={onLinkClickCapture}
               >
@@ -63,7 +64,7 @@ export function HomePopularMarquee({ items }: { items: Produto[] }) {
             return (
               <Link
                 key={`${p.id}-dup`}
-                to={`/produto/${p.id}`}
+                to={produtoPath(p)}
                 className="home-pop-card"
                 tabIndex={-1}
                 onClickCapture={onLinkClickCapture}

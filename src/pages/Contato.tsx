@@ -1,4 +1,5 @@
 import { empresa } from '@/data/empresa'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 /** Ponto de referência visível no Google Maps (mercado ao lado do qual ficamos). */
 const PONTO_REFERENCIA_MAPA = 'Armazém Sales, Goiânia, GO, Brasil'
@@ -8,6 +9,7 @@ const MAPA_ABRIR_URL = `https://www.google.com/maps/search/?api=1&query=${encode
 const MAPA_ENDERECO_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(empresa.endereco)}`
 
 export function Contato() {
+  usePageTitle('Contato — Endereço e WhatsApp')
   return (
     <div className="page-section">
       <div className="container" style={{ paddingBottom: '2rem' }}>
@@ -31,7 +33,8 @@ export function Contato() {
         </p>
         <div className="map-embed">
           <iframe
-            title="Mapa: região do Armazém Sales, Goiânia — referência ao lado da Don Salerno"
+            title="Localização Don Salerno"
+            aria-label="Mapa mostrando a localização da Don Salerno em Goiânia"
             src={MAPA_EMBED_URL}
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

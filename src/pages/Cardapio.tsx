@@ -5,6 +5,7 @@ import { CardapioProductCard } from '@/components/CardapioProductCard'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { categoriasCardapioVisiveis, rotulosCategoria } from '@/data/categorias'
 import { PEDIDO_MINIMO_ESFIHAS, produtos } from '@/data/produtos'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { brl } from '@/lib/format'
 
 const validas = categoriasCardapioVisiveis
@@ -17,7 +18,10 @@ const SWIPE_VERTICAL_RATIO = 0.65
 export function Cardapio() {
   const navigate = useNavigate()
   const { categoria } = useParams<{ categoria: string }>()
-  const cat = (categoria?.toLowerCase() as Categoria) || 'pizzas'
+  const catParam = (categoria?.toLowerCase() as Categoria) || 'pizzas'
+  const catOk = validas.includes(catParam)
+  const cat = catOk ? catParam : 'pizzas'
+  usePageTitle(`Cardápio — ${rotulosCategoria[cat]}`)
   const touchStart = useRef<{ x: number; y: number } | null>(null)
   const navCooldown = useRef(false)
 
@@ -60,7 +64,7 @@ export function Cardapio() {
     [cat, navigate],
   )
 
-  if (!categoria || !validas.includes(cat)) {
+  if (!categoria || !catOk) {
     return <Navigate to="/cardapio/pizzas" replace />
   }
 

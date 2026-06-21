@@ -3,6 +3,7 @@ import { CookieBanner } from './CookieBanner'
 import { Footer } from './Footer'
 import { Header } from './Header'
 import { ScrollToTop } from './ScrollToTop'
+import { WhatsAppFloat } from './WhatsAppFloat'
 
 export function Layout() {
   const { pathname } = useLocation()
@@ -22,6 +23,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <WhatsAppFloat />
       <CookieBanner />
     </>
   )

@@ -1,8 +1,10 @@
 import { empresa } from '@/data/empresa'
+import { usePageTitle } from '@/hooks/usePageTitle'
 
 const waUrl = `https://wa.me/${empresa.whatsappDigits}`
 
 export function Privacidade() {
+  usePageTitle('Política de Privacidade (LGPD)')
   return (
     <div className="container" style={{ padding: '2rem 1rem', maxWidth: 720 }}>
       <h1>Política de privacidade (LGPD)</h1>

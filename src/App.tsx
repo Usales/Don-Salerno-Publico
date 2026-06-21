@@ -19,8 +19,9 @@ export default function App() {
           <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="cardapio" element={<Navigate to="/cardapio/pizzas" replace />} />
+            <Route path="cardapio/:categoria/:slug" element={<Produto />} />
             <Route path="cardapio/:categoria" element={<Cardapio />} />
-            <Route path="produto/:id" element={<Produto />} />
+            <Route path="produto/:slug" element={<Produto />} />
             <Route path="carrinho" element={<Carrinho />} />
             <Route path="conta" element={<Conta />} />
             <Route path="sobre" element={<Sobre />} />

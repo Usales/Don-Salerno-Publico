@@ -5,7 +5,9 @@ import { Link } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { empresa } from '@/data/empresa'
 import { getProdutoPorId, PEDIDO_MINIMO_ESFIHAS } from '@/data/produtos'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { brl } from '@/lib/format'
+import { produtoPath } from '@/lib/produtoPath'
 import { useCart, type LinhaCarrinho } from '@/stores/useCart'
 import './Carrinho.css'
 
@@ -51,6 +53,7 @@ function AvisoPedidoConteudo() {
 }
 
 export function Carrinho() {
+  usePageTitle('Carrinho')
   const [mostrarAvisoPedido, setMostrarAvisoPedido] = useState(false)
   const [avisoPedidoLido, setAvisoPedidoLido] = useState(false)
   const [enviandoPedido, setEnviandoPedido] = useState(false)
@@ -235,10 +238,13 @@ export function Carrinho() {
                 </tr>
               </thead>
               <tbody>
-                {itens.map((linha) => (
+                {itens.map((linha) => {
+                  const produtoRef = getProdutoPorId(linha.produtoId)
+                  const linkProduto = produtoRef ? produtoPath(produtoRef) : '/cardapio/pizzas'
+                  return (
                   <tr key={linha.id} className="cart-table__row">
                     <td className="cart-table__td cart-table__td--img">
-                      <Link to={`/produto/${linha.produtoId}`} className="cart-table__img-link">
+                      <Link to={linkProduto} className="cart-table__img-link">
                         <img
                           className="cart-table__img"
                           src={linha.imagem}
@@ -251,7 +257,7 @@ export function Carrinho() {
                       </Link>
                     </td>
                     <td className="cart-table__td">
-                      <Link to={`/produto/${linha.produtoId}`} className="cart-table__nome">
+                      <Link to={linkProduto} className="cart-table__nome">
                         {linha.nome}
                       </Link>
                       <span className="cart-table__tam">
@@ -324,7 +330,8 @@ export function Carrinho() {
                       </button>
                     </td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </div>

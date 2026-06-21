@@ -1,12 +1,14 @@
 import { Fragment, useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { ComboDualImage } from '@/components/ComboDualImage'
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
 import { ProdutoReviews } from '@/components/ProdutoReviews'
 import { rotulosCategoria } from '@/data/categorias'
 import { getProdutoPorId, getProdutosPorCategoria, PEDIDO_MINIMO_ESFIHAS } from '@/data/produtos'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { brl } from '@/lib/format'
+import { produtoPath } from '@/lib/produtoPath'
 import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
 import type { CarrinhoAdicional, ComboSelecao, PartesPizza, TamanhoCodigo } from '@/types'
@@ -27,12 +29,23 @@ function PassoTextoReceita({ texto }: { texto: string }) {
 }
 
 export function Produto() {
-  const { id: idParam } = useParams<{ id: string }>()
-  const p = idParam ? getProdutoPorId(idParam) : undefined
-  const reviewProdutoId = p?.id ?? idParam ?? ''
-  const listaReviews = useReviews(
-    useShallow((s) => s.porProduto(reviewProdutoId)),
-  )
+  const { slug: slugParam } = useParams<{ slug: string; categoria?: string }>()
+  const navigate = useNavigate()
+  const param = slugParam ?? ''
+  const p = param ? getProdutoPorId(param) : undefined
+
+  usePageTitle(p ? `${p.nome} — Cardápio` : 'Produto não encontrado')
+
+  useEffect(() => {
+    if (!p) return
+    const canonical = produtoPath(p)
+    if (window.location.pathname !== canonical) {
+      navigate(canonical, { replace: true })
+    }
+  }, [p, navigate])
+
+  const reviewProdutoId = p?.id ?? param
+  const listaReviews = useReviews(useShallow((s) => s.porProduto(reviewProdutoId)))
 
   const [feedbackCarrinho, setFeedbackCarrinho] = useState(false)
   const adicionarAoCarrinho = useCart((s) => s.adicionar)
@@ -76,47 +89,66 @@ export function Produto() {
     }
   }, [tamanho, tamanhosDisponiveis])
 
+  useEffect(() => {
+    if (!p) return
+    setQtdCompra(1)
+    setPartes('inteira')
+    setSegundoSaborId('')
+    setAdicionalIds([])
+    setComboSelecoes({})
+  }, [p?.id])
+
+  const outrasPizzas = useMemo(() => {
+    if (!p || p.categoria !== 'pizzas') return []
+    return getProdutosPorCategoria('pizzas')
+      .filter((x) => x.id !== p.id)
+      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
+  }, [p])
+
+  const adicionaisSelecionados = useMemo((): CarrinhoAdicional[] => {
+    if (!p) return []
+    const set = new Set(adicionalIds)
+    return p.adicionais.filter((a) => set.has(a.id)).map((a) => ({ id: a.id, nome: a.nome, preco: a.preco }))
+  }, [p, adicionalIds])
+
+  const precoBaseTamanho = useMemo(() => {
+    if (!p) return 0
+    const p1 = p.precos[tamanho]
+    if (partes !== 'meio-meio' || !segundoSaborId) return p1
+    const p2 = getProdutoPorId(segundoSaborId)
+    if (!p2) return p1
+    return Math.max(p1, p2.precos[tamanho])
+  }, [p, tamanho, partes, segundoSaborId])
+
+  const comboIncompleto = useMemo(() => {
+    if (!p?.comboItens?.length) return false
+    return p.comboItens.some((slot) => !comboSelecoes[slot.id])
+  }, [p, comboSelecoes])
+
+  const imagemComboAtiva = useMemo(() => {
+    if (!p || p.categoria !== 'combos' || !p.comboItens?.length) return null
+    const slotPizza = p.comboItens.find((s) => s.opcoesIds.some((oid) => getProdutoPorId(oid)?.categoria === 'pizzas'))
+    if (!slotPizza) return null
+    const selecionadoId = comboSelecoes[slotPizza.id]
+    if (!selecionadoId) return null
+    const pizzaSelecionada = getProdutoPorId(selecionadoId)
+    return pizzaSelecionada?.imagemDestaque ?? pizzaSelecionada?.imagem ?? null
+  }, [p, comboSelecoes])
+
   if (!p) {
     return (
       <div className="container" style={{ padding: '2rem' }}>
         <div className="empty-state-page">
           <EmptyStateMascote alt="Produto não encontrado" />
+          <h1>Página não encontrada</h1>
           <p>Produto não encontrado.</p>
-          <Link to="/cardapio/pizzas">Voltar ao cardápio</Link>
+          <Link to="/">Voltar ao início</Link>
         </div>
       </div>
     )
   }
 
   const produto = p
-
-  useEffect(() => {
-    setQtdCompra(1)
-    setPartes('inteira')
-    setSegundoSaborId('')
-    setAdicionalIds([])
-    setComboSelecoes({})
-  }, [produto.id])
-
-  const outrasPizzas = useMemo(() => {
-    if (produto.categoria !== 'pizzas') return []
-    return getProdutosPorCategoria('pizzas')
-      .filter((x) => x.id !== produto.id)
-      .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-  }, [produto.categoria, produto.id])
-
-  const adicionaisSelecionados = useMemo((): CarrinhoAdicional[] => {
-    const set = new Set(adicionalIds)
-    return produto.adicionais.filter((a) => set.has(a.id)).map((a) => ({ id: a.id, nome: a.nome, preco: a.preco }))
-  }, [produto.adicionais, adicionalIds])
-
-  const precoBaseTamanho = useMemo(() => {
-    const p1 = produto.precos[tamanho]
-    if (partes !== 'meio-meio' || !segundoSaborId) return p1
-    const p2 = getProdutoPorId(segundoSaborId)
-    if (!p2) return p1
-    return Math.max(p1, p2.precos[tamanho])
-  }, [produto, tamanho, partes, segundoSaborId])
 
   const extrasSoma = adicionaisSelecionados.reduce((s, a) => s + a.preco, 0)
   const precoUnitario = Math.round((precoBaseTamanho + extrasSoma) * 100) / 100
@@ -125,25 +157,9 @@ export function Produto() {
   const bloqueadoMeioMeio =
     produto.categoria === 'pizzas' && partes === 'meio-meio' && segundoSaborId.length === 0
 
-  const comboIncompleto = useMemo(() => {
-    if (!produto.comboItens?.length) return false
-    return produto.comboItens.some((slot) => !comboSelecoes[slot.id])
-  }, [produto.comboItens, comboSelecoes])
-
   const bloqueadoCombo = produto.categoria === 'combos' && comboIncompleto
 
   const bloqueado = bloqueadoMeioMeio || bloqueadoCombo
-
-  /** Imagem dinâmica do combo: mostra a pizza selecionada ou a imagem padrão do combo. */
-  const imagemComboAtiva = useMemo(() => {
-    if (produto.categoria !== 'combos' || !produto.comboItens?.length) return null
-    const slotPizza = produto.comboItens.find((s) => s.opcoesIds.some((oid) => getProdutoPorId(oid)?.categoria === 'pizzas'))
-    if (!slotPizza) return null
-    const selecionadoId = comboSelecoes[slotPizza.id]
-    if (!selecionadoId) return null
-    const pizzaSelecionada = getProdutoPorId(selecionadoId)
-    return pizzaSelecionada?.imagemDestaque ?? pizzaSelecionada?.imagem ?? null
-  }, [produto.categoria, produto.comboItens, comboSelecoes])
 
   function toggleAdicional(id: string) {
     setAdicionalIds((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]))

@@ -5,6 +5,7 @@ import { HomeBannersMarquee } from '@/components/HomeBannersMarquee'
 import { HomeMarqueeStrip } from '@/components/HomeMarqueeStrip'
 import { HomePopularMarquee } from '@/components/HomePopularMarquee'
 import { useHeroCarousel, type HeroSlide } from '@/hooks/useHeroCarousel'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { JsonLdRestaurant } from '@/lib/seo'
 import { rotulosCategoria } from '@/data/categorias'
 import { produtos } from '@/data/produtos'
@@ -122,13 +123,14 @@ const banners = [
     title: 'Calzone crocante',
     sub: 'Sabor intenso',
     ctaClass: 'home-banner__cta--red' as const,
-    to: '/produto/c1',
+    to: '/cardapio/calzones/calzone-presunto',
     img: '/home-banner-calzone.png',
     imgAlt: 'Calzone cortado ao meio com pepperoni, mussarela e molho',
   },
 ]
 
 export function Home() {
+  usePageTitle('Home — Pizza Artesanal')
   const [showScrollTop, setShowScrollTop] = useState(false)
   const [heroCategoria, setHeroCategoria] = useState<Categoria>('pizzas')
 

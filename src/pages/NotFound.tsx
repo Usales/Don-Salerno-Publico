@@ -1,7 +1,9 @@
 import { EmptyStateMascote } from '@/components/EmptyStateMascote'
+import { usePageTitle } from '@/hooks/usePageTitle'
 import { Link } from 'react-router-dom'
 
 export function NotFound() {
+  usePageTitle('Página não encontrada')
   return (
     <div className="container" style={{ padding: '3rem 1rem' }}>
       <div className="empty-state-page">
