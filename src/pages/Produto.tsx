@@ -8,6 +8,7 @@ import { rotulosCategoria } from '@/data/categorias'
 import { getProdutoPorId, getProdutosPorCategoria, PEDIDO_MINIMO_ESFIHAS } from '@/data/produtos'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { brl } from '@/lib/format'
+import { precoComboUnitario } from '@/lib/precoCombo'
 import { produtoPath } from '@/lib/produtoPath'
 import { useCart } from '@/stores/useCart'
 import { useReviews } from '@/stores/useReviews'
@@ -113,12 +114,13 @@ export function Produto() {
 
   const precoBaseTamanho = useMemo(() => {
     if (!p) return 0
+    if (p.categoria === 'combos') return precoComboUnitario(p, tamanho, comboSelecoes)
     const p1 = p.precos[tamanho]
     if (partes !== 'meio-meio' || !segundoSaborId) return p1
     const p2 = getProdutoPorId(segundoSaborId)
     if (!p2) return p1
     return Math.max(p1, p2.precos[tamanho])
-  }, [p, tamanho, partes, segundoSaborId])
+  }, [p, tamanho, partes, segundoSaborId, comboSelecoes])
 
   const comboIncompleto = useMemo(() => {
     if (!p?.comboItens?.length) return false
@@ -390,7 +392,9 @@ export function Produto() {
                       <option value="">Escolha o sabor</option>
                       {opcoes.map((op) => (
                         <option key={op!.id} value={op!.id}>
-                          {op!.nome}
+                          {op!.categoria === 'bebidas' && produto.comboPrecoBebidaSeparado
+                            ? `${op!.nome} — ${brl(op!.precos.P)}`
+                            : op!.nome}
                         </option>
                       ))}
                     </select>

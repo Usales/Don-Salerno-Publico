@@ -109,6 +109,8 @@ export interface Produto {
   comboVisual?: { pizza: string; bebida: string }
   /** Combos: slots de seleção (pizza, bebida, etc.) que o cliente deve escolher. */
   comboItens?: ComboItemSlot[]
+  /** Combos: preço base (pizza) + valor da bebida escolhida no slot. */
+  comboPrecoBebidaSeparado?: boolean
   precos: Record<TamanhoCodigo, number>
   massas: OpcaoMassa[]
   adicionais: Adicional[]

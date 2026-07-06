@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { ComboDualImage } from '@/components/ComboDualImage'
 import { brl } from '@/lib/format'
+import { precoComboMinimo } from '@/lib/precoCombo'
 import { produtoPath } from '@/lib/produtoPath'
 import { useFavorites } from '@/stores/useFavorites'
 import type { Produto } from '@/types'
@@ -53,6 +54,7 @@ function IconEye() {
 }
 
 export function CardapioProductCard({ produto: p }: { produto: Produto }) {
+  const precoExibido = p.comboPrecoBebidaSeparado ? precoComboMinimo(p) : p.precos.P
   const favorito = useFavorites((s) => s.isFav(p.id))
   const toggleFav = useFavorites((s) => s.toggle)
   const to = produtoPath(p)
@@ -94,7 +96,7 @@ export function CardapioProductCard({ produto: p }: { produto: Produto }) {
         <p className="pcard__meta">{p.descricao}</p>
         <div className="pcard__preco-block">
           <span className="pcard__preco-label">A partir de</span>
-          <span className="pcard__preco">{brl(p.precos.P)}</span>
+          <span className="pcard__preco">{brl(precoExibido)}</span>
         </div>
       </Link>
       <button

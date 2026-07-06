@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { getProdutoPorId } from '@/data/produtos'
+import { precoComboUnitario } from '@/lib/precoCombo'
 import type { CarrinhoAdicional, CarrinhoSegundoSabor, ComboSelecao, PartesPizza, Produto, TamanhoCodigo } from '@/types'
 
 export interface LinhaCarrinho {
@@ -119,7 +120,10 @@ export const useCart = create<CartState>()(
             ? { ...opcoes.segundoSabor }
             : undefined
         const comboSel = opcoes?.comboSelecoes?.length ? [...opcoes.comboSelecoes] : undefined
-        const base = produto.categoria === 'combos' ? produto.precos[tamanho] : basePrecoPizza(produto, tamanho, segundo)
+        const base =
+          produto.categoria === 'combos'
+            ? precoComboUnitario(produto, tamanho, comboSel)
+            : basePrecoPizza(produto, tamanho, segundo)
         const precoUnit = precoComAdicionais(base, ads)
         const nomeLinha = nomeMeioMeio(produto.nome, segundo)
         const qtdAdd = Math.min(99, Math.max(1, Math.floor(opcoes?.quantidade ?? 1)))
@@ -216,7 +220,10 @@ export const useCart = create<CartState>()(
                 p2 && i.segundoSabor ? { produtoId: p2.id, nome: p2.nome } : undefined
               const partesSync: PartesPizza | undefined =
                 i.partes === 'meio-meio' && !segundoAtual ? 'inteira' : i.partes
-              const base = basePrecoPizza(p, i.tamanho, segundoAtual)
+              const base =
+                p.categoria === 'combos'
+                  ? precoComboUnitario(p, i.tamanho, i.comboSelecoes)
+                  : basePrecoPizza(p, i.tamanho, segundoAtual)
               const nomeAtual = nomeMeioMeio(p.nome, segundoAtual)
               return {
                 ...i,

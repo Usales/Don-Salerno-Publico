@@ -682,7 +682,8 @@ export const produtos: Produto[] = [
     adicionais: adicionaisPadrao,
   },
   // ────────────────────────────────────────────────────────────
-  // COMBOS
+  // COMBOS — base = pizzas com até 30% off; refri somado pelo preço cheio do cardápio
+  // (P 25cm R$ 59,90 · G 35cm R$ 79,90)
   // ────────────────────────────────────────────────────────────
   {
     id: 'cb1',
@@ -695,7 +696,8 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 18,
     imagem: '/combos/combo-individual.png',
     imagemDestaque: '/combos/combo-individual.png',
-    precos: { P: 69.9, M: 69.9, G: 69.9 },
+    precos: { P: 59, M: 59, G: 59 },
+    comboPrecoBebidaSeparado: true,
     massas: [],
     adicionais: [],
     comboItens: [
@@ -714,7 +716,8 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 22,
     imagem: '/combos/combo-casal.png',
     imagemDestaque: '/combos/combo-casal.png',
-    precos: { P: 97.7, M: 97.7, G: 97.7 },
+    precos: { P: 70, M: 70, G: 70 },
+    comboPrecoBebidaSeparado: true,
     massas: [],
     adicionais: [],
     comboItens: [
@@ -732,7 +735,8 @@ export const produtos: Produto[] = [
     alergenos: ['Contém glúten e lactose.'],
     tempoPreparoMin: 25,
     imagem: '/combos/combo-dupla.png',
-    precos: { P: 138.8, M: 138.8, G: 138.8 },
+    precos: { P: 84, M: 84, G: 84 },
+    comboPrecoBebidaSeparado: true,
     massas: [],
     adicionais: [],
     comboItens: [
@@ -752,7 +756,8 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 28,
     imagem: '/combos/combo-premium.png',
     imagemDestaque: '/combos/combo-premium.png',
-    precos: { P: 161, M: 161, G: 161 },
+    precos: { P: 98, M: 98, G: 98 },
+    comboPrecoBebidaSeparado: true,
     massas: [],
     adicionais: [],
     comboItens: [
@@ -772,7 +777,8 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 30,
     imagem: '/combos/combo-familia.png',
     imagemDestaque: '/combos/combo-familia.png',
-    precos: { P: 177.6, M: 177.6, G: 177.6 },
+    precos: { P: 112, M: 112, G: 112 },
+    comboPrecoBebidaSeparado: true,
     massas: [],
     adicionais: [],
     comboItens: [
@@ -792,7 +798,8 @@ export const produtos: Produto[] = [
     tempoPreparoMin: 38,
     imagem: '/combos/combo-festa.png',
     imagemDestaque: '/combos/combo-festa.png',
-    precos: { P: 277.6, M: 277.6, G: 277.6 },
+    precos: { P: 168, M: 168, G: 168 },
+    comboPrecoBebidaSeparado: true,
     massas: [],
     adicionais: [],
     comboItens: [
