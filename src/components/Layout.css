@@ -764,7 +764,7 @@
   height: auto;
 }
 
-/* Bebidas: mesmo palco quadrado que pizza; arte larga (Coca, Gatorade) encaixa com contain, sem palco extra no mobile. */
+/* Bebidas e combos: mesmo palco quadrado que pizza; arte larga encaixa com contain, sem palco extra no mobile. */
 .hero__pizza-stage .hero__pizza.hero__pizza--bebidas-drift {
   width: 100%;
   max-width: 100%;

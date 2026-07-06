@@ -21,7 +21,7 @@ const HERO_PIZZAS_MAX_SLIDES = 10
 const HERO_BEBIDAS_GATORADE_SLIDE_ID = 'hero-bebidas-gatorade'
 const HERO_BEBIDAS_GATORADE_SRC = '/hero-bebidas-gatorade.png'
 
-/** Categorias sem rotação "forno"; calzones usa flutuar próprio; bebidas usa drift suave (ver CSS). */
+/** Categorias sem rotação "forno"; calzones usa flutuar próprio; bebidas/combos usam drift suave (ver CSS). */
 const HERO_CATEGORIAS_VISUAL_ESTATICO: Categoria[] = ['calzones']
 
 function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
@@ -30,7 +30,9 @@ function heroPizzaImgClass(slide: HeroSlide, categoria: Categoria): string {
   if (slide.id.startsWith('placeholder-')) c += ' hero__pizza--empty-mascote'
   if (HERO_CATEGORIAS_VISUAL_ESTATICO.includes(categoria)) c += ' hero__pizza--static'
   if (categoria === 'calzones') c += ' hero__pizza--calzone-float'
-  if (categoria === 'bebidas') c += ' hero__pizza--bebidas-drift'
+  if (categoria === 'bebidas' || categoria === 'combos' || slide.src.includes('/combos/')) {
+    c += ' hero__pizza--bebidas-drift'
+  }
   return c
 }
 
@@ -266,7 +268,7 @@ export function Home() {
               )}
             </div>
             <figcaption
-              className={`hero__pizza-nome${heroCategoria === 'bebidas' ? ' hero__pizza-nome--bebidas' : ''}`}
+              className={`hero__pizza-nome${heroCategoria === 'bebidas' || heroCategoria === 'combos' ? ' hero__pizza-nome--bebidas' : ''}`}
             >
               {captionSlide.nome}
             </figcaption>
