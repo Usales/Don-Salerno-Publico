@@ -1,4 +1,4 @@
-export const WHATSAPP_PIZZARIA = '5562995227774'
+export const WHATSAPP_PIZZARIA = '351912754580'
 
 export type ItemPedido = {
   nome: string
