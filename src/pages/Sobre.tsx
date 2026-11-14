@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { usePageTitle } from '@/hooks/usePageTitle'
 
 export function Sobre() {
@@ -6,9 +7,32 @@ export function Sobre() {
     <div className="page-section">
       <div className="container sobre-page" style={{ maxWidth: 720 }}>
         <h1>Sobre o Don Salerno</h1>
+
+        <figure style={{ margin: '0 0 1.5rem', textAlign: 'center' }}>
+          <img
+            src="/dono.png"
+            alt="Dono da pizzaria Don Salerno"
+            width={240}
+            height={240}
+            loading="eager"
+            decoding="async"
+            style={{
+              width: 'min(240px, 70vw)',
+              height: 'auto',
+              aspectRatio: '1 / 1',
+              objectFit: 'cover',
+              borderRadius: '10%',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.18)',
+            }}
+          />
+          <figcaption style={{ marginTop: '0.75rem', fontSize: '0.95rem', opacity: 0.8 }}>
+            Quem está por trás de cada pizza e cada esfiha
+          </figcaption>
+        </figure>
+
         <p>
           Somos uma pizzaria e esfiharia de Goiânia com raízes italianas e coração brasileiro. Aqui a receita não vem de
-          manual corporativo — vem da cozinha, do forno e do cuidado com cada pedido.
+          manual corporativo: vem da cozinha, do forno e do cuidado com cada pedido.
         </p>
         <p>
           Nossa massa descansa por <strong>48 horas</strong>. Nosso molho é feito todo dia, com tomates selecionados.
@@ -21,7 +45,7 @@ export function Sobre() {
 
         <h2>Nossa cozinha</h2>
         <p>
-          Trabalhamos com processos abertos — da preparação à saída do forno — porque confiança se constrói vendo o
+          Trabalhamos com processos abertos, da preparação à saída do forno, porque confiança se constrói vendo o
           trabalho acontecer.
         </p>
         <p>O que não abrimos mão:</p>
@@ -31,8 +55,30 @@ export function Sobre() {
           <li>Ingredientes selecionados e porções honestas</li>
           <li>Atendimento próximo, como em casa</li>
         </ul>
+
+        <h2>Peça direto com a gente</h2>
+        <p>
+          Faça seu pedido pelo site e ele chega direto no nosso WhatsApp. Sem intermediários: você fala com quem faz a
+          sua pizza.
+        </p>
+        <ul className="sobre-page__lista">
+          <li>
+            <strong>Horário:</strong> todos os dias, das 18h às 23h
+          </li>
+          <li>
+            <strong>Fechado:</strong> às terças-feiras
+          </li>
+          <li>
+            <strong>Retirada:</strong> no balcão da pizzaria (não fazemos entregas)
+          </li>
+        </ul>
         <p>
           O resultado é simples: comida que aquece, cheiro de pizza no ar e a vontade de pedir de novo na semana que vem.
+        </p>
+        <p>
+          <Link to="/cardapio/pizzas" className="btn btn--primario">
+            Ver o cardápio
+          </Link>
         </p>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { empresa } from '@/data/empresa'
 import { getProdutoPorId, PEDIDO_MINIMO_ESFIHAS } from '@/data/produtos'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { brl } from '@/lib/format'
+import { statusDaLoja } from '@/lib/horario'
 import { produtoPath } from '@/lib/produtoPath'
 import { useCart, type LinhaCarrinho } from '@/stores/useCart'
 import './Carrinho.css'
@@ -57,6 +58,7 @@ export function Carrinho() {
   const [mostrarAvisoPedido, setMostrarAvisoPedido] = useState(false)
   const [avisoPedidoLido, setAvisoPedidoLido] = useState(false)
   const [enviandoPedido, setEnviandoPedido] = useState(false)
+  const [statusLoja, setStatusLoja] = useState(() => statusDaLoja())
   const modalRef = useRef<HTMLDivElement>(null)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
   const {
@@ -85,6 +87,20 @@ export function Carrinho() {
 
   const totalEsfihas = useMemo(() => subtotalEsfihas(itens), [itens])
   const esfihasAbaixoMinimo = totalEsfihas > 0 && totalEsfihas < PEDIDO_MINIMO_ESFIHAS
+
+  // Atualiza o status da loja a cada minuto (cliente pode deixar a página aberta)
+  useEffect(() => {
+    const id = window.setInterval(() => setStatusLoja(statusDaLoja()), 60_000)
+    return () => window.clearInterval(id)
+  }, [])
+
+  const checarLojaAberta = useCallback(() => {
+    const loja = statusDaLoja()
+    setStatusLoja(loja)
+    if (loja.aberta) return true
+    window.alert(`${loja.mensagem}\n\nVocê pode montar o pedido agora e enviar quando abrirmos.`)
+    return false
+  }, [])
 
   const onLimparCarrinho = useCallback(() => {
     if (!window.confirm('Deseja remover todos os itens do carrinho?')) return
@@ -130,6 +146,7 @@ export function Carrinho() {
 
   const enviarPedidoWhatsapp = useCallback(() => {
     if (enviandoPedido) return
+    if (!checarLojaAberta()) return
     const totalEsfihas = subtotalEsfihas(itens)
     if (totalEsfihas > 0 && totalEsfihas < PEDIDO_MINIMO_ESFIHAS) {
       window.alert(
@@ -165,6 +182,7 @@ export function Carrinho() {
     let mensagemPedido =
       `Olá, Don Salerno! Segue meu pedido:\n\n${linhas}\n\n` +
       `Subtotal: ${brl(subtotal())}\n` +
+      (descontoValor() > 0 ? `Desconto: -${brl(descontoValor())}\n` : '') +
       `Total: ${brl(total())}`
     if (obs) {
       mensagemPedido += `\n\nObservações / detalhes do pedido:\n${obs}`
@@ -172,22 +190,35 @@ export function Carrinho() {
     mensagemPedido += '\n\nObrigado!'
     const waUrl = `https://wa.me/${empresa.whatsappDigits}?text=${encodeURIComponent(mensagemPedido)}`
 
-    const win = window.open(waUrl, '_blank', 'noopener,noreferrer')
-    if (win != null) {
+    // Sem 'noopener' na string de features: com ele o navegador devolve sempre null
+    // e o carrinho nunca seria limpo. A proteção equivalente é feita com win.opener = null.
+    const win = window.open(waUrl, '_blank')
+    if (win) {
+      win.opener = null
       limparCarrinho()
       setAvisoPedidoLido(false)
     }
     // Cooldown de 2s para evitar múltiplos envios
     window.setTimeout(() => setEnviandoPedido(false), 2000)
-  }, [itens, limparCarrinho, observacaoPedido, subtotal, total, enviandoPedido])
+  }, [
+    itens,
+    limparCarrinho,
+    observacaoPedido,
+    subtotal,
+    descontoValor,
+    total,
+    enviandoPedido,
+    checarLojaAberta,
+  ])
 
   const onEnviarPedido = useCallback(() => {
+    if (!checarLojaAberta()) return
     if (!avisoPedidoLido) {
       setMostrarAvisoPedido(true)
       return
     }
     enviarPedidoWhatsapp()
-  }, [avisoPedidoLido, enviarPedidoWhatsapp])
+  }, [avisoPedidoLido, enviarPedidoWhatsapp, checarLojaAberta])
 
   return (
     <div className="cart-page container">
@@ -196,6 +227,12 @@ export function Carrinho() {
       </nav>
 
       <h1 className="cart-page__titulo">Carrinho</h1>
+
+      {!statusLoja.aberta ? (
+        <p className="cardapio-aviso" role="status">
+          {statusLoja.mensagem} Você pode montar o pedido agora e enviar quando abrirmos.
+        </p>
+      ) : null}
 
       {esfihasAbaixoMinimo ? (
         <p className="cardapio-aviso cart-page__aviso-esfihas" role="alert">

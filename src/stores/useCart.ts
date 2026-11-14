@@ -96,7 +96,11 @@ function precoComAdicionais(base: number, ads: CarrinhoAdicional[] | undefined):
   return Math.round((base + extra) * 100) / 100
 }
 
-/** Cupons demo (maiúsculas/minúsculas ignoradas). */
+/**
+ * Cupons (maiúsculas/minúsculas ignoradas).
+ * ATENÇÃO: este código vai para o navegador do cliente, então qualquer pessoa consegue ler
+ * os cupons abaixo. Se eram só de teste, apague as linhas e deixe apenas `return null`.
+ */
 function resolverCupom(codigo: string): CupomAplicado | null {
   const c = codigo.trim().toUpperCase()
   if (c === 'SALERNO10' || c === 'DON10') return { codigo: c, percentual: 10 }
@@ -241,7 +245,8 @@ export const useCart = create<CartState>()(
 
       totalItens: () => get().itens.reduce((acc, i) => acc + i.quantidade, 0),
 
-      subtotal: () => get().itens.reduce((acc, i) => acc + i.precoUnit * i.quantidade, 0),
+      subtotal: () =>
+        Math.round(get().itens.reduce((acc, i) => acc + i.precoUnit * i.quantidade, 0) * 100) / 100,
 
       descontoValor: () => {
         const sub = get().subtotal()
@@ -257,6 +262,15 @@ export const useCart = create<CartState>()(
     }),
     {
       name: 'don-salerno-cart',
+      // Ao mudar o formato de LinhaCarrinho no futuro, suba este número
+      // e os carrinhos antigos salvos nos celulares serão descartados.
+      version: 1,
+      // Salva só os dados (as funções do store não vão para o localStorage).
+      partialize: (s) => ({
+        itens: s.itens,
+        cupomAplicado: s.cupomAplicado,
+        observacaoPedido: s.observacaoPedido,
+      }),
       onRehydrateStorage: () => {
         return (state) => {
           if (state) state.sincronizarPrecos()
