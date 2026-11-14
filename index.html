@@ -1,20 +1,36 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta
-      name="description"
-      content="Don Salerno — pizzaria e esfiharia artesanal. Pizzas, esfihas, sobremesas e bebidas. Cardápio e contato."
-    />
-    <meta name="theme-color" content="#ea1d2c" />
-    <link rel="icon" type="image/png" href="/logo.png" />
-    <link rel="apple-touch-icon" href="/logo.png" />
-    <link rel="manifest" href="/manifest.json" />
-    <title>Don Salerno — Pizzaria &amp; Esfiharia</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <link rel="canonical" href="https://[SEU-DOMINIO]/" />
+  <meta property="og:type" content="restaurant.restaurant" />
+  <meta property="og:title" content="Don Salerno — Pizzaria & Esfiharia" />
+  <meta property="og:description" content="Pizzas e esfihas artesanais. Faça seu pedido e retire no balcão." />
+  <meta property="og:image" content="https://[SEU-DOMINIO]/logo.png" />
+  <meta property="og:locale" content="pt_BR" />
+  <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Restaurant",
+  "name": "Don Salerno",
+  "servesCuisine": ["Pizza", "Esfiha"],
+  "url": "https://[SEU-DOMINIO]/",
+  "telephone": "[TELEFONE]",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "[RUA E NÚMERO]",
+    "addressLocality": "Goiânia",
+    "addressRegion": "GO",
+    "addressCountry": "BR"
+  },
+  "openingHours": "Mo,We-Su 18:30-23:00"
+}
+</script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
